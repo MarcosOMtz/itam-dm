@@ -1,0 +1,106 @@
+---
+title: "Algas y calidad de agua"
+author: "Andrea Garcia, Edwin Chazaro, Andrea Fernández"
+date: "17/11/2014"
+output: html_document
+---
+
+## Introduccion
+
+Esta base de datos contiene relaciones entre concentraciones de algas y niveles quimicos. Los datos vienen de muestras de diferentes sitios en rios de diferentes ciudades Europeas tomadas en un periodo de 1 ano.
+
+Vienen concentraciones de: nitrogeno en forma de nitratos y nitritos, amonia, fosfatos, ph, nivel de oxigeno y nivel de cloro.
+
+```{r, echo=FALSE, warning=FALSE, error=FALSE, message=FALSE}
+library(ggplot2)
+library(knitr)
+library(corrplot)
+library(GGally)
+library(graphics)
+source('../utils_na.r')
+source('../utils.r', chdir=TRUE)
+
+algas <- read.table('../../../../data/algas/algas.txt',
+                    header=FALSE,
+                    dec=".",
+                    na.strings = "XXXXXXX",
+                    strip.white = TRUE,
+                    col.names = c('temporada', 'tamaño', 'velocidad', 'mxPH',
+                                  'mnO2', 'Cl', 'NO3', 'NO4', 'oPO4', 'PO4',
+                                  'Chla', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7'))
+names(algas) <- tolower(names(algas))
+```
+
+## Sumario estadistico
+
+```{r}
+summary(algas)
+```
+
++ Notamos que tenemos varios valores faltantes. 
+
+
+## Tratamiento de NAs
+
+```{r, eval=FALSE}
+#numero de NAs por variable
+tabla <- as.data.frame(cbind(names(sapply(algas, FUN=suma)),sapply(algas, FUN=suma)), row.names=FALSE)
+names(tabla) <- c("Variable","Valores perdidos")
+kable(tabla)
+
+#porcentaje de NAs por columna
+tabla <- as.data.frame(cbind(names(sapply(algas, FUN=prom)),sapply(algas, FUN=prom)), row.names=FALSE)
+names(tabla) <- c("Variable","% perdidos")
+kable(tabla)
+
+#grafica de correlacion de NAs
+graf_corr(algas)
+
+#observaciones con mas de 2 nas
+kable(obs_nas(algas,1), row.names=FALSE)
+
+# #Para quedarse con las observaciones que tienen menos de X% de NAs
+# algas <- elimina(algas, 0.2)
+# 
+# #Para rellenar con tendencia central
+# algas$chla<-imputarValorCentral(algas$chla)
+# 
+# #Para rellenar con regresion
+# algas <- elimina(algas, 0.2)
+# lm(po4 ~ opo4, data=algas)
+# algas$po4 <- imputaRegresion(algas$po4,algas$opo4,42.897,1.293)
+# algas$opo4
+# 
+# ggplot(data=algas) + 
+#   aes(x=opo4, y=po4) + 
+#   geom_point(shape=1) + # Usamos una bolita para los puntos
+#   geom_smooth(method=lm, se=FALSE) 
+
+````
+
+Prueba de plots varios
+
+```{r}
+source('../two_plots.r')
+two_plots(algas)
+
+```
+ 
+Histogramas por cada variable 
+```{r, eval=FALSE}
+
+ggpairs(algas[,1:6], colour = 'tamaño' ) 
+ggpairs(algas[,7:12], colour = 'tamaño' ) 
+ggpairs(algas[,12:18], colour = 'tamaño' ) 
+
+```
+
+Utilizamos nuestra funcion en utils para hacer el grafico correspondiente para cada variable del dataframe.
+```{r}
+# Una por una (18) variables
+# primero pregunta si es la clase y dependiendo de ella  eliges el tipo de gráfica
+# idedntificar picos, medianas 
+
+sapply(algas,FUN=graficas)
+
+```

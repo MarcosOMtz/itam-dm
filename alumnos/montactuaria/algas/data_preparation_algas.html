@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Introducción</title>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: #990073
+   }
+
+   pre .number {
+     color: #099;
+   }
+
+   pre .comment {
+     color: #998;
+     font-style: italic
+   }
+
+   pre .keyword {
+     color: #900;
+     font-weight: bold
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: #d14;
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Introducción</h1>
+
+<p>Nuestro archivo a explorar procede del repositorio UCI Machine Learning Repository.
+Datos que evaluan caraterísticas de cierto tipo de algas en alguna región de USA.</p>
+
+<h2>Variables</h2>
+
+<p>Nuestro dataset está compuesto de 200 observarciones en 18 variables. 3 de las variables son categóricas y 15 son numércias. 8 de las variables numéricas presneta NAs. </p>
+
+<p>Las categóricas son : Temporada, tamaño, velocidad.
+Algunas numércias son: mxPH, Cl, NO3, NO4, oP4, PO4, etc.</p>
+
+<h1>Estructura General</h1>
+
+<pre><code class="r">ds
+</code></pre>
+
+<pre><code>## Source: local data frame [200 x 18]
+## 
+##    temporada tamaño velocidad mxPH mnO2    Cl    NO3    NO4   oPO4    PO4
+## 1     winter  small    medium 8.00  9.8 60.80  6.238 578.00 105.00 170.00
+## 2     spring  small    medium 8.35  8.0 57.75  1.288 370.00 428.75 558.75
+## 3     autumn  small    medium 8.10 11.4 40.02  5.330 346.67 125.67 187.06
+## 4     spring  small    medium 8.07  4.8 77.36  2.302  98.18  61.18 138.70
+## 5     autumn  small    medium 8.06  9.0 55.35 10.416 233.70  58.22  97.58
+## 6     winter  small      high 8.25 13.1 65.75  9.248 430.00  18.25  56.67
+## 7     summer  small      high 8.15 10.3 73.25  1.535 110.00  61.25 111.75
+## 8     autumn  small      high 8.05 10.6 59.07  4.990 205.67  44.67  77.43
+## 9     winter  small    medium 8.70  3.4 21.95  0.886 102.75  36.30  71.00
+## 10    winter  small      high 7.93  9.9  8.00  1.390   5.80  27.25  46.60
+## ..       ...    ...       ...  ...  ...   ...    ...    ...    ...    ...
+## Variables not shown: Chla (dbl), a1 (dbl), a2 (dbl), a3 (dbl), a4 (dbl),
+##   a5 (dbl), a6 (dbl), a7 (dbl)
+</code></pre>
+
+<h2>Tamaño</h2>
+
+<pre><code class="r">dim(ds)
+</code></pre>
+
+<pre><code>## [1] 200  18
+</code></pre>
+
+<h2>Columnas</h2>
+
+<pre><code class="r">names(ds)
+</code></pre>
+
+<pre><code>##  [1] &quot;temporada&quot; &quot;tamaño&quot;    &quot;velocidad&quot; &quot;mxPH&quot;      &quot;mnO2&quot;     
+##  [6] &quot;Cl&quot;        &quot;NO3&quot;       &quot;NO4&quot;       &quot;oPO4&quot;      &quot;PO4&quot;      
+## [11] &quot;Chla&quot;      &quot;a1&quot;        &quot;a2&quot;        &quot;a3&quot;        &quot;a4&quot;       
+## [16] &quot;a5&quot;        &quot;a6&quot;        &quot;a7&quot;
+</code></pre>
+
+<h2>Estructura</h2>
+
+<pre><code class="r">str(ds)
+</code></pre>
+
+<pre><code>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    200 obs. of  18 variables:
+##  $ temporada: Factor w/ 4 levels &quot;autumn&quot;,&quot;spring&quot;,..: 4 2 1 2 1 4 3 1 4 4 ...
+##  $ tamaño   : Factor w/ 3 levels &quot;large&quot;,&quot;medium&quot;,..: 3 3 3 3 3 3 3 3 3 3 ...
+##  $ velocidad: Factor w/ 3 levels &quot;high&quot;,&quot;low&quot;,&quot;medium&quot;: 3 3 3 3 3 1 1 1 3 1 ...
+##  $ mxPH     : num  8 8.35 8.1 8.07 8.06 8.25 8.15 8.05 8.7 7.93 ...
+##  $ mnO2     : num  9.8 8 11.4 4.8 9 13.1 10.3 10.6 3.4 9.9 ...
+##  $ Cl       : num  60.8 57.8 40 77.4 55.4 ...
+##  $ NO3      : num  6.24 1.29 5.33 2.3 10.42 ...
+##  $ NO4      : num  578 370 346.7 98.2 233.7 ...
+##  $ oPO4     : num  105 428.8 125.7 61.2 58.2 ...
+##  $ PO4      : num  170 558.8 187.1 138.7 97.6 ...
+##  $ Chla     : num  50 1.3 15.6 1.4 10.5 ...
+##  $ a1       : num  0 1.4 3.3 3.1 9.2 15.1 2.4 18.2 25.4 17 ...
+##  $ a2       : num  0 7.6 53.6 41 2.9 14.6 1.2 1.6 5.4 0 ...
+##  $ a3       : num  0 4.8 1.9 18.9 7.5 1.4 3.2 0 2.5 0 ...
+##  $ a4       : num  0 1.9 0 0 0 0 3.9 0 0 2.9 ...
+##  $ a5       : num  34.2 6.7 0 1.4 7.5 22.5 5.8 5.5 0 0 ...
+##  $ a6       : num  8.3 0 0 0 4.1 12.6 6.8 8.7 0 0 ...
+##  $ a7       : num  0 2.1 9.7 1.4 1 2.9 0 0 0 1.7 ...
+</code></pre>
+
+<p><em>NOTA: Indicar si hay una discrepancia entre las clases de las variables en el data set y en su significado, i.e. fechas que no son fechas, si no factores, etc.</em></p>
+
+<h2>Observaciones</h2>
+
+<pre><code class="r">head(ds)
+</code></pre>
+
+<pre><code>## Source: local data frame [6 x 18]
+## 
+##   temporada tamaño velocidad mxPH mnO2    Cl    NO3    NO4   oPO4    PO4
+## 1    winter  small    medium 8.00  9.8 60.80  6.238 578.00 105.00 170.00
+## 2    spring  small    medium 8.35  8.0 57.75  1.288 370.00 428.75 558.75
+## 3    autumn  small    medium 8.10 11.4 40.02  5.330 346.67 125.67 187.06
+## 4    spring  small    medium 8.07  4.8 77.36  2.302  98.18  61.18 138.70
+## 5    autumn  small    medium 8.06  9.0 55.35 10.416 233.70  58.22  97.58
+## 6    winter  small      high 8.25 13.1 65.75  9.248 430.00  18.25  56.67
+## Variables not shown: Chla (dbl), a1 (dbl), a2 (dbl), a3 (dbl), a4 (dbl),
+##   a5 (dbl), a6 (dbl), a7 (dbl)
+</code></pre>
+
+<pre><code class="r">tail(ds)
+</code></pre>
+
+<pre><code>## Source: local data frame [6 x 18]
+## 
+##   temporada tamaño velocidad mxPH mnO2     Cl   NO3    NO4  oPO4    PO4
+## 1    summer  large    medium  8.5  7.9  12.44 2.586  96.67 19.11  61.44
+## 2    autumn  large    medium  8.4  8.4  17.38 3.833  83.75 53.62  79.75
+## 3    spring  large    medium  8.3 10.6  14.32 3.200 125.33 35.33  75.90
+## 4    autumn  large    medium  8.2  7.0 139.99 2.978  60.11 78.33 140.22
+## 5    winter  large    medium  8.0  7.6     NA    NA     NA    NA     NA
+## 6    summer  large    medium  8.5  6.7  82.85 2.800  27.07 64.00 140.52
+## Variables not shown: Chla (dbl), a1 (dbl), a2 (dbl), a3 (dbl), a4 (dbl),
+##   a5 (dbl), a6 (dbl), a7 (dbl)
+</code></pre>
+
+<h1>Sumario Estadístico</h1>
+
+<pre><code class="r">summary(ds)
+</code></pre>
+
+<pre><code>##   temporada     tamaño    velocidad       mxPH           mnO2      
+##  autumn:40   large :45   high  :84   Min.   :5.60   Min.   : 1.50  
+##  spring:53   medium:84   low   :33   1st Qu.:7.70   1st Qu.: 7.72  
+##  summer:45   small :71   medium:83   Median :8.06   Median : 9.80  
+##  winter:62                           Mean   :8.01   Mean   : 9.12  
+##                                      3rd Qu.:8.40   3rd Qu.:10.80  
+##                                      Max.   :9.70   Max.   :13.40  
+##                                      NA&#39;s   :1      NA&#39;s   :2      
+##        Cl             NO3             NO4             oPO4      
+##  Min.   :  0.2   Min.   : 0.05   Min.   :    5   Min.   :  1.0  
+##  1st Qu.: 11.0   1st Qu.: 1.30   1st Qu.:   38   1st Qu.: 15.7  
+##  Median : 32.7   Median : 2.67   Median :  103   Median : 40.1  
+##  Mean   : 43.6   Mean   : 3.28   Mean   :  501   Mean   : 73.6  
+##  3rd Qu.: 57.8   3rd Qu.: 4.45   3rd Qu.:  227   3rd Qu.: 99.3  
+##  Max.   :391.5   Max.   :45.65   Max.   :24064   Max.   :564.6  
+##  NA&#39;s   :10      NA&#39;s   :2       NA&#39;s   :2       NA&#39;s   :2      
+##       PO4             Chla              a1              a2       
+##  Min.   :  1.0   Min.   :  0.20   Min.   : 0.00   Min.   : 0.00  
+##  1st Qu.: 41.4   1st Qu.:  2.00   1st Qu.: 1.50   1st Qu.: 0.00  
+##  Median :103.3   Median :  5.47   Median : 6.95   Median : 3.00  
+##  Mean   :137.9   Mean   : 13.97   Mean   :16.92   Mean   : 7.46  
+##  3rd Qu.:213.8   3rd Qu.: 18.31   3rd Qu.:24.80   3rd Qu.:11.38  
+##  Max.   :771.6   Max.   :110.46   Max.   :89.80   Max.   :72.60  
+##  NA&#39;s   :2       NA&#39;s   :12                                      
+##        a3              a4              a5              a6       
+##  Min.   : 0.00   Min.   : 0.00   Min.   : 0.00   Min.   : 0.00  
+##  1st Qu.: 0.00   1st Qu.: 0.00   1st Qu.: 0.00   1st Qu.: 0.00  
+##  Median : 1.55   Median : 0.00   Median : 1.90   Median : 0.00  
+##  Mean   : 4.31   Mean   : 1.99   Mean   : 5.06   Mean   : 5.96  
+##  3rd Qu.: 4.92   3rd Qu.: 2.40   3rd Qu.: 7.50   3rd Qu.: 6.92  
+##  Max.   :42.80   Max.   :44.60   Max.   :44.40   Max.   :77.60  
+##                                                                 
+##        a7      
+##  Min.   : 0.0  
+##  1st Qu.: 0.0  
+##  Median : 1.0  
+##  Mean   : 2.5  
+##  3rd Qu.: 2.4  
+##  Max.   :31.6  
+## 
+</code></pre>
+
+<h1>Limpieza de metadatos</h1>
+
+<pre><code class="r">source(&quot;~/itam-dm/alumnos/jtmancilla/german/utils.r&quot;)
+</code></pre>
+
+<pre><code>## -------------------------------------------------------------------------
+## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)
+## -------------------------------------------------------------------------
+## 
+## Attaching package: &#39;plyr&#39;
+## 
+## The following object is masked from &#39;package:lubridate&#39;:
+## 
+##     here
+## 
+## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize
+</code></pre>
+
+<pre><code class="r"># Usaremos la función que hiciste de ejercicio
+names(ds) &lt;- normalizarNombres(names(ds))
+</code></pre>
+
+<p>Además de normalizar los nombres de variables, este es el lugar para poner nombres que tengan significado como que la columna que tenga datos de fecha, se llame <code>fecha</code> o <code>date</code>.</p>
+
+<pre><code class="r">names(ds)
+</code></pre>
+
+<pre><code>##  [1] &quot;temporada&quot; &quot;tamaño&quot;    &quot;velocidad&quot; &quot;mx.ph&quot;     &quot;mn.o2&quot;    
+##  [6] &quot;cl&quot;        &quot;no3&quot;       &quot;no4&quot;       &quot;o.po4&quot;     &quot;po4&quot;      
+## [11] &quot;chla&quot;      &quot;a1&quot;        &quot;a2&quot;        &quot;a3&quot;        &quot;a4&quot;       
+## [16] &quot;a5&quot;        &quot;a6&quot;        &quot;a7&quot;
+</code></pre>
+
+<h1>Ajuste de formatos</h1>
+
+<p>Las clases de las variables son</p>
+
+<pre><code class="r">sapply(ds, class)
+</code></pre>
+
+<pre><code>## temporada    tamaño velocidad     mx.ph     mn.o2        cl       no3 
+##  &quot;factor&quot;  &quot;factor&quot;  &quot;factor&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; 
+##       no4     o.po4       po4      chla        a1        a2        a3 
+## &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; 
+##        a4        a5        a6        a7 
+## &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot;
+</code></pre>
+
+<p>En esta sección arreglamos los formatos de los datos. Un ejemplo típico son las fechas.</p>
+
+<p>Otros problemas con variables son: categóricas/numéricas que no lo son, booleanas que no lo son, ordenar variables nominales, reetiquetar las variables categóricas, etc.</p>
+
+<p>Para arreglar las fechas, utiliza el paquete <code>lubridate</code>.</p>
+
+<p>El formato de fechas debe de ser <code>YMD</code> y si es <code>timestamp</code> debe de serlo hasta la precisión que den los datos, no más, no menos.</p>
+
+<p><em>NOTA: Es recomendable hacer todas las transformaciones en un solo <code>mutate</code> y no una por una (a menos que haya problemas de memoria, y hay que usar otras técnicas).</em></p>
+
+<p>Así quedan las variables corregidas:</p>
+
+<pre><code class="r">sapply(ds, class) 
+</code></pre>
+
+<pre><code>## temporada    tamaño velocidad     mx.ph     mn.o2        cl       no3 
+##  &quot;factor&quot;  &quot;factor&quot;  &quot;factor&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; 
+##       no4     o.po4       po4      chla        a1        a2        a3 
+## &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; 
+##        a4        a5        a6        a7 
+## &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot;
+</code></pre>
+
+<h1>Transformación de variables</h1>
+
+<p>En esta sección incluímos la transformación de las variables necesarias (normalización, estandarización, <em>binning</em>, <code>log</code>, etc.)</p>
+
+<p><em>NOTA: Es recomendable hacer todas las transformaciones en un solo <code>mutate</code> y no una por una (a menos que haya problemas de memoria, y hay que usar otras técnicas).</em></p>
+
+<h1>Identificación de variables</h1>
+
+<pre><code class="r"># Aplicando Normalización:
+
+normalizar  &lt;- function(data){
+    df  &lt;- data.frame()
+    for (n in 1:ncol(data)){
+            if(class(data[,n])==&quot;numeric&quot;){
+                data$n  &lt;- (data[,n]-mean(data[,n],na.rm=T))/sd(data[,n],na.rm=T)
+
+            }
+    }
+}
+
+
+normalizar(ds)
+</code></pre>
+
+<pre><code>## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: the condition has length &gt; 1 and only the first element will be used
+</code></pre>
+
+<pre><code class="r">vars &lt;- names(ds) # Guardamos los nombres de variables
+
+
+
+target &lt;- &quot;tamaño&quot; # Si el modelo es supervisado
+#risk &lt;- &quot;&quot; # Si se proveé, es la importancia de la observación respecto a la variable (es una variable de salida)
+#costo &lt;- &quot;&quot; # Costo de equivocarse en la predicción (Si se proveé) (es una variable de salida)
+id &lt;- vars # Armar una id con columnas, o seleccionar el id del dataset
+</code></pre>
+
+<h1>Recodificación</h1>
+
+<p>No aplica para este caso..</p>
+
+<p>Antes de pasar a la etapa de ignorar variables, es importante <strong>recodificar</strong>. </p>
+
+<ul>
+<li><p>Hay métodos como el  <code>randomForest</code> que no soporta variables categóricas con más de 32 niveles, habría que agruparlos (e.g. si son países se pueden reagrupar por región, similitud -esto requiere otra base de datos, etc.)</p></li>
+<li><p>Si las fechas son <code>timestamp</code> hay que extraer variables categóricas como <code>mes</code>, <code>día.de.la.semana</code>, <code>fin.de.semana</code>, <code>temporada</code>, etc. claro que depende del tipo del problema al que nos estemos enfrentando.</p></li>
+</ul>
+
+<h1>Variables a ignorar</h1>
+
+<p>No aplicaca en este caso..</p>
+
+<p>Identificamos en una variable, las columnas a ignorar en el entrenamiento del modelo.</p>
+
+<h3>IDs y variables de salida</h3>
+
+<pre><code class="r">vars.a.ignorar &lt;- id #union(id,if (exists(&quot;risk&quot;)) risk, if (exists(&quot;costo&quot;)) costo)
+</code></pre>
+
+<h3>Constantes y valores únicos por observación</h3>
+
+<pre><code class="r"># Ignoramos las que tengan un único valor por cada observación, pueden ser IDs
+# IMPORTANTE: Esto puede eliminar fechas, ver sección anterior
+
+ids &lt;- names(which(sapply(ds, function(x) length(unique(x)) == nrow(ds))))
+
+# Ignoramos los factores que tengan muchos niveles
+# IMPORTANTE: ver sección anterior
+
+factors &lt;- which(sapply(ds[vars], is.factor))
+niveles &lt;- sapply(factors, function(x) length(levels(ds[[x]])))
+(muchos.niveles &lt;- names(which(niveles &gt; 20)))
+
+vars.a.ignorar &lt;- union(vars.a.ignorar, muchos.niveles)
+
+# Constantes
+constantes &lt;- names(which(sapply(ds[vars], function(x) all(x == x[1L]))))
+
+var.a.ignorar &lt;- union(vars.a.ignorar, ids, constantes)
+</code></pre>
+
+<h3>Faltantes</h3>
+
+<pre><code class="r"># Las que sean puros NAs
+ids.nas.count &lt;- sapply(ds[vars], function(x) sum(is.na(x)))
+ids.nas &lt;- names(which(ids.nas.count == nrow(ds)))
+
+vars.a.ignorar &lt;- ids.nas #union(ids.nas, vars.a.ignorar)
+
+# Las que tengan muchos NAs (un 70% o más)
+ids.many.nas &lt;- names(which(ids.nas.count &gt;= 0.7*nrow(ds)))
+
+vars.a.ignorar &lt;- union(ids.many.nas, vars.a.ignorar)
+</code></pre>
+
+<h3>Variable de salida (<code>target</code>)</h3>
+
+<p>Si el problema de minado, es supervisado, removemos las observaciones que tengan <code>NA</code> en la variable <code>target</code></p>
+
+<pre><code class="r">dim(ds)
+</code></pre>
+
+<pre><code>## [1] 200  18
+</code></pre>
+
+<pre><code class="r">ds &lt;- ds[!is.na(ds[target]),]
+dim(ds)
+</code></pre>
+
+<pre><code>## [1] 200  18
+</code></pre>
+
+<p>Si el problema es de clasificación, hay que convertir la variable <code>target</code> a categórica.</p>
+
+<pre><code class="r">ds[target] &lt;- as.factor(ds[[target]])
+table(ds[target])
+</code></pre>
+
+<pre><code>## 
+##  large medium  small 
+##     45     84     71
+</code></pre>
+
+<p>Mostramos la distribución (esto nos indicará si el problema no está balanceado)</p>
+
+<pre><code class="r">ggplot(data=ds, aes_string(x=target)) + geom_bar(width=0.3)
+</code></pre>
+
+<p><img src="data:image/png;base64,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F3vyfX3/X0rcq9+0adPoavX29oaenp7R267kKaBHefYl16psL7l2Js+6bC9pfWl6wK9evboI9mq5kydPDuvWrQtTp04t7rruuuvCkiVLqr8O++23XzjvvPNGb3fblQcffLDbVtn6NiBge2kArwuH2l7yb/ratWuTi2x6wPf394cNGzaMFhz31gcGBkZvn3zyyeGkk04avR2fuT366KOjt11pTGDatGnFEZI1a9Y0tiCju0Ig/t+Ml1WrVnXF+lrJxgQmTJhQHKFdsWJFYwsyelRgcHAw7LjjjqO367nS9NfgZ8yYEZ544olQqVRCPDwff1YPz1cLjxtJ9eLQTFXFTwIECBAgsP0CTd+D32mnncKsWbPCwoULQzz0MG/evO2v1pwECBAgQIDAdgk0PeBjVXPmzAmzZ88e3UvfrkrNRIAAAQIECGy3QEsCPla3+WH57a7YjAQIECBAgMA2BZr+Gvw2KzIDAQIECBAg0LCAgG+Y0AIIECBAgEB+AgI+v56oiAABAgQINCwg4BsmtAACBAgQIJCfgIDPrycqIkCAAAECDQsI+IYJLYAAAQIECOQnIODz64mKCBAgQIBAwwICvmFCCyBAgAABAvkJCPj8eqIiAgQIECDQsICAb5jQAggQIECAQH4CAj6/nqiIAAECBAg0LCDgGya0AAIECBAgkJ+AgM+vJyoiQIAAAQINCwj4hgktgAABAgQI5Ccg4PPriYoIECBAgEDDAj2VkanhpVhA2wj87Gc/C9OnTw9vfOMb26ZmhbZO4O677w5/+MMfwumnn966Ijxy2wisXbs2XHjhheErX/lK29TcyYXag+/k7o6xbhs3bgzDw8Nj/MZdBLYUeO6550LcZkwEtkcg7i9u2LBhe2Y1TxMEBHwTkD0EAQIECBBotoCAb7a4xyNAgAABAk0Q8Bp8E5BzeojHH3889Pf3h9122y2nstSSqcDq1atDvOy7776ZVqisnATiy38PPPBAOOyww3Iqq2trEfBd23orToAAAQKdLOAQfSd317oRIECAQNcKCPiubb0VJ0CAAIFOFhDwHdLd+FnlW2+9tUPWxmrkJPCtb32rKOeqq64Kf//733MqTS1tJvDUU0+FH//4x0XVF198cZtV337lCvj269mYFcfPnq5fv370d/HNLps2bRq9Ha/EzzQ///zzo/fF25tPY923+Txut59A3B6q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" alt="plot of chunk unnamed-chunk-23"/> </p>
+
+<h1>Variables correlacionadas</h1>
+
+<pre><code class="r">vars.cor &lt;- cor(ds[which(sapply(ds, is.numeric))], use=&quot;complete.obs&quot;)
+vars.cor[upper.tri(vars.cor, diag=TRUE)] &lt;- NA
+
+vars.cor &lt;- vars.cor                                  %&gt;%
+            abs()                                     %&gt;%   
+            data.frame()                              %&gt;%
+            mutate(var1=row.names(vars.cor))          %&gt;%
+            gather(var2, cor, -var1)                  %&gt;%
+            na.omit()
+
+
+vars.cor &lt;- vars.cor[order(-abs(vars.cor$cor)), ]
+
+(muy.cor &lt;- filter(vars.cor, cor &gt; 0.95)) # Mostramos las que tengan más del 95% de correlación
+</code></pre>
+
+<pre><code>## [1] var1 var2 cor 
+## &lt;0 rows&gt; (or 0-length row.names)
+</code></pre>
+
+<pre><code class="r"># Habría que decidir si se remueven y cuales se remueven (var1 o var2)
+vars.a.ignorar &lt;- union(vars.a.ignorar, muy.cor$var2)
+</code></pre>
+
+<p>En esta base de observación no tenemos ninguna variable con una correlación igual o mayro
+al 95%.</p>
+
+<p><em>NOTA: ¿Qué pasa con las categóricas? ¿Usamos asociación o independencia?</em></p>
+
+<h1>Valores faltantes</h1>
+
+<p>Se elimiarán las observaciones: 62 y 199 por tener un alto % de NA en el registro.</p>
+
+<pre><code class="r">observaciones.omitidas  &lt;- ds[apply(ds, 1, function(x) sum(is.na(x))) &gt; 2,]
+
+ds &lt;- ds[-c(199,62),]
+</code></pre>
+
+<p>Para los valores faltantes de la columna PO4 utilizaremos una regresión lineal, utilizando
+a oPO4 como covariable.</p>
+
+<pre><code class="r">lm  &lt;- predict(lm(po4 ~ o.po4, data=ds))
+ds$po4 &lt;-  ifelse(!is.na(ds[,&quot;po4&quot;]),ds[,&quot;po4&quot;],lm)
+</code></pre>
+
+<p>Para el resto de las columnas con NAs se imputara con el promedio.</p>
+
+<pre><code class="r">#Creando función
+
+imputarValorCentral &lt;- function(data, colnames){
+    for(n in colnames){
+        if(class(data[,n])==&quot;factor&quot;){
+
+            vec  &lt;- ifelse(!is.na(data[,n]),data[,n],
+                             names(table(data[,n]))[max(table(data[,n])) == table(data[,n])])
+
+            data[,n]   &lt;-  mapvalues(vec,from=1:nlevels(data[,n]), to=levels(data[,n]))  
+        }
+        else{
+            data[,n]   &lt;-  ifelse(!is.na(data[,n]),data[,n],mean(data[,n],na.rm=T))
+
+        }
+    }
+}
+
+imputarValorCentral(ds,c(&quot;mx.ph&quot;,&quot;mn.o2&quot;,&quot;cl&quot;,&quot;chla&quot;))                    
+</code></pre>
+
+<pre><code>## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: provided 198 variables to replace 1 variables
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: provided 198 variables to replace 1 variables
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: provided 198 variables to replace 1 variables
+## Warning: the condition has length &gt; 1 and only the first element will be used
+## Warning: provided 198 variables to replace 1 variables
+</code></pre>
+
+<h1>Normalizar niveles</h1>
+
+<p>Removemos espacios, puntuaciones, camelCase, etc. en los niveles de los factores supervivientes.</p>
+
+<pre><code class="r">factors &lt;- which(sapply(ds[vars], is.factor))
+for (f in factors) levels(ds[[f]]) &lt;- normalizarNombres(levels(ds[[f]]))
+</code></pre>
+
+<h1>Identificación de Variables</h1>
+
+<pre><code class="r">(vars.input &lt;- setdiff(vars, target))
+</code></pre>
+
+<pre><code>##  [1] &quot;temporada&quot; &quot;velocidad&quot; &quot;mx.ph&quot;     &quot;mn.o2&quot;     &quot;cl&quot;       
+##  [6] &quot;no3&quot;       &quot;no4&quot;       &quot;o.po4&quot;     &quot;po4&quot;       &quot;chla&quot;     
+## [11] &quot;a1&quot;        &quot;a2&quot;        &quot;a3&quot;        &quot;a4&quot;        &quot;a5&quot;       
+## [16] &quot;a6&quot;        &quot;a7&quot;
+</code></pre>
+
+<pre><code class="r">idxs.input &lt;- sapply(vars.input, function(x) which(x == names(ds)), USE.NAMES=FALSE)
+
+idxs.numericas &lt;- intersect(idxs.input, which(sapply(ds, is.numeric)))
+(vars.numericas &lt;- names(ds)[idxs.numericas])
+</code></pre>
+
+<pre><code>##  [1] &quot;mx.ph&quot; &quot;mn.o2&quot; &quot;cl&quot;    &quot;no3&quot;   &quot;no4&quot;   &quot;o.po4&quot; &quot;chla&quot;  &quot;a1&quot;   
+##  [9] &quot;a2&quot;    &quot;a3&quot;    &quot;a4&quot;    &quot;a5&quot;    &quot;a6&quot;    &quot;a7&quot;
+</code></pre>
+
+<pre><code class="r">idxs.categoricas &lt;- intersect(idxs.input, which(sapply(ds, is.factor)))
+(vars.categoricas &lt;- names(ds)[idxs.categoricas])
+</code></pre>
+
+<pre><code>## [1] &quot;temporada&quot; &quot;velocidad&quot;
+</code></pre>
+
+<pre><code class="r"># Por conveniencia guardamos el número de observaciones supervivientes
+num.observaciones &lt;- nrow(ds)
+</code></pre>
+
+<h3>Apéndice: Ambiente</h3>
+
+<pre><code>## R version 3.1.1 (2014-07-10)
+## Platform: x86_64-apple-darwin13.1.0 (64-bit)
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] grid      stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] plyr_1.8.1      stringr_0.6.2   lubridate_1.3.3 tidyr_0.1      
+##  [5] ggthemes_1.7.0  gridExtra_0.9.1 ggplot2_1.0.0   scales_0.2.4   
+##  [9] dplyr_0.3.0.2   knitr_1.6      
+## 
+## loaded via a namespace (and not attached):
+##  [1] assertthat_0.1   colorspace_1.2-4 DBI_0.3.1        digest_0.6.4    
+##  [5] evaluate_0.5.5   formatR_0.10     gtable_0.1.2     labeling_0.2    
+##  [9] lazyeval_0.1.9   magrittr_1.0.1   markdown_0.7.2   MASS_7.3-33     
+## [13] memoise_0.2.1    mime_0.1.2       munsell_0.4.2    parallel_3.1.1  
+## [17] proto_0.3-10     Rcpp_0.11.2      reshape2_1.4     tools_3.1.1
+</code></pre>
+
+</body>
+
+</html>

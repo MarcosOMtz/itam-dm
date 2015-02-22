@@ -1,0 +1,52 @@
+---
+title: "German"
+author: "Andrea Garcia, Edwin Chazaro, Andrea Fernández"
+date: "17/11/2014"
+output: html_document
+---
+
+## Introducción
+
+La base de datos de *German credit data* es una base de datos financiera, donada en 1994 gracias al Profesor Dr. Hans Hofmann de la Universidad de Hamburgo.
+
+```{r, echo=FALSE, warning=FALSE, error=FALSE, message=FALSE}
+library(dplyr)
+library(ggplot2)
+source('utils.r')
+
+german.data <-load()
+german.data <- as.data.frame(sapply(german.data, FUN=german.decode))
+german.data <- arreglacols(german.data)
+```
+
+¿Cómo se comparan los datos de Goodloan frente a los de Badloan en su historial crediticio?
+
+```{r, echo=FALSE}
+df <- german.data[ , c("credit.history", "good.loan")] %>%
+    group_by(credit.history, good.loan) %>%
+    summarise(cuenta = n())
+df <- transform(df, credit.history=reorder(credit.history, cuenta))
+ggplot(df, aes(x=credit.history, y=cuenta, fill=good.loan)) +
+    geom_bar(stat='identity', position="dodge") +
+    coord_flip() +
+    theme(axis.text.y=element_text(size=rel(0.8)))
+```
+
+Resulta curioso que los que más se han tardado en pagar sus deudas en el pasado son los catalogados como *GoodLoan*. Además, este mismo grupo tiene menos historial de haber pagado todos sus créditos pasados. 
+
+## Faltantes
+
+```{r}
+summary(german.data)
+```
+
+Del sumario podemos ver que no tenemos valores faltantes.
+
+Anomalias detectadas:
++ Hay 274 cuentas con saldo negativo en su checking account.
++ Esta muy raro que no haya mujeres solteras.
++ No parece tener mucho sentido el installment rate como proporcion del ingresodisponible.
++ Tampoco esta recodificado present.residence.since
+
+
+

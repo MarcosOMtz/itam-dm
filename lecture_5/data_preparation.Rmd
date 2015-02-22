@@ -1,0 +1,493 @@
+---
+title: "Preparación de los Datos"
+author: "Adolfo De Unánue T."
+date: "01/12/2014"
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    fig_caption: yes
+    latex_engine: xelatex
+    number_sections: yes
+    toc: yes
+---
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+library(Hmisc)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+library(stringr)
+```
+
+
+```{r, eval=TRUE, echo=FALSE, include=TRUE,warning=FALSE, message=FALSE,}
+source(file = "../lib/utils.r", chdir = TRUE)
+```
+
+
+```{r, eval=TRUE, echo=TRUE}
+# Cargamos el dataset
+
+ds.path <- "../data/KDD1998/cup98lrn.txt" # Puede ser un URL o una dirección en el directorio
+
+ds.name <- "cup98" # Nombre de nuestro conjunto de datos, e.g. algas, german
+
+ds <- loadData(name=ds.name, full_path=ds.path, sep=",", head=TRUE)
+               
+ds <- tbl_df(ds) # Para obtener un print mejorado
+```
+
+
+# Introducción
+
+Explicamos la procedencia del archivo, como lo obtuvimos, indicar si es una muestra, etc.
+
+Si es una muestra indicar el método de muestreo y el algoritmo para generar los números aleatorios
+
+## Variables
+
+Explicación de las variables que componen (o que deberían de componer) el dataset
+
+
+# Estructura General
+
+```{r, eval=TRUE}
+ds
+```
+
+
+## Tamaño
+```{r, eval=TRUE}
+dim(ds)
+```
+
+## Estructura
+
+```{r, eval=TRUE}
+sapply(ds, class)
+```
+
+_NOTA: Indicar si hay una discrepancia entre las clases de las variables en el data set y en su significado, i.e. fechas que no son fechas, si no factores, etc._
+
+# Sumario Estadístico
+
+## Variables demográficas
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,1:28])
+```
+
+## Número de veces que el donador respondió a otras campañas
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,29:42])
+```
+
+## Overlay data (?)
+
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,43:55])
+```
+
+## Intereses del donador
+
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,56:74])
+```
+
+## Estatus PEP star RFA
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,75])
+```
+
+## Características de la vecindad del donador
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,76:361])
+```
+
+## Histórico de promociones
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,362:407])
+```
+
+## Resúmen de variables del histórico de promociones
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,408:412])
+```
+
+
+## Histórico de donativos
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,413:456])
+```
+
+## Resúmen de variables del histórico de donativos
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,457:469])
+```
+
+## ID y targets
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,470:473])
+```
+
+## RFA
+
+**RFA** significa *Recency/Frequency/Donation Amount*
+
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,474:479])
+```
+
+## Clúster y Geocode
+
+```{r, echo=FALSE, eval=FALSE}
+describe(ds[,480:481])
+```
+
+
+# Descripción de las variables de salida
+
+```{r, echo=TRUE}
+(porcentaje.respuesta.b <- round(100 * prop.table(table(ds$TARGET_B)), digits=1))
+```
+
+```{r pie_target_b, echo=FALSE, fig.height=6, fig.align='center', fig.width=6}
+etiquetas <- paste("TARGET_B=", names(porcentaje.respuesta.b), "\n", porcentaje.respuesta.b, "%", sep=" ")
+pie(porcentaje.respuesta.b, labels = etiquetas)
+```
+
+
+```{r, echo=FALSE}
+ds.positive <- ds[ds$TARGET_D >0, ]
+target.d.positive <- ds.positive$TARGET_D
+summary(target.d.positive)
+```
+
+
+```{r, echo=FALSE}
+donaciones.positivas <- length(target.d.positive)
+```
+
+
+Las donaciones positivas son `r donaciones.positivas` y están distribuidas así:
+
+```{r box_plot_target_d, fig.height=6, fig.align='center', fig.width=6, echo=FALSE}
+boxplot(target.d.positive)
+```
+
+Si vemos aquellas que fueron mayores a **1 USD** (es decir, no fueron centavos), tenemos que restarle `r sum(!(target.d.positive %in% 1:200))` donaciones.
+
+```{r, echo=FALSE}
+target.d.positive <- round(target.d.positive)
+```
+
+```{r barplot_target_d_redondeado, fig.height=6, fig.align='center', fig.width=8, echo=FALSE}
+barplot(table(target.d.positive), las=2, cex.axis=0.8, cex.names=0.8)
+```
+
+De acuerdo a la gráfica de arriba, discretizamos `TARGET_D` como sigue:
+
+```{r, echo=TRUE}
+ds$TARGET_D2 <- cut(ds$TARGET_D, right=FALSE, breaks=c(0,0.1, 10,15,20,25,30,50, max(ds$TARGET_D)))
+```
+```{r echo=FALSE}
+ds.positive$TARGET_D2 <- cut(ds.positive$TARGET_D, right=FALSE, breaks=c(0,0.1, 10,15,20,25,30,50, max(ds.positive$TARGET_D)))
+```
+
+```{r, echo=FALSE}
+table(ds$TARGET_D2)
+```
+
+
+# Limpieza de metadatos
+
+```{r, eval=TRUE, echo=FALSE}
+names(ds) <- normalizarNombres(names(ds))
+```
+
+Estandarizamos los nombres de las variables al estándar de `R`, quedando de la siguiente manera:
+
+```{r, eval=TRUE, echo=FALSE}
+names(ds)
+```
+
+# Ajuste de formatos
+
+Las clases de las variables son
+
+```{r, eval=FALSE, echo=TRUE}
+sapply(ds, class)
+```
+
+# Transformación de variables
+
+En esta sección incluímos la transformación de las variables necesarias (normalización, estandarización, _binning_, `log`, etc.)
+
+
+*NOTA: Es recomendable hacer todas las transformaciones en un solo `mutate` y no una por una (a menos que haya problemas de memoria, y hay que usar otras técnicas).*
+# Identificación de variables
+
+```{r, eval=TRUE}
+vars <- names(ds) # Guardamos los nombres de variables
+
+target <- c("target.b", "target.d", "target.d2")  # Si el modelo es supervisado
+risk <- NULL # Si se proveé, es la importancia de la observación respecto a la variable (es una variable de salida)
+costo <- NULL # Costo de equivocarse en la predicción (Si se proveé) (es una variable de salida)
+id <- "controln" # Armar una id con columnas, o seleccionar el id del dataset
+```
+
+# Recodificación
+
+Antes de pasar a la etapa de ignorar variables, es importante **recodificar**. 
+
+- Hay métodos como el  `randomForest` que no soporta variables categóricas con más de 32 niveles, habría que agruparlos (e.g. si son países se pueden reagrupar por región, similitud -esto requiere otra base de datos, etc.)
+
+- Si las fechas son `timestamp` hay que extraer variables categóricas como `mes`, `día.de.la.semana`, `fin.de.semana`, `temporada`, etc. claro que depende del tipo del problema al que nos estemos enfrentando.
+
+
+```{r, eval=TRUE, echo=FALSE}
+vars.input <- setdiff(vars, target)
+idxs.input <- sapply(vars.input, function(x) which(x == names(ds)), USE.NAMES=FALSE)
+
+idxs.numericas <- intersect(idxs.input, which(sapply(ds, is.numeric)))
+vars.numericas <- names(ds)[idxs.numericas]
+
+idxs.categoricas <- intersect(idxs.input, which(sapply(ds, is.factor)))
+vars.categoricas <- names(ds)[idxs.categoricas]
+```
+
+# Variables a ignorar
+
+Identificamos en una variable `vars.a.ignorar`, las columnas a ignorar en el entrenamiento del modelo.
+
+### IDs y variables de salida
+
+```{r, eval=TRUE}
+vars.a.ignorar <- union(union(id, if (exists("risk")) risk), if(exists("cost")) cost)
+```
+
+### Constantes y valores únicos por observación
+
+```{r, eval=TRUE}
+
+# Ignoramos las que tengan un único valor por cada observación, pueden ser IDs
+# IMPORTANTE: Esto puede eliminar fechas, ver sección anterior
+
+ids <- names(which(sapply(ds, function(x) length(unique(x)) == nrow(ds))))
+
+# Ignoramos los factores que tengan muchos niveles
+# IMPORTANTE: ver sección anterior
+
+factors <- which(sapply(ds[vars], is.factor))
+niveles <- sapply(factors, function(x) length(levels(ds[[x]])))
+(muchos.niveles <- names(which(niveles > 32)))
+
+vars.a.ignorar <- union(vars.a.ignorar, muchos.niveles)
+
+# Constantes
+constantes <- names(which(sapply(ds[vars], function(x) all(x == x[1L]))))
+
+vars.a.ignorar <- union(vars.a.ignorar, c(ids, constantes))
+```
+
+
+
+### Faltantes
+
+```{r, eval=TRUE}
+# Las que sean puros NAs
+ids.nas.count <- sapply(ds[vars], function(x) sum(is.na(x)))
+ids.nas <- names(which(ids.nas.count == nrow(ds)))
+
+vars.a.ignorar <- union(ids.nas, vars.a.ignorar)
+```
+
+
+```{r, eval=TRUE}
+# Las que tengan muchos NAs (un 70% o más)
+ids.many.nas <- names(which(ids.nas.count >= 0.7*nrow(ds)))
+
+vars.a.ignorar <- union(ids.many.nas, vars.a.ignorar)
+```
+
+Las variables a ignorar son `r length(vars.a.ignorar)` y son las siguientes:
+
+```{r, echo=FALSE}
+vars.a.ignorar
+```
+
+
+### Variable de salida (`target`) 
+
+Si el problema de minado, es supervisado, removemos las observaciones que tengan `NA` en la variable `target`
+
+```{r, eval=TRUE}
+dim(ds)
+ds <- ds[!is.na(ds[target[1]]),]
+ds <- ds[!is.na(ds[target[2]]),]
+dim(ds)
+```
+
+Si el problema es de clasificación, hay que convertir la variable `target` a categórica.
+
+```{r}
+sapply(ds[,target], class)
+```
+
+
+```{r, eval=TRUE}
+ds[target[1]] <- as.factor(ds[[target[1]]])
+table(ds[target[1]])
+```
+
+
+```{r}
+sapply(ds[,target], class)
+```
+
+
+Mostramos la distribución (esto nos indicará si el problema no está balanceado)
+
+```{r check-unbalanced-data, eval=TRUE}
+ggplot(data=ds, aes_string(x=target[1])) + geom_bar(width=0.3)
+```
+
+
+# Variables correlacionadas
+
+```{r, eval=TRUE, cache=TRUE}
+(system.time(vars.cor <- cor(ds[which(sapply(ds, is.numeric))], use="pairwise.complete.obs")))
+
+vars.cor[upper.tri(vars.cor, diag=TRUE)] <- NA
+
+vars.cor <- vars.cor                                  %>%
+            abs()                                     %>%   
+            data.frame()                              %>%
+            mutate(var1=row.names(vars.cor))          %>%
+            gather(var2, cor, -var1)                  %>%
+            na.omit()
+            
+
+vars.cor <- vars.cor[order(-abs(vars.cor$cor)), ]
+
+if (!file.exists("output")) dir.create("output") # Creamos la carpeta output, si no existe
+
+# Guardar a CSV para tenerlo como respaldo
+write.csv(vars.cor, "output/absolute_correlation.csv", row.names=FALSE)
+
+(muy.cor <- filter(vars.cor, cor > 0.95)) # Mostramos las que tengan más del 95% de correlación
+
+# Habría que decidir si se remueven y cuales se remueven (var1 o var2)
+vars.a.ignorar <- union(vars.a.ignorar, muy.cor$var2)
+```
+
+Obtenemos la correlación entre las variables y los **target**
+
+```{r, eval=FALSE, cache=TRUE}
+
+```
+
+Para variables categóricas medimos su **asociación** con una prueba $\chi$-cuadrada
+
+```{r, eval=FALSE, cache=TRUE}
+sapply(names(which(sapply(ds.positive, is.factor))), pruebaChiCuadrada, var2=ds$target.d2)
+```
+
+
+
+# Valores faltantes
+
+En esta sección hay que poner la estrategia de manejo de valores faltantes elegida durante la etapa del EDA.
+
+Hay muy pocas ocasiones donde es recomendable dejar que el modelo se encargue de las imputaciones.
+
+Las observaciones a omitir, guárdalas en `observaciones.omitidas`.
+
+```{r}
+observaciones.omitidas <- NULL
+
+if (!file.exists("output")) dir.create("output") # Creamos la carpeta clean, si no existe
+
+if(exists("observaciones.omitidas")) {
+  write.csv(observaciones.omitidas, "output/observaciones_omitidas.csv", row.names=FALSE)
+}
+```
+
+
+# Normalizar niveles
+
+Removemos espacios, puntuaciones, camelCase, etc. en los niveles de los factores supervivientes.
+
+
+```{r, eval=TRUE}
+factors <- which(sapply(ds[vars], is.factor))
+for (f in factors) levels(ds[[f]]) <- normalizarNombres(levels(ds[[f]]))
+```
+
+
+
+```{r, eval=TRUE, echo=FALSE}
+# Removemos las variables
+vars <- setdiff(vars, vars.a.ignorar)
+```
+
+# Identificación de Variables
+
+
+## Variables independientes
+
+```{r, eval=TRUE}
+(vars.input <- setdiff(vars, target))
+idxs.input <- sapply(vars.input, function(x) which(x == names(ds)), USE.NAMES=FALSE)
+```
+
+## Variables numéricas
+
+```{r, eval=TRUE}
+idxs.numericas <- intersect(idxs.input, which(sapply(ds, is.numeric)))
+(vars.numericas <- names(ds)[idxs.numericas])
+```
+
+## Variables categóricas
+```{r, eval=TRUE}
+idxs.categoricas <- intersect(idxs.input, which(sapply(ds, is.factor)))
+(vars.categoricas <- names(ds)[idxs.categoricas])
+```
+
+```{r, echo=FALSE}
+# Por conveniencia guardamos el número de observaciones supervivientes
+num.observaciones <- nrow(ds)
+```
+
+## Variables target
+```{r}
+target
+```
+
+```{r, eval=TRUE, echo=FALSE}
+# Guardamos todo en la carpeta 
+ds.date <- paste0("_", format(Sys.Date(), "%y%m%d"))
+ds.rdata <- paste0(ds.name, ds.date, ".RData") # Guardamos todo en un RData para poder automatizar el modelado
+
+if (!file.exists("clean")) dir.create("clean") # Creamos la carpeta clean, si no existe
+
+save(ds, ds.name, ds.path, ds.date, target, risk, costo, 
+     id, vars.a.ignorar, vars, num.observaciones, 
+     vars.input, idxs.input,
+     observaciones.omitidas,
+     vars.categoricas, idxs.categoricas,
+     file=paste0("clean", "/", ds.rdata)
+     )
+```
+
+
+# Apéndice: Ambiente
+
+```{r, echo=FALSE}
+sessionInfo()
+```
+

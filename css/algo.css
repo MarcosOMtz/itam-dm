@@ -1,0 +1,51 @@
+# Decodificar german.data
+decode <- function(x) {
+  if (class(x) == 'character') {
+    x <- as.factor(as.character(german.codes[x]))
+  }
+  return(x)
+}
+
+## Historial crediticio
+ggplot(data=german.data) + aes(x=german.data$'Credit history', fill=Good.Loan) + geom_bar(stat="bin", position="stack") + coord_flip() + theme(axis.text.y=element_text(size=rel(0.8)))
+
+## Para ordenarla
+credit.history.tbl <- table(german.data$'Credit history')
+credit.history.df <- as.data.frame(credit.history.tbl)
+colnames(credit.history.df) <- c('credit.history', 'count')
+summary(credit.history.df)
+
+credit.history.df <- transform(credit.history.df, credit.history=reorder(credit.history, count))
+summary(credit.history.df)
+
+ggplot(credit.history.df) + geom_bar(aes(x=credit.history, y=count), stat="identity", fill="gray") + coord_flip() + theme(axis.text.y=element_text(size=rel(0.8)))
+
+## En ggvis
+
+german.data %>% ggvis(x = ~german.data$'Credit history', fill = ~ Good.Loan) %>% layer_bars()
+
+## Explorando la edad
+
+ggplot(data=german.data) + aes(x=german.data$'Age in years')  + geom_histogram(aes(y=..density..), alpha=.8, fill="grey") + geom_density(alpha=.3, fill="blue") + geom_vline(aes(xintercept=mean(german.data$'Age in years', na.rm=TRUE)), color="red", linetype="dashed") + geom_rug(col="darkblue", alpha=0.1)
+
+german.data %>% ggvis(x = ~german.data$'Age in years') %>% layer_densities()
+
+ggplot(data=german.data) + aes(x=german.data$'Age in years')  + geom_density(alpha=.3, fill="blue") + geom_vline(aes(xintercept=mean(german.data$'Age in years', na.rm=TRUE)), color="red", linetype="dashed") + geom_rug(col="darkblue", alpha=0.1) + scale_x_log10()
+
+
+
+
+Hay 11 variables:
+
+  - Estación del año en el que se recolectaron las muestras.
+  - Tamaño del río.
+  - Velocidad del río.
+  - Máximo valor del pH
+  - Mínimo valor de $O_2$ (molécula de oxígeno)
+  - Valor medio del $Cl$
+  - Valor medio de $NO_3^{-}$ (nitratos)
+  - Valor medio de $NH_4^{+}$ (amonio)
+  - Valor medio de $PO_4^{3-}$ (ortofosfato)
+  - Media del total de $PO_4$ (fosfato)
+  - Media del clorofila
+  - Valores de 7 diferentes tipos de algas dañinas.

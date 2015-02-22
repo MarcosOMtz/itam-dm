@@ -1,0 +1,188 @@
+---
+title: "Preparación de los Datos"
+author: "Andrea Fernández, Edwin Chazaro, Andrea García"
+date: "29/10/2014"
+output: html_document
+---
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+library(stringr)
+library(GGally)
+library(corrplot)
+library(knitr)
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE}
+# Cargamos el dataset
+source('../utils.r', chdir=TRUE)
+ds <- read.table('../../../../data/algas/algas.txt',
+                    header=FALSE,
+                    dec=".",
+                    na.strings = "XXXXXXX",
+                    strip.white = TRUE,
+                    col.names = c('temporada', 'tamaño', 'velocidad', 'mxPH',
+                                  'mnO2', 'Cl', 'NO3', 'NO4', 'oPO4', 'PO4',
+                                  'Chla', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7'))
+
+ds.path <- '../../../../data/algas/algas.txt' # Puede ser un URL o una dirección en el directorio
+
+ds.name <- "algas" # Nombre de nuestro conjunto de datos, e.g. algas, german
+
+
+# ds # <- # Leemos el dataset, usando readRDS (ya que ya lo tenemos en disco debido a nuestro EDA)
+   # Hay que utilizar el data set al que no se le han removido las observaciones NAs
+   # Lo guardamos en la variable ds para hacer más genérico los pasos.
+
+ds <- tbl_df(ds) # Para obtener un print mejorado
+```
+
+
+# Introducción
+
+Esta base de datos contiene relaciones entre concentraciones de algas y niveles químicos. Los datos vienen de muestras de diferentes  ríos de diferentes ciudades Europeas tomadas en un periodo de 1 año.
+
+Vienen concentraciones de: nitrogeno en forma de nitratos y nitritos, amonia, fosfatos, ph, nivel de oxigeno y nivel de cloro entre otros.
+
+
+## Variables
+ La base de compone de 18 variables, de las cuales 2 son factores y el restante numéricas 
+
+
+# Estructura General
+
+```{r, eval=FALSE}
+ds
+```
+
+## Tamaño
+```{r}
+dim(ds)
+```
+
+## Columnas
+```{r}
+names(ds)
+```
+
+## Estructura
+
+```{r}
+str(ds)
+```
+
+## Observaciones
+
+```{r}
+head(ds)
+```
+
+```{r}
+tail(ds)
+```
+
+# Sumario Estadístico
+
+```{r, warning=FALSE}
+summary(ds)
+```
+
+# Limpieza de metadatos
+
+```{r}
+names(ds) <- normalizarNombres(names(ds))
+names(ds)
+```
+
+# EDA
+
+## Gráficos por variable
+
+```{r, warning=FALSE, error=FALSE, echo=FALSE, message=FALSE}
+# unigrafica
+sapply(ds,FUN = graficas)
+```
+Las variables mxph y mno2  se  parece que tienen una distribucion normal 
+
+## Gráficos por pares de variables
+
+```{r, warning=TRUE, echo=FALSE, error=FALSE, message=FALSE}
+two_plots(ds)
+```
+
+
+# Transformación de variables
+ A excepción de mxph y mno2 el resto de las variables categoricas estaban sesgadas a la derecha  por lo que sería burno transformarlas  on log10
+
+```{r, warning=TRUE, echo=FALSE, error=FALSE, message=FALSE}
+ds.transformed <- mutate(ds, 
+                         mx.ph = log10(mx.ph),
+                         mn.o2 = log10(mn.o2))
+
+two_plots(ds.transformed, vector=c("mx.ph","mn.o2"))
+```
+
+# Recodificación
+
+Dado que las variables categoricas de algas no pasan de 4 categorias , no tenemos que recodificar 
+
+
+# Valores faltantes
+
+Número de NAs por variable
+
+```{r, warning=TRUE, echo=FALSE, error=FALSE, message=FALSE}
+tabla <- as.data.frame(cbind(names(sapply(ds, FUN=suma)),sapply(ds, FUN=suma)), row.names=FALSE)
+names(tabla) <- c("Variable","Valores perdidos")
+kable(tabla)
+```
+
+
+Porcentaje de NAs por columna
+
+```{r, warning=TRUE, echo=FALSE, error=FALSE, message=FALSE}
+tabla <- as.data.frame(cbind(names(sapply(ds, FUN=prom)),sapply(ds, FUN=prom)), row.names=FALSE)
+names(tabla) <- c("Variable","% perdidos")
+kable(tabla)
+```
+
+Grafica de correlacion de NAs
+
+```{r, warning=TRUE, echo=FALSE, error=FALSE, message=FALSE}
+graf_corr(ds)
+```
+
+Observaciones con mas de 2 NAs
+
+```{r, warning=TRUE, echo=FALSE, error=FALSE, message=FALSE}
+kable(obs_nas(ds,1), row.names=FALSE)
+```
+
+Eliminamos observaciones con mas de 20% faltantes
+
+```{r}
+ds.rm.missing <- elimina(ds, 0.2)
+dim(ds.rm.missing)
+```
+
+Ejemplo de imputacion con tendencia central
+```{r}
+is.na(ds$chla)
+ds$chla<-imputarValorCentral(ds$chla)
+is.na(ds$chla)
+```
+
+Ejemplo de imputacion con regresion
+```{r}
+lm(po4 ~ o.po4, data=ds)
+ds$po4 <- imputaRegresion(ds$po4,ds$o.po4,42.897,1.293)
+ggplot(data=ds) + 
+  aes(x=o.po4, y=po4) + 
+  geom_point(shape=1) + # Usamos una bolita para los puntos
+  geom_smooth(method=lm, se=FALSE) 
+```

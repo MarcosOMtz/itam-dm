@@ -1,0 +1,407 @@
+---
+title: 'Preparación de los datos: german'
+author: "Equipo CAL (Carlos, Amanda, Liliana)"
+date: "Noviembre 2014"
+output: html_document
+---
+
+```{r, echo=FALSE, eval=TRUE}
+# Limpiamos objetos
+rm(list = ls())  
+
+# Cerramos gráficas
+graphics.off()
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+# Cargamos las librerías necesarias para el proceso
+library(plyr)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(directlabels)
+library(lubridate)
+library(stringr)
+library(corrplot)
+```
+
+```{r, echo=FALSE, eval=TRUE}
+# Guardamos la ruta de trabajo
+ds.path <- 'C:/Users/Amanda/Documents/GitHub/itam-dm/alumnos/equipos/CAL/german'
+#ds.path <- 'J:/Maestria/2_Mineria_Datos_II/CAL/german'
+
+# Definimos directorio de trabajo
+setwd(ds.path)
+
+# Definimos nombre de la base
+ds.name <- 'german'
+
+# Definimos la ruta de donde se obtendrán los datos
+ds.url <- 'http://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data'
+
+# Cargamos nuestro archivo de funciones utils_german.r
+source('utils_german.r')
+
+# Cargamos la base de análisis
+source('0-load_german.r')
+
+# Para obtener un print mejorado
+ds <- tbl_df(ds)
+
+# Preparamos la base
+source('1-prepare_german.r')
+```
+
+# verificación de la base
+
+## Tamaño
+
+Se muestra la dimensión de la base.
+
+```{r, echo=FALSE, eval=TRUE}
+dim(ds)
+```
+
+La base contiene 1000 registros para cada una de las 21 variables.
+
+## Estructura
+
+Se muestra la estructura de la base.
+
+```{r, echo=FALSE, eval=TRUE}
+str(ds)
+```
+
+No se observa alguna discrepancia entre los datos y los correspondientes nombres de las variables.
+
+# Identificación de variables
+
+No se cuenta con variables `risk` ni `costo` identificadas en esta base. Se considera como variables `target` a las correspondientes a la información sobre distribución de algas (a1, a2, a3, a4, a5, a6 y a7). Se identifica el nombre de la variable correspondiente al id.
+
+```{r, echo=FALSE, eval=TRUE}
+# Guardamos los nombres de variables
+vars <- names(ds) 
+
+# Identificamos las variables target
+target <- 'good.loan'
+
+# En este caso no se cuenta con variables risk ni costo
+#risk <- ''
+#costo <- ''
+
+# Identificamos el id de la base
+id <- 'id'
+```
+
+# Variables a ignorar
+
+Vamos a guardar en una variable, los nombres de las columnas que se van a ignorar en el entrenamiento del modelo.
+
+### IDs y variables de salida
+
+Tenemos que la base no cuenta con variables `risk` ni `costo`.
+
+```{r, echo=FALSE, eval=TRUE}
+vars.a.ignorar <- 'id'
+if (exists('risk')) vars.a.ignorar <- union(vars.a.ignorar, risk)
+if (exists('costo')) vars.a.ignorar <- union(vars.a.ignorar, costo)
+vars.a.ignorar
+```
+
+Por el momento sólo tenemos la variable "id" como variable a ignorar.
+
+### Constantes y valores únicos por observación
+
+Se van a ignorar aquellas variables que contengan un único valor en todas las observaciones. Se tiene que la base no tiene variables con un valor único en todas las observaciones.
+
+En el set de datos de german no se encontraron variables con muchos niveles, la que tiene de mayor número de niveles es Purpose con 10.
+
+```{r, echo=FALSE, eval=TRUE}
+# Ignoramos las que tengan un único valor por cada observación
+ids <- names(which(sapply(ds, function(x) length(unique(x)) == nrow(ds))))
+if (length(ids) > 0){
+  vars.a.ignorar <- union(vars.a.ignorar, ids)
+}
+
+# Ignoramos los factores que tengan muchos niveles
+factors <- which(sapply(ds[vars], is.factor))
+niveles <- sapply(factors, function(x) length(levels(ds[[x]])))
+muchos.niveles <- names(which(niveles > 20))
+if (length(muchos.niveles) > 0){
+  vars.a.ignorar <- union(vars.a.ignorar, muchos.niveles)
+}
+
+# Ignoramos las variables constantes
+constantes <- names(which(sapply(ds[vars], function(x) all(x == x[1L]))))
+if (length(constantes) > 0){
+  vars.a.ignorar <- union(vars.a.ignorar, constantes)
+}
+
+# Lista de variables a ignorar
+vars.a.ignorar               
+```
+
+En este momento tenemos que la única variable a ignorar es el "id" de la base.
+
+### Faltantes
+
+Vamos a identificar las variables con valores faltantes, se observa que la base no cuenta con variables que tengan valores faltantes.
+
+```{r, echo=FALSE, eval=TRUE}
+# Las que sean puros NAs
+ids.nas.count <- sapply(ds[vars], function(x) sum(is.na(x)))
+ids.nas <- names(which(ids.nas.count == nrow(ds)))
+if (length(ids.nas) > 0){
+  vars.a.ignorar <- union(vars.a.ignorar, ids.nas)
+}
+
+# Las que tengan muchos NAs (un 70% o más)
+ids.many.nas <- names(which(ids.nas.count >= 0.7*nrow(ds)))
+if (length(ids.many.nas) > 0){
+  vars.a.ignorar <- union(vars.a.ignorar, ids.many.nas)
+}
+
+# Lista de variables a ignorar
+vars.a.ignorar
+```
+
+Así tenemos un nuevo listado de variables a ignorar.
+
+### Variable de salida (`target`) 
+
+Si el problema de minado, es supervisado, removemos las observaciones que tengan `NA` en la variable `target`.
+
+Vemos si se modificaría la dimensión de la base al eliminar NA's de las variables `target`. En este caso observamos que no cambiaría la base.
+
+```{r, echo=FALSE, eval=TRUE}
+dim(ds)
+  ds.sin.NA <- ds[!is.na(ds[target]),]
+dim(ds.sin.NA)
+```
+
+Si el problema es de clasificación, hay que convertir la variable `target` a categórica. En este caso ese paso ya se realizó en la preparación de la información.
+
+```{r, echo=FALSE, eval=TRUE}
+  ds[target] <- as.factor(ds[[target]])
+  table(ds[target])
+```
+
+Mostramos la distribución (esto nos indicará si el problema no está balanceado). 
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+ggplot(data=ds, aes_string(x=target)) + geom_bar(width=0.3)
+```
+
+# Variables correlacionadas
+
+Identificamos las variables muy correlacionadas. Se tiene que no hay variables con correlación mayor a 0.95.
+
+```{r, echo=FALSE, eval=TRUE}
+ds_sin_id <- select(ds, -id)
+vars.cor <- cor(ds[which(sapply(ds_sin_id, is.numeric))], use = "complete.obs")
+vars.cor[upper.tri(vars.cor, diag=TRUE)] <- NA
+
+vars.cor <- vars.cor                                  %>%
+            abs()                                     %>%   
+            data.frame()                              %>%
+            mutate(var1 = row.names(vars.cor))        %>%
+            gather(var2, cor, -var1)                  %>%
+            na.omit()
+            
+vars.cor <- vars.cor[order(-abs(vars.cor$cor)),]
+
+# Mostramos las que tengan más del 95% de correlación
+muy.cor <- filter(vars.cor, cor > 0.95) 
+muy.cor
+
+# Habrá que decidir si se remueven y cuales se remueven (var1 o var2)
+if (length(muy.cor) > 0) {
+  vars.a.ignorar <- union(vars.a.ignorar, muy.cor$var2)
+}
+vars.a.ignorar
+```
+
+Se agregan las variables a ignorar por alta correlación, en este caso no se tienen variables altamente correlacionadas.
+
+# Valores faltantes
+
+Vamos a identificar si los valores faltantes entre las diferentes variables están correlacionados.
+
+```{r, echo=FALSE, eval=TRUE}
+# Identificamos las variables que contengan NAs
+con.na <- as.data.frame(abs(is.na(ds)))
+
+# Extraemos las variables que tienen observaciones con Nas
+var.con.na <- con.na[which(sapply(con.na, sd) > 0)]
+
+# Obtenemos la correlación 
+correla <- cor(var.con.na)
+
+# Graficamos la correlación
+
+#corrplot.mixed(correla)
+```
+
+Tenemos que en esta base no hay valores faltantes.
+
+```{r, echo=FALSE, eval=FALSE}
+# Número de observaciones que tienen algún NA
+r <- nrow(ds[!complete.cases(ds),])
+print(paste('El no. de observaciones con algún NA es:', r))
+
+# Observaciones con algún NAs
+ds.con.NAs <- ds[!complete.cases(ds),]
+print('Las observaciones con algún NA son:')
+ds.con.NAs
+
+# ¿Cuántos NAs hay por observación?
+no_na <- apply(ds, 1, function(x) sum(is.na(x)))
+print('¿Cuántos NAs hay por observación?')
+no_na
+
+# Veamos las observaciones con más de dos NAs
+ds.con.NA.2 <- ds[apply(ds, 1, function(x) sum(is.na(x))) > 2,]
+print('Las observaciones con más de dos NAs son:')
+ds.con.NA.2
+
+# Guardamos los índices de las observaciones serán omitidas
+observaciones.omitidas <- indicesConNAs(ds, 0.2)
+
+# Omitimos las observaciones identificadas
+ds.sin.NA <- omitirObserva(ds, observaciones.omitidas)
+dim(ds.sin.NA)
+```
+
+# Imputación de valores faltantes
+
+En esta base no hay valores faltantes por lo que no se requiere imputación.
+
+```{r, echo=FALSE, eval=FALSE}
+# Identificamos las variables que tienen NA's y cuál es su tipo
+vars.sin.omitir <- setdiff(vars, vars.a.ignorar)
+ids.nas.cuenta <- sapply(ds.sin.NA[vars.sin.omitir], function(x) sum(is.na(x)))
+ids.na <- which(ids.nas.cuenta > 0)
+ids.nas.factor <- intersect(ids.na, which(sapply(ds, is.factor)))
+ids.nas.numericas <- intersect(ids.na, which(sapply(ds, is.numeric)))
+```
+
+## Imputación en variables categóricas
+
+En el caso de tener observaciones con NA en alguna variable categórica, se crearía una nueva variable donde se asignaría a los NA a un nuevo `level`. En nuestro caso no tenemos variables categóricas cono NA's.
+
+```{r, echo=FALSE, eval=FALSE}
+#Creamos una base para hacer el ejemplo de imputación
+ds.sin.NA.cate <- ds.sin.NA
+
+#Realizamos las imputaciones a las diferentes variables identificadas con NAs
+if (length(ids.nas.factor) > 0){
+  ds.sin.NA.cate <- imputaCate(ds.sin.NA, ds.sin.NA.cate, ids.nas.factor){
+}
+```
+
+## Imputación: Central
+
+No se requiere.
+
+```{r, echo=FALSE, eval=FALSE}
+#Creamos una base para hacer el ejemplo de imputación
+ds.sin.NA.central <- ds.sin.NA
+
+#Realizamos las imputaciones a las diferentes variables identificadas con NAs
+if (length(ids.nas.numericas) > 0){
+  ds.sin.NA.central <- imputaNumeCentral(ds.sin.NA, ds.sin.NA.central, ids.nas.numericas)
+}
+
+# Verificamos que se hayan hecho las imputaciones
+ids.nas.cuenta.central <- sapply(ds.sin.NA.central, function(x) sum(is.na(x)))
+ids.nas.central <- which(ids.nas.cuenta.central > 0)
+ids.nas.central
+```
+
+## Imputación: Correlación
+
+No se requiere.
+
+```{r, echo=FALSE, eval=FALSE}
+#Creamos una base para hacer el ejemplo de imputación
+ds.sin.NA.correla <- ds.sin.NA
+
+#Realizamos las imputaciones a las diferentes variables identificadas con NAs
+var.cor <- c(11, 6, 5, 8, 7, 10, 9, 4)
+if (length(ids.nas.numericas) > 0){
+  ds.sin.NA.correla <- imputaNumeCorrela (ds.sin.NA, ds.sin.NA.correla, ids.nas.numericas, var.cor)
+}
+
+# Verificamos que se hayan hecho las imputaciones
+ids.nas.cuenta.correla <- sapply(ds.sin.NA.correla, function(x) sum(is.na(x)))
+ids.nas.correla <- which(ids.nas.cuenta.correla > 0)
+ids.nas.correla
+```
+
+## Imputación: Similitud
+
+No se requiere.
+
+```{r, echo=FALSE, eval=FALSE}
+#Creamos una base para hacer el ejemplo de imputación
+ds.sin.NA.simil <- ds.sin.NA
+
+#Realizamos las imputaciones a las diferentes variables identificadas con NAs
+if (length(ids.nas.numericas) > 0){
+  ds.sin.NA.simil <- imputaNumeSimil(ds.sin.NA, ds.sin.NA.simil, ids.nas.numericas)
+}
+
+# Verificamos que se hayan hecho las imputaciones
+ids.nas.cuenta.simil <- sapply(ds.sin.NA.simil, function(x) sum(is.na(x)))
+ids.nas.simil <- which(ids.nas.cuenta.simil > 0)
+ids.nas.simil
+```
+
+# Identificación de Variables
+
+Guardamos la información que utilizaremos para definir nuestros modelos.
+
+```{r, echo=FALSE, eval=TRUE}
+
+# Removemos las variables a ignorar
+vars <- setdiff(vars, vars.a.ignorar)
+
+if (exists('target')) vars.input <- setdiff(vars, target) else vars.input <- vars
+
+idxs.input <- sapply(vars.input, function(x) which(x == names(ds)), USE.NAMES=FALSE)
+
+idxs.numericas <- intersect(idxs.input, which(sapply(ds, is.numeric)))
+vars.numericas <- names(ds)[idxs.numericas]
+
+idxs.categoricas <- intersect(idxs.input, which(sapply(ds, is.factor)))
+vars.categoricas <- names(ds)[idxs.categoricas]
+
+# Por conveniencia guardamos el número de observaciones supervivientes
+num.observaciones <- nrow(ds)
+```
+
+```{r, echo=FALSE, eval=TRUE}
+ds.date <- paste('_', format(Sys.Date(), '%y%m%d'), sep = '')
+
+# Guardamos todo en un RData para poder automatizar el modelado
+ds.rdata <- paste(ds.name, ds.date, '.rdata', sep = '') 
+
+# Creamos la carpeta clean, si no existe
+if (!file.exists('clean')) dir.create('clean') 
+
+archivo <- paste(ds.path, '//clean//', ds.rdata, sep = '')
+save(ds, ds.name, ds.path, ds.date, target, #risk, costo, 
+     id, vars.a.ignorar, vars, num.observaciones, 
+     vars.input, idxs.input,
+     # observaciones.omitidas,
+     vars.numericas, idxs.numericas,
+     vars.categoricas, idxs.categoricas,
+     file = archivo
+     )
+```
+
+### Apéndice: Ambiente
+
+```{r, echo=FALSE, eval=TRUE}
+sessionInfo()
+```

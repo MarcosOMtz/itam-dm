@@ -1,0 +1,95 @@
+---
+title: "Ejercico2-Equipo “no comos muchos pero somos machos"
+author: "Jose Antonio Mancilla"
+date: "17 de noviembre de 2014"
+output: html_document
+---
+
+# Tarea 2
+
+### Carga de datos y llamado de los recursos a utilizar
+
+```{r}
+
+source("0-load.r")
+source("2-eda.r")
+library(corrgram)
+library(plyr)
+
+algas.data  <- load()
+
+```
+
+
+## Exploración 
+
+#### General y estructura
+```{r}
+summary(algas.data)
+
+str(algas.data)
+```
+
+
+
+#### Análisis Exploratorio: Graficando ciertas covariables
+
+```{r,warning=FALSE, message=TRUE, error=FALSE, echo=TRUE}
+
+eda1(algas.data,c(3,9,5,11,16))
+
+```
+
+#### Graficando la covariable 1 vs  2 y 6
+
+```{r,,warning=FALSE, message=FALSE, error=FALSE, echo=TRUE}
+
+eda2(algas.data,1,c(2,6))
+
+```
+
+#### visualización de NA`s
+
+```{r}
+na_algas <- as.data.frame(abs(is.na(algas.data)))
+colSums(na_algas)
+colMeans(na_algas)
+
+```
+
+```{r}
+# Extrae las variables que tienen algunas celdas con NAs
+y <- na_algas[which(sapply(na_algas, sd) > 0)] 
+
+# Da la correación un valor alto positivo significa que desaparecen juntas.
+cor(y)
+```
+
+```{r}
+# Grafico de correlación
+
+corrgram(y, order=TRUE, lower.panel=panel.shade,
+  upper.panel=panel.pie, text.panel=panel.txt,
+  main="Datos numéricos sin NA`s de algas.data") 
+```
+
+### Variables faltantes: Remover observaciones
+
+Las variables con más faltantes son Promedio de Cloruro Cl (10) y Promedio de 
+Clorofila Chla (12).
+```{r}
+summary(algas.data[-grep(colnames(algas.data),pattern = "^a[1-9]")])
+
+```
+
+Antes de removerlas es recomendable verlos, guardarlos y contarlos:
+
+```{r}
+nrow(algas.data[!complete.cases(algas.data),])
+```
+
+Hay r nrow(algas[!complete.cases(algas),]) observaciones en las cuales tienen NAs
+
+```{r}
+algas.con.NAs <- algas.data[!complete.cases(algas.data),]
+```

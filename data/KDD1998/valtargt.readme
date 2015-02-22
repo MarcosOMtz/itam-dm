@@ -1,0 +1,27 @@
+
++--------------------------------------------------------------------+
+| VALtargt.README File Description                                   |
++--------------------------------------------------------------------+
+
+o This file contains the target fields that were left out of the 
+  validation data set that was sent to the KDD-CUP-98 participants. 
+  These fields were used by the KDD-CUP-98 Committee to evaluate the 
+  accuracy of the predictions submitted by the participants. 
+ 
+o The file is in comma delimited format and contains 96,367 records 
+  and the following 3 fields: 
+
+  CONTROLN     Control number (unique record identifier)
+
+  TARGET_B     Target Variable: Binary Indicator for Response to the 
+               97NK Mailing
+
+  TARGET_D     Target Variable: Donation Amount (in $) associated 
+               with the Response to the 97NK Mailing
+
+  The first/header row of the file contains the field names.
+
+o The field CONTROLN will be used as the match key to merge these
+  3 fields into the original validation data set (file name:
+  cup98VAL.txt)
+

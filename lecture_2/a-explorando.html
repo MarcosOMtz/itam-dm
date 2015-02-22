@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Explorando</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+  <meta name="date" content="2014-12-10" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="a-explorando_files/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="a-explorando_files/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="a-explorando_files/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Explorando',
+                        subtitle: 'los datos y el proceso',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+              },
+
+      // Author information
+      presenters: [
+            {
+        name: 'Adolfo J. De Unánue T.'
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+  </style>
+
+  <link rel="stylesheet" href="../css/itam.css" type="text/css" />
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides>
+
+  <slide class="title-slide segue nobackground">
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+            <p style="margin-top: 6px; margin-left: -2px;">21/10/2014</p>
+          </hgroup>
+  </slide>
+
+<slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2>Proceso</h2></hgroup><article  id="proceso">
+
+</article></slide><slide class=''><hgroup><h2>CRISP-DM</h2></hgroup><article  id="crisp-dm" class="flexbox vcenter">
+
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/CRISP-DM_Process_Diagram.png/479px-CRISP-DM_Process_Diagram.png" align="center"/></p>
+
+<p><a href='http://en.wikipedia.org/wiki/Cross_Industry_Standard_Process_for_Data_Mining' title=''>Cross Industry Standard Process for Data Mining</a></p>
+
+</article></slide><slide class=''><hgroup><h2>Metas</h2></hgroup><article  id="metas" class="flexbox vcenter">
+
+<ul>
+<li>¿Por qué quieren el proyecto?¿Qué les falta? ¿Qué necesitan?</li>
+<li>¿Qué hacen para resolver el problema ahora?¿Por qué no es suficiente?</li>
+<li>¿Qué recursos existen?¿Tendrás acceso a expertos del dominio?</li>
+<li>¿Cómo planean utilizar los resultados?¿Cómo harán el <em>deploy</em>? ¿Qué restricciones existen?</li>
+<li>¿La meta es específica y medible?</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Métricas</h2></hgroup><article  id="metricas">
+
+<ul>
+<li><p><span class="blue">
+Exactitud (<em>Accuracy</em>)</span></p></li>
+<li><p><span class="blue2">
+Recall</span></p></li>
+<li><p><span class="blue3">
+Precisión</span></p></li>
+<li><p><span class="blue">
+ False positive rate (FPR)</span></p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Expectativas</h2></hgroup><article  id="expectativas" class="flexbox vcenter">
+
+<ul>
+<li><p>Establecer las expectativas es una parte <span class="red2">
+crucial</span> al definir el proyecto y los criterios de éxito.</p></li>
+<li><p>Entender lo que el modelo <span class="blue2">
+debe</span> hacer para tener un desempeño aceptable es importante.</p></li>
+<li><p>Entender lo que el modelo <span class="green2">
+puede</span> hacer con los datos disponibles también.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Expectativas: El mínimo</h2></hgroup><article  id="expectativas-el-minimo" class="flexbox vcenter">
+
+<ul>
+<li><p>El mínimo esperado se puede definir usando <span class="blue3">
+el modelo nulo</span>.</p></li>
+<li><p>Se puede entender como el &quot;educated guess&quot;.</p></li>
+<li><p>Si ya hay un modelo o una solución, ese es el <span class="blue3">
+modelo nulo</span>.</p></li>
+<li><p>Si no lo hay, es el modelo más simple:</p>
+
+<ul>
+<li>adivinando la variable dependiente,<br/></li>
+<li>predecir siempre con la media,<br/></li>
+<li>prediciendo siempre una clase en particular, etc.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Expectativas: El mínimo</h2></hgroup><article  id="expectativas-el-minimo-1" class="flexbox vcenter">
+
+<ul>
+<li><p>Cuando tengas un modelo debe de ser mejor que el modelo nulo.</p></li>
+<li><p>Para saber si es verdaderamente mejor, es necesario correr una <span class="blue">
+prueba de hipótesis</span>.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Expectativas: El máximo</h2></hgroup><article  id="expectativas-el-maximo" class="flexbox vcenter">
+
+<ul>
+<li><p>Debes de saber, al principio del proyecto, que tienes los datos para cubrir con las metas planteadas.</p></li>
+<li><p>La cantidad a determinar es la <span class="green">
+Varianza Inexplicable (unexplained variance)</span>: ¿Cuánto de la variación de tus datos de salida no puede ser explicado por tus variables de entrada?</p></li>
+<li><p>El límite de exactitud (<em>accuracy</em>) debido a la <em>unexplained variance</em> se conoce como <span class="blue">
+Tasa de Bayes</span> (<em>Bayes rate</em>).</p></li>
+<li><p>Claro esto tiene sentido, si lo que están pidiendo está en función del <em>accuracy</em>.</p></li>
+<li><p>Se puede aproximar por un clasificador de vecinos cercanos o construyendo una tabla con las combinaciones de variables posibles.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Data</h2></hgroup><article  id="data" class="flexbox vcenter">
+
+<ul>
+<li>¿Los datos están disponibles?</li>
+<li>¿Los datos me ayudarán a resolver el problema?</li>
+<li>¿Son suficientes?</li>
+<li>¿La calidad es buena?</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>IMPORTANTE</h2></hgroup><article  id="importante" class="flexbox vcenter">
+
+<p><span class="large">
+Reproductibilidad</span></p>
+
+<p>Debes de ser capaz (o cualquier otro) de repetir tu trabajo sin depender de resultados intermedios.</p>
+
+<p>Todo debe de estar comentado con como reproducirlo o con documentación de donde se obtuvo.</p>
+
+<p>Debes de poder defender tu trabajo</p>
+
+<p>Manten tus <code>scripts</code> bajo control de versiones</p>
+
+</article></slide><slide class=''><hgroup><h2>IMPORTANTE</h2></hgroup><article  id="importante-1" class="flexbox vcenter">
+
+<p><span class="large">
+Estilo y Convención</span></p>
+
+<p><a href='http://r-pkgs.had.co.nz/style.html' title=''>Style Guide</a></p>
+
+<p>Salvo el asunto de la terminación en <code>.R</code>, usa <code>.r</code></p>
+
+</article></slide><slide class=''><hgroup><h2>IMPORTANTE</h2></hgroup><article  id="importante-2" class="flexbox vcenter large">
+
+<p>Pruebas</p>
+
+</article></slide><slide class=''><hgroup><h2>IMPORTANTE</h2></hgroup><article  id="importante-3" class="flexbox vcenter large">
+
+<p>Comunicación</p>
+
+</article></slide><slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2>Ejemplo</h2></hgroup><article  id="ejemplo">
+
+</article></slide><slide class=''><hgroup><h2>¿Quién eres?</h2></hgroup><article  id="quien-eres" class="flexbox vcenter">
+
+<p>Eres el científico de datos de un banco alemán, el banco tiene muchas pérdidas debido a malos créditos y quiere reducir sus pérdidas. Te piden realizar esta tarea, indicando que quieren reducir la tasa de pérdidas en un 10%.</p>
+
+</article></slide><slide class=''><hgroup><h2>Datos</h2></hgroup><article  id="datos" class="flexbox vcenter">
+
+<ul>
+<li>Usaremos para este ejemplo, los datos de crédito aleman (<em>German data set</em>). Los datos ya se encuentran en <code>data/german</code>.</li>
+</ul>
+
+<p><a href='https://archive.ics.uci.edu/ml/datasets/Statlog+%28German+Credit+Data%29' title=''>German Credit Data</a></p>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio</h2></hgroup><article  id="ejercicio">
+
+<p>En tu carpeta, crea una subcarpeta <code>german</code>.</p>
+
+</article></slide><slide class=''><hgroup><h2>Carga de datos</h2></hgroup><article  id="carga-de-datos" class="tiny">
+
+<pre class = 'prettyprint lang-r'>german.url &lt;- paste(&#39;http://archive.ics.uci.edu/ml&#39;,
+                    &#39;/machine-learning-databases/statlog&#39;,
+                    &#39;/german/german.data&#39;,
+                    sep=&#39;&#39;)
+
+german.data &lt;- read.table(german.url, 
+                          stringsAsFactors = FALSE, 
+                          header = FALSE)</pre>
+
+<p>Los datos son un asco&#8230;</p>
+
+<pre class = 'prettyprint lang-r'>head(german.data)</pre>
+
+<pre >##    V1 V2  V3  V4   V5  V6  V7 V8  V9  V10 V11  V12 V13  V14  V15 V16  V17
+## 1 A11  6 A34 A43 1169 A65 A75  4 A93 A101   4 A121  67 A143 A152   2 A173
+## 2 A12 48 A32 A43 5951 A61 A73  2 A92 A101   2 A121  22 A143 A152   1 A173
+## 3 A14 12 A34 A46 2096 A61 A74  2 A93 A101   3 A121  49 A143 A152   1 A172
+## 4 A11 42 A32 A42 7882 A61 A74  2 A93 A103   4 A122  45 A143 A153   1 A173
+## 5 A11 24 A33 A40 4870 A61 A73  3 A93 A101   4 A124  53 A143 A153   2 A173
+## 6 A14 36 A32 A46 9055 A65 A73  2 A93 A101   4 A124  35 A143 A153   1 A172
+##   V18  V19  V20 V21
+## 1   1 A192 A201   1
+## 2   1 A191 A201   2
+## 3   2 A191 A201   1
+## 4   2 A191 A201   1
+## 5   2 A191 A201   2
+## 6   2 A192 A201   1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio</h2></hgroup><article  id="ejercicio-1" class="flexbox vcenter">
+
+<ul>
+<li><p>Crea una función <code>load</code> en <code>utils.r</code> en tu carpeta, que descargue, si y sólo si no existe un archivo <code>german.rds</code>. Si no existe, descarga y guarda el archivo.</p></li>
+<li><p><code>?saveRDS</code>, <code>?readRDS</code></p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Transformación de datos</h2></hgroup><article  id="transformacion-de-datos" class="smaller">
+
+<p>Los nombres de las columnas fueron copiados a mano desde <code>german.odt</code></p>
+
+<pre class = 'prettyprint lang-r'>german.colnames &lt;- c(&#39;Status of existing checking account&#39;, 
+                     &#39;Duration in month&#39;,
+                     &#39;Credit history&#39;,
+                     &#39;Purpose&#39;,
+                     &#39;Credit amount&#39;,
+                     &#39;Savings account/bonds&#39;,
+                     &#39;Present employment since&#39;,
+                     &#39;Installment rate in percentage of disposable income&#39;,
+                     &#39;Personal status and sex&#39;,
+                     &#39;Other debtors / guarantors&#39;,
+                     &#39;Present residence since&#39;,
+                     &#39;Property&#39;,
+                     &#39;Age in years&#39;,
+                     &#39;Other installment plans&#39;,
+                     &#39;Housing&#39;,
+                     &#39;Number of existing credits at this bank&#39;,
+                     &#39;Job&#39;,
+                     &#39;Number of people being liable to provide maintenance for&#39;,
+                     &#39;Telephone&#39;,
+                     &#39;foreign worker&#39;,
+                     &#39;Good.Loan&#39;
+                     )</pre>
+
+</article></slide><slide class=''><hgroup><h2>Transformación de datos</h2></hgroup><article  id="transformacion-de-datos-1" class="smaller">
+
+<p>La variable de salida la estoy definiendo como categórica (<code>factor</code> en <code>R</code>)</p>
+
+<pre class = 'prettyprint lang-r'>colnames(german.data) &lt;- german.colnames
+german.data$Good.Loan &lt;- as.factor(
+                          ifelse(
+                            german.data$Good.Loan == 1, 
+                            &#39;GoodLoan&#39;, 
+                            &#39;BadLoan&#39;
+                            )
+                          )</pre>
+
+</article></slide><slide class=''><hgroup><h2>Decodificar</h2></hgroup><article  id="decodificar" class="tiny">
+
+<pre class = 'prettyprint lang-r'>german.codes &lt;- list(&#39;A11&#39;=&#39;... &lt; 0 DM&#39;,
+ &#39;A12&#39;=&#39;0 &lt;= ... &lt; 200 DM&#39;, 
+ &#39;A13&#39;=&#39;... &gt;= 200 DM / salary assignments for at least 1 year&#39;,
+ &#39;A14&#39;=&#39;no checking account&#39;, 
+ &#39;A30&#39;=&#39;no credits taken/all credits paid back duly&#39;,
+ &#39;A31&#39;=&#39;all credits at this bank paid back duly&#39;, 
+ &#39;A32&#39;=&#39;existing credits paid back duly till now&#39;,
+ &#39;A33&#39;=&#39;delay in paying off in the past&#39;, 
+ &#39;A34&#39;=&#39;critical account/other credits existing (not at this bank)&#39;,
+ &#39;A40&#39;=&#39;car (new)&#39;, 
+ &#39;A41&#39;=&#39;car (used)&#39;, 
+ &#39;A42&#39;=&#39;furniture/equipment&#39;,
+ &#39;A43&#39;=&#39;radio/television&#39;, &#39;A44&#39;=&#39;domestic appliances&#39;, &#39;A45&#39;=&#39;repairs&#39;,
+ &#39;A46&#39;=&#39;education&#39;, &#39;A47&#39;=&#39;(vacation - does not exist?)&#39;,
+ &#39;A48&#39;=&#39;retraining&#39;, &#39;A49&#39;=&#39;business&#39;, &#39;A410&#39;=&#39;others&#39;, &#39;A61&#39;=&#39;... &lt; 100 DM&#39;,
+ &#39;A62&#39;=&#39;100 &lt;= ... &lt; 500 DM&#39;, &#39;A63&#39;=&#39;500 &lt;= ... &lt; 1000 DM&#39;,
+ &#39;A64&#39;=&#39;.. &gt;= 1000 DM&#39;, &#39;A65&#39;=&#39;unknown/ no savings account&#39;,
+ &#39;A71&#39;=&#39;unemployed&#39;, &#39;A72&#39;=&#39;... &lt; 1 year&#39;, &#39;A73&#39;=&#39;1 &lt;= ... &lt; 4 years&#39;, 
+ &#39;A74&#39;=&#39;4 &lt;= ... &lt; 7 years&#39;, &#39;A75&#39;=&#39;.. &gt;= 7 years&#39;, &#39;A91&#39;=&#39;male : divorced/separated&#39;,
+ &#39;A92&#39;=&#39;female : divorced/separated/married&#39;,
+ &#39;A93&#39;=&#39;male : single&#39;,
+ &#39;A94&#39;=&#39;male : married/widowed&#39;, 
+ &#39;A95&#39;=&#39;female : single&#39;,
+ &#39;A101&#39;=&#39;none&#39;, 
+ &#39;A102&#39;=&#39;co-applicant&#39;,
+ &#39;A103&#39;=&#39;guarantor&#39;, &#39;A121&#39;=&#39;real estate&#39;,
+ &#39;A122&#39;=&#39;if not A121 : building society savings agreement/life insurance&#39;,
+ &#39;A123&#39;=&#39;if not A121/A122 : car or other, not in attribute 6&#39;,
+ &#39;A124&#39;=&#39;unknown / no property&#39;, 
+ &#39;A141&#39;=&#39;bank&#39;, &#39;A142&#39;=&#39;stores&#39;,  &#39;A143&#39;=&#39;none&#39;, &#39;A151&#39;=&#39;rent&#39;, &#39;A152&#39;=&#39;own&#39;,
+ &#39;A153&#39;=&#39;for free&#39;, &#39;A171&#39;=&#39;unemployed/ unskilled - non-resident&#39;,
+ &#39;A172&#39;=&#39;unskilled - resident&#39;, &#39;A173&#39;=&#39;skilled employee / official&#39;,
+ &#39;A174&#39;=&#39;management/ self-employed/highly qualified employee/ officer&#39;,
+ &#39;A191&#39;=&#39;none&#39;, &#39;A192&#39;=&#39;yes, registered under the customers name&#39;,
+ &#39;A201&#39;=&#39;yes&#39;, &#39;A202&#39;=&#39;no&#39;)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio</h2></hgroup><article  id="ejercicio-2" class="flexbox vcenter">
+
+<ul>
+<li><p>Crea una función <code>german.decode</code> en un archivo <code>utils.r</code> dentro de tu carpeta, esta función debe de utilizar <code>german.codes</code> para decodificar los elementos de todas las columnas (por ejemplo <code>A201</code> -&gt; <code>yes</code>)</p></li>
+<li><p>Utiliza <code>lapply</code> para decodificar todas las columnas de <code>german.data</code></p></li>
+<li><p>Utiliza <code>dplyr</code> para decodificar todas las columnas de <code>german.data</code></p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Datos manejables</h2></hgroup><article  id="datos-manejables" class="flexbox vcenter">
+
+<p>En este momento deberás de tener archivos <code>0-load.r</code>, <code>1-prepare.r</code> y un archivo <code>utils.r</code> dentro de <code>german</code>. Además deberías de tener un archivo <code>german.rds</code>.</p>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio</h2></hgroup><article  id="ejercicio-3" class="flexbox vcenter">
+
+<ul>
+<li><p>¿Hay algo raro con los datos de préstamo?</p></li>
+<li><p>¿Cuál crees que debería ser la distribución del resultado del préstamo <code>Good.Loan</code> respecto a <code>Credit history</code>?</p></li>
+<li><p>Grafícalo y comenta tus resultados.</p></li>
+<li><p>Si lo vas a hacer con <code>ggplot2</code> usa esta <a href='http://zevross.com/blog/2014/08/04/beautiful-plotting-in-r-a-ggplot2-cheatsheet-3/' title=''>guía</a> o este <a href='http://rforpublichealth.blogspot.mx/2014/02/ggplot2-cheatsheet-for-visualizing.html' title=''>cheatsheet</a></p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Tarea</h2></hgroup><article  id="tarea" class="flexbox vcenter">
+
+<ul>
+<li><p>Fue terrible poder hacer la gráfica con <code>ggplot</code> utilizando los nombres de columnas que pusimos (<code>german.colnames</code>).</p></li>
+<li><p>Modifica el archivo donde tengas <code>german.colnames</code> (puede ser <code>utils.r</code> o <code>metadata.r</code>) y sustituye (usando quizá <code>stringr</code> o <code>grep</code>) los <code>&#39; &#39;</code> y <code>&#39;/&#39;</code> por <code>&#39;.&#39;</code> (ve la guía de estilo) y pasa todo a minúsculas.</p></li>
+<li><p>Ejecuta todo de nuevo (¡la ventaja de ser reproducible!)</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Intermedio</h2></hgroup><article  id="intermedio" class="smaller">
+
+<ul>
+<li>Si te quedó desacomodado, este código ordena los <code>bar charts</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>credit.history.tbl &lt;- table(german.data$&#39;Credit history&#39;)
+credit.history.df &lt;- as.data.frame(credit.history.tbl)
+colnames(credit.history.df) &lt;- c(&#39;credit.history&#39;, &#39;count&#39;)
+summary(credit.history.df)
+
+credit.history.df &lt;- transform(credit.history.df, 
+                               credit.history=reorder(credit.history, count)
+                               )
+summary(credit.history.df)
+
+ggplot(credit.history.df) + 
+  geom_bar(aes(x=credit.history, y=count), stat=&quot;identity&quot;, fill=&quot;gray&quot;) + 
+    coord_flip() + 
+      theme(axis.text.y=element_text(size=rel(0.8)))</pre>
+
+<ul>
+<li>Aunque no lo colorea ¿Cómo hay que modificarlo?</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio</h2></hgroup><article  id="ejercicio-4" class="flexbox vcenter">
+
+<p>Modifica el ejercico anterior para mostrar la gráfica de manera ordenada y sea más claro tu caso.</p>
+
+</article></slide><slide class=''><hgroup><h2>Sanidad de los datos</h2></hgroup><article  id="sanidad-de-los-datos">
+
+<ul>
+<li><p>El nombre de la columna no significa lo que tu crees que significa</p></li>
+<li><p>El significado de la columna cambia con el paso del tiempo o la metodología para medir esa variable.</p></li>
+<li><p>Mucha / muy poca resolución</p></li>
+<li>Los valores <code>missing</code> no son realmente faltantes (<code>NAs</code>), si no que significan algo
+
+<ul>
+<li>Regularmente no documentado</li>
+</ul></li>
+<li>Si es un <code>csv</code> de seguro a alguien ya le pareció chistoso ponerle comas
+
+<ul>
+<li>Existe una historia parecida para los <code>tsv</code>, <code>psv</code>, etc.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2><code class="build">summary</code></h2></hgroup><article  id="summary">
+
+<p>Un uso del <code>summary()</code> es detectar problemas en los datos.</p>
+
+<ul>
+<li>¿Valores faltantes?
+
+<ul>
+<li>¿Hay una variable con muchos faltantes?¿Por qué?¿Es un error? ¿Significa algo?</li>
+</ul></li>
+<li>¿Valores inválidos?
+
+<ul>
+<li>¿Hay negativos donde no debería de haber? (Como en edad, ingreso, estatura)</li>
+<li>¿Texto en lugar de números?</li>
+</ul></li>
+<li>¿Outliers?
+
+<ul>
+<li>Son aquellos valores que no crees que deberían de estar (En el ejemplo de edad 1400 años)</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2><code class="build">summary</code></h2></hgroup><article  id="summary-1">
+
+<ul>
+<li>¿Rangos?
+
+<ul>
+<li>Es importante saber cuanto varía la variable.</li>
+<li>Si es muy amplio, puede ser un problema para algunos algoritmos de modelado.</li>
+<li>Si varía muy poco (o nada) no puede ser usado como predictor.</li>
+</ul></li>
+<li>¿Unidades?
+
+<ul>
+<li>¿El salario es mensual?¿Quincenal?¿Por hora?</li>
+<li>¿Los intervalos de tiempo están en segundos?¿Años?</li>
+<li>¿Las longitudes? ¿La moneda?</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio</h2></hgroup><article  id="ejercicio-5" class="flexbox vcenter">
+
+<p>Revisa <code>german.data</code> con <code>summary()</code>, reporta alguna anomalía.</p>
+
+</article></slide><slide class=''><hgroup><h2>¿Quién eres?</h2></hgroup><article  id="quien-eres-1" class="flexbox vcenter">
+
+<p>Como el dinero no alcanza, tomas otro trabajo rápido para una ONG. Quieren predecir la concentración de algas en ríos de la región. Tomaron datos durante un año.</p>
+
+<p>Cada observación es el efecto de agregar varias muestras de agua recolectadas en el mismo río por un periodo de 3 meses en la misma estación del año.</p>
+
+</article></slide><slide class=''><hgroup><h2>Más datos</h2></hgroup><article  id="mas-datos" class="flexbox vcenter">
+
+<ul>
+<li><p>Usaremos, además del <em>German data set</em>, los datos de la competición COIL de 1999 sobre contaminación de ríos</p></li>
+<li><p>Ya se encuentran en <code>data/algas</code>.</p></li>
+</ul>
+
+<p><a href='https://archive.ics.uci.edu/ml/datasets/Coil+1999+Competition+Data' title=''>Coil 1999 Competition Data</a></p>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio</h2></hgroup><article  id="ejercicio-6" class="flexbox vcenter">
+
+<ul>
+<li><p>Repite los pasos realizados para <code>german.data</code> con <code>algas</code>.</p></li>
+<li><p>Revisa con <code>summary()</code>, reporta alguna anomalía.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Usando gráficas</h2></hgroup><article  id="usando-graficas">
+
+<ul>
+<li><p>El resumen estadístico quizá no cuente toda la historia.</p></li>
+<li><p>El siguiente paso es explorar mediante gráficas.</p></li>
+<li><p>Es un proceso iterativo.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Una sola variable</h2></hgroup><article  id="una-sola-variable" class="smaller">
+
+<ul>
+<li>¿Cuál es el pico? ¿Coincide con la media? ¿La mediana? ¿Existe?</li>
+<li>¿Cuántos picos?</li>
+<li>Si es <code>bimodal</code> o <code>multimodal</code> quizá haya varias poblaciones en lugar de una y será mejor modelar por separado.</li>
+<li>¿Qué tan normal es? ¿El log-normal?
+
+<ul>
+<li>Utiliza una gráfica <code>Q-Q</code></li>
+</ul></li>
+<li>¿Cuánto varía? ¿Está concentrada en un intervalo o una categoría?</li>
+<li>¿Outliers? -&gt; Usa gráficas de <code>boxplot</code>.</li>
+<li>Da preferencia a los <code>density plots</code>, en esta gráfica es más importante la forma que los valores actuales del eje vertical.</li>
+<li>Si los datos están concentrados en un solo lado de la gráfica (<code>skewed</code>) y es no negativa es bueno representarla en <code>log10</code>.</li>
+<li>Una grafica de barras no da más información que <code>summary()</code>, aunque alguna gente las prefiere.
+
+<ul>
+<li>Es bueno mostrarla horizontal y ordenada.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Tarea</h2></hgroup><article  id="tarea-1" class="flexbox vcenter">
+
+<ul>
+<li>Es importante en la etapa de exploración, poder generar varias gráficas de manera automática y simple para analizarlas visualmente y tener una idea de los datos.</li>
+<li>Crea una función que genere los tipos de gráfica correspondiente para cada variable del <code>data.frame</code>.</li>
+<li>Guárdala en <code>utils.r</code>.</li>
+<li>Úsala en <code>2-eda.r</code> en ambas carpetas: <code>algas</code> y <code>german</code>.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Dos variables</h2></hgroup><article  id="dos-variables">
+
+<ul>
+<li>¿Existe relación entre dos variables de entrada? ¿entre una entrada y la variable de salida?</li>
+<li>¿Qué tan fuerte?</li>
+<li>¿Qué tipo de relación?</li>
+<li><code>Scatter plot</code> entre dos variables numéricas, calcular la correlación de Pearson en un conjunto <code>sano</code> de los datos, visualizar la curva que mejor representa los datos.</li>
+<li><code>Stacked bar charts</code> para dos variables categóricas.
+
+<ul>
+<li>Si quieres comparar razones a lo largo de las categorías lo mejor es usar un <code>filled bar chart</code>. En este caso se recomienda agregar un <code>rug</code> para tener una idea de la cantidad de individuos.</li>
+<li>Si hay múltiples categorías por variable, es mejor usar <code>facets</code>.</li>
+</ul></li>
+<li>Para variable categórica y numérica es recomendable usar <code>boxplot</code> (en su versión de <code>violin</code> o <code>jitter</code>).</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Tarea</h2></hgroup><article  id="tarea-2" class="flexbox vcenter">
+
+<ul>
+<li>Es importante en la etapa de exploración, poder generar varias gráficas de manera automática y simple para analizarlas visualmente y tener una idea de los datos.</li>
+<li>Crea una función que genere los tipos de gráfica para cada par de variables del <code>data.frame</code>. Esta función debe de recibir dos parámetros, uno que indique si genera todas las combinaciones de dos variables o recibe una lista de variables en las cuales generar las combinaciones.</li>
+<li>Guárdala en <code>utils.r</code>.</li>
+<li>Úsala en <code>2-eda.r</code> en ambas carpetas: <code>algas</code> y <code>german</code>.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Valores faltantes: <code>NAs</code></h2></hgroup><article  id="valores-faltantes-nas">
+
+<ul>
+<li>Los pasos son los siguientes:
+
+<ul>
+<li>Identificar los datos faltantes.</li>
+<li>Examinar las causas de los datos faltantes.
+
+<ul>
+<li>Preguntar al domain expert, etc.</li>
+</ul></li>
+<li>Borrar los casos (o columnas) que contienen los <code>NAs</code> o reemplazar (imputar) los <code>NAs</code> con valores razonables.</li>
+</ul></li>
+<li>La teoría la veremos más adelante en el curso.</li>
+</ul>
+
+<p><span class="yellow">
+NOTA: Todas estás recomendaciones aplican igual para outliers</span></p>
+
+</article></slide><slide class=''><hgroup><h2>Valores faltantes: <code>NAs</code></h2></hgroup><article  id="valores-faltantes-nas-1">
+
+<ul>
+<li><p>Es importante recordar que en <code>R</code> la operación <code>x == NA</code> nunca regresa <code>TRUE</code>, siempre hay que utilizar las funciones <code>is.na()</code>, <code>is.nan()</code> e <code>is.infinite()</code>.</p></li>
+<li><p>El método <code>complete.cases</code> identifica los renglones (individuos) del <code>data.frame</code> que no tienen ningún <code>NA</code> en sus columnas (variables).</p></li>
+<li>Es posible usar <code>sum</code> y <code>mean</code> con <code>is.na</code> para obtener el total por columna de faltantes y el porcentaje.
+
+<ul>
+<li>¿Por qué?</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Valores faltantes</h2></hgroup><article  id="valores-faltantes" class="smaller">
+
+<p>Aunque más adelante veremos técnicas más poderosas, vale la pena mencionar el ejemplo mostrado en <code>R in action</code>, cap. 15.</p>
+
+<p>La técnica nos permite determinar si los faltantes en una variable están correlacionados con otra.</p>
+
+<pre class = 'prettyprint lang-r'>x &lt;- as.data.frame(abs(is.na(df))) # df es un data.frame
+
+head(df)
+
+head(x)
+
+# Extrae las variables que tienen algunas celdas con NAs
+y &lt;- x[which(sapply(x, sd) &gt; 0)] 
+
+# Da la correación un valor alto positivo significa que desaparecen juntas.
+cor(y) </pre>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio</h2></hgroup><article  id="ejercicio-7" class="flexbox vcenter">
+
+<ul>
+<li><p>Genera un reporte para ambos conjuntos de datos que reporte el estado de los valores missing.</p></li>
+<li><p>Muestra la matriz de correlación faltante en una gráfica.</p></li>
+<li><p>¿Qué puedes entender?</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Remover observaciones</h2></hgroup><article  id="variables-faltantes-remover-observaciones" class="tiny">
+
+<p>Las variables con más faltantes son Promedio de Cloruro <code>Cl</code> (10) y Promedio de Clorofila <code>Chla</code> (12).</p>
+
+<pre class = 'prettyprint lang-r'>summary(algas[-grep(colnames(algas),pattern = &quot;^a[1-9]&quot;)]) # Nota el uso del grep</pre>
+
+<pre >##   temporada     tamaño    velocidad       mxPH            mnO2       
+##  autumn:40   large :45   high  :84   Min.   :5.600   Min.   : 1.500  
+##  spring:53   medium:84   low   :33   1st Qu.:7.700   1st Qu.: 7.725  
+##  summer:45   small :71   medium:83   Median :8.060   Median : 9.800  
+##  winter:62                           Mean   :8.012   Mean   : 9.118  
+##                                      3rd Qu.:8.400   3rd Qu.:10.800  
+##                                      Max.   :9.700   Max.   :13.400  
+##                                      NA&#39;s   :1       NA&#39;s   :2       
+##        Cl               NO3              NO4                oPO4       
+##  Min.   :  0.222   Min.   : 0.050   Min.   :    5.00   Min.   :  1.00  
+##  1st Qu.: 10.981   1st Qu.: 1.296   1st Qu.:   38.33   1st Qu.: 15.70  
+##  Median : 32.730   Median : 2.675   Median :  103.17   Median : 40.15  
+##  Mean   : 43.636   Mean   : 3.282   Mean   :  501.30   Mean   : 73.59  
+##  3rd Qu.: 57.824   3rd Qu.: 4.446   3rd Qu.:  226.95   3rd Qu.: 99.33  
+##  Max.   :391.500   Max.   :45.650   Max.   :24064.00   Max.   :564.60  
+##  NA&#39;s   :10        NA&#39;s   :2        NA&#39;s   :2          NA&#39;s   :2       
+##       PO4              Chla        
+##  Min.   :  1.00   Min.   :  0.200  
+##  1st Qu.: 41.38   1st Qu.:  2.000  
+##  Median :103.29   Median :  5.475  
+##  Mean   :137.88   Mean   : 13.971  
+##  3rd Qu.:213.75   3rd Qu.: 18.308  
+##  Max.   :771.60   Max.   :110.456  
+##  NA&#39;s   :2        NA&#39;s   :12</pre>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Remover observaciones</h2></hgroup><article  id="variables-faltantes-remover-observaciones-1">
+
+<p>Antes de removerlas es recomendable verlos, guardarlos y contarlos:</p>
+
+<pre class = 'prettyprint lang-r'>nrow(algas[!complete.cases(algas),])</pre>
+
+<p>Hay 16 observaciones en las cuales tienen <code>NAs</code></p>
+
+<pre class = 'prettyprint lang-r'>algas.con.NAs &lt;- algas[!complete.cases(algas),]</pre>
+
+<p>Siempre es bueno guardarlas, si se piensan eliminar del dataset.</p>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Remover observaciones</h2></hgroup><article  id="variables-faltantes-remover-observaciones-2" class="tiny">
+
+<p>Las observaciones con <code>NAs</code>son las siguientes:</p>
+
+<pre class = 'prettyprint lang-r'>algas.con.NAs[c(&#39;mxPH&#39;, &#39;mnO2&#39;, &#39;Cl&#39;, &#39;NO3&#39;, &#39;NO4&#39;, &#39;oPO4&#39;, &#39;PO4&#39;, &#39;Chla&#39;)]</pre>
+
+<pre >##     mxPH mnO2    Cl   NO3 NO4    oPO4     PO4  Chla
+## 28  6.80 11.1 9.000 0.630  20   4.000      NA  2.70
+## 38  8.00   NA 1.450 0.810  10   2.500   3.000  0.30
+## 48    NA 12.6 9.000 0.230  10   5.000   6.000  1.10
+## 55  6.60 10.8    NA 3.245  10   1.000   6.500    NA
+## 56  5.60 11.8    NA 2.220   5   1.000   1.000    NA
+## 57  5.70 10.8    NA 2.550  10   1.000   4.000    NA
+## 58  6.60  9.5    NA 1.320  20   1.000   6.000    NA
+## 59  6.60 10.8    NA 2.640  10   2.000  11.000    NA
+## 60  6.60 11.3    NA 4.170  10   1.000   6.000    NA
+## 61  6.50 10.4    NA 5.970  10   2.000  14.000    NA
+## 62  6.40   NA    NA    NA  NA      NA  14.000    NA
+## 63  7.83 11.7 4.083 1.328  18   3.333   6.667    NA
+## 116 9.70 10.8 0.222 0.406  10  22.444  10.111    NA
+## 161 9.00  5.8    NA 0.900 142 102.000 186.000 68.05
+## 184 8.00 10.9 9.055 0.825  40  21.083  56.091    NA
+## 199 8.00  7.6    NA    NA  NA      NA      NA    NA</pre>
+
+<p>de los cuales, <code>62</code> y <code>199</code> tienen más del <code>50%</code> (<code>6</code>) de las variables independientes nulas.</p>
+
+<p><span class="green">
+Aunque remover las observaciones con <code>NAs</code> NO sea la estrategia, quitar las observaciones con muchas columnas vacías, puede ser recomendable. </span></p>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Remover observaciones</h2></hgroup><article  id="variables-faltantes-remover-observaciones-3" class="tiny">
+
+<p>En los casos en los que no es posible hacer una explorarción visual, se puede utilizar el siguiente código</p>
+
+<pre class = 'prettyprint lang-r'># ¿Cuántos NAs hay por observación?
+apply(algas, 1, function(x) sum(is.na(x)))</pre>
+
+<pre >##   [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0
+##  [36] 0 0 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 2 2 2 2 2 2 2 6 1 0 0 0 0 0 0 0
+##  [71] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+## [106] 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+## [141] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+## [176] 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 6 0</pre>
+
+<p>Si queremos ver las observaciones:</p>
+
+<pre class = 'prettyprint lang-r'>algas[apply(algas, 1, function(x) sum(is.na(x))) &gt; 2,]</pre>
+
+<pre >##     temporada tamaño velocidad mxPH mnO2 Cl NO3 NO4 oPO4 PO4 Chla   a1
+## 62     summer  small    medium  6.4   NA NA  NA  NA   NA  14   NA 19.4
+## 199    winter  large    medium  8.0  7.6 NA  NA  NA   NA  NA   NA  0.0
+##       a2  a3 a4 a5  a6  a7
+## 62   0.0 0.0  2  0 3.9 1.7
+## 199 12.5 3.7  1  0 0.0 4.9</pre>
+
+<p>Lo cual confirma nuestra exploración visual.</p>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Remover observaciones</h2></hgroup><article  id="variables-faltantes-remover-observaciones-4" class="smaller">
+
+<p>Si eliminar las observaciones con <code>NAs</code> va a ser el camino que vamos a tomar, habrá que hacerlo de manera reproducible</p>
+
+<pre class = 'prettyprint lang-r'>indicesConNAs &lt;- function(data, porcentaje=0.2) {
+  n &lt;- if (porcentaje &lt; 1) {
+    as.integer(porcentaje  * ncol(data))
+  } else {
+    stop(&quot;Debes de introducir el porcentaje de columnas con NAs.&quot;)
+  }
+  indices &lt;- which( apply(data, 1, function(x) sum(is.na(x))) &gt; n )
+  if (!length(indices)) {
+    warning(&quot;No hay observaciones con tantos NAs 
+            (la respuesta de la función es vacía),
+            no se recomienda indexar el data.frame con esto&quot;)
+  }
+  indices
+}</pre>
+
+<p><span class="blue">
+Ejercicio</span>: ¿Qué hace esta función?</p>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Remover observaciones</h2></hgroup><article  id="variables-faltantes-remover-observaciones-5" class="smaller">
+
+<pre class = 'prettyprint lang-r'>indicesConNAs(algas, 0.2)</pre>
+
+<pre >## [1]  62 199</pre>
+
+<pre class = 'prettyprint lang-r'>indicesConNAs(algas, 0.8)</pre>
+
+<pre >## Warning in indicesConNAs(algas, 0.8): No hay observaciones con tantos NAs 
+##             (la respuesta de la función es vacía),
+##             no se recomienda indexar el data.frame con esto</pre>
+
+<pre >## integer(0)</pre>
+
+<pre class = 'prettyprint lang-r'># Si queremos remover las que tengan más del 20% de NAs...
+algas &lt;- algas[-indicesConNAs(algas, 0.2),]</pre>
+
+<p><span class="blue">
+Ejercicio</span>: Agrega esta función a tu archivo <code>utils.r</code>.</p>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Renivelar</h2></hgroup><article  id="variables-faltantes-renivelar" class="smaller">
+
+<ul>
+<li><p>Si la variable es categórica (<code>factor</code>), puedes crear una nueva variable y poner los <code>NA</code>s a un nuevo <code>level</code>, e.g. <code>missing</code></p>
+
+<ul>
+<li>Por ejemplo, suponiendo que hubiese una variable categórica con faltantes en nuestros dataset</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>dataset$cat.with.NAs.fix &lt;- ifelse(is.na(dataset$cat.with.NAs),
+                              &quot;missing&quot;,
+                              ifelse(dataset$ccat.with.NAs == TRUE,    
+                                                # o el valor que sea
+                                                &quot;level_1&quot;,
+                                                &quot;level_2&quot;))</pre>
+
+<ul>
+<li><p>Sólo recuerda que es posible que el valor de <code>NA</code> signifique algo.</p></li>
+<li><p>Esto también se puede hacer con variables numéricas, si primero las vuelves categóricas (<span class="blue">
+binning</span>)</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Central</h2></hgroup><article  id="variables-faltantes-central">
+
+<ul>
+<li>Una estrategia es rellenar los valores faltantes con alguna medida de centralidad.
+
+<ul>
+<li>Media, mediana, moda, etc.</li>
+</ul></li>
+<li><p>Para variables distribuidas normalmente, esta opción es la mejor.</p></li>
+<li><p>Pero para variables <span class="red2">
+skewed</span> o con <span class="red">
+outliers</span> esta decisión puede ser desastrosa.</p></li>
+<li><p>Por lo tanto, esta estrategia no se debe de utilizar salvo una exploración previa de las variables.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Tarea</h2></hgroup><article  id="tarea-3" class="flexbox vcenter">
+
+<ul>
+<li><p>¿A qué variables le puedes de <code>algas</code> le puedes aplicar este procedimiento?</p></li>
+<li><p>¿Qué puedes decir de <code>german</code>?</p></li>
+<li><p>A las variables que no se les puede aplicar, explica por qué no.</p></li>
+<li><p>Esta decisión debe de ser reproducible, agrega a <code>utils.r</code> una función que impute en las variables con <code>NAs</code> el valor central (<code>median</code> si es numérica, <code>moda</code> si es categórica). La función debe de tener la siguiente firma:</p></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>imputarValorCentral &lt;- function(data, colnames) {...}</pre>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Correlación</h2></hgroup><article  id="variables-faltantes-correlacion" class="smaller">
+
+<p>Calculando rápidamente la correlación</p>
+
+<pre class = 'prettyprint lang-r'>symnum(
+  cor(algas[c(&#39;mxPH&#39;, &#39;mnO2&#39;, &#39;Cl&#39;, &#39;NO3&#39;, &#39;NO4&#39;, &#39;oPO4&#39;, &#39;PO4&#39;, &#39;Chla&#39;)], 
+      use=&quot;complete.obs&quot;)
+  )</pre>
+
+<pre >##      mP mO Cl NO3 NO4 o P Ch
+## mxPH 1                      
+## mnO2    1                   
+## Cl         1                
+## NO3           1             
+## NO4           ,   1         
+## oPO4    .  .          1     
+## PO4     .  .          * 1   
+## Chla .                    1 
+## attr(,&quot;legend&quot;)
+## [1] 0 &#39; &#39; 0.3 &#39;.&#39; 0.6 &#39;,&#39; 0.8 &#39;+&#39; 0.9 &#39;*&#39; 0.95 &#39;B&#39; 1</pre>
+
+<p>Observamos que <code>NO3</code> y <code>NO4</code> y <code>oPO4</code> y <code>PO4</code> están altamente relacionadas (<code>&gt; 0.9</code>).</p>
+
+<p><span class="yellow">
+Si removiste las observaciones <code>62</code> y <code>199</code> no hay columnas que tengan vacíos a <code>NO3</code> y <code>NO4</code> a la vez.</span></p>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Correlación</h2></hgroup><article  id="variables-faltantes-correlacion-1" class="tiny">
+
+<pre class = 'prettyprint lang-r'>library(ggplot2)
+ggplot(data=algas) + 
+  aes(x=oPO4, y=PO4) + 
+  geom_point(shape=1) + # Usamos una bolita para los puntos
+  geom_smooth(method=lm, se=FALSE) </pre>
+
+<p><img src="a-explorando_files/figure-html/correlacion-1.png" title="" alt="" width="768" /></p>
+
+<pre class = 'prettyprint lang-r'>  # Mostramos la linea de la regresión y no mostramos la región de confianza</pre>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Correlación</h2></hgroup><article  id="variables-faltantes-correlacion-2" class="smaller">
+
+<pre class = 'prettyprint lang-r'>algas &lt;- algas[-indicesConNAs(algas),]
+lm(PO4 ~ oPO4, data=algas)</pre>
+
+<pre >## 
+## Call:
+## lm(formula = PO4 ~ oPO4, data = algas)
+## 
+## Coefficients:
+## (Intercept)         oPO4  
+##      42.897        1.293</pre>
+
+<p>Entonces la fórmula es</p>
+
+<p>\[
+PO4 = 42.897 + 1.293*oPO4
+\]</p>
+
+<p><span class="blue2">
+Ejercicio</span>: Crea una función que sustituya los <code>NAs</code> con el valor dado por la regresión lineal recién calculada (No automatices la regresión lineal) <span></p>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Similitud</h2></hgroup><article  id="variables-faltantes-similitud">
+
+<ul>
+<li>Podemos suponer que si dos observaciones son similares y una de ellas tiene <code>NAs</code> en alguna variable, hay una alta probabilidad de que esa variable tenga un valor similar al valor de esa variable en la otra observación.
+
+<ul>
+<li>Obviamente es una suposición&#8230;</li>
+</ul></li>
+<li>Debemos definir la noción de similar
+
+<ul>
+<li>Y esto significa definir un espacio métrico en el espacio que usamos para describir las observaciones.</li>
+<li>Obviamente, otra gran suposición&#8230;</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Similitud</h2></hgroup><article  id="variables-faltantes-similitud-1">
+
+<ul>
+<li>Para variables numéricas se puede usar la distancia euclídea</li>
+</ul>
+
+<p>\[
+d(\vec{x}, \vec{y}) = \sqrt{\sum_{i=1}^p(\vec{x}_i - \vec{y}_i)}
+\]</p>
+
+<ul>
+<li>Si son nominales las variables</li>
+</ul>
+
+<p>\[
+d(\vec{x}, \vec{y}) = \sqrt{\sum_{i=1}^p \delta_i(\vec{x}_i, \vec{y}_i)}
+\]</p>
+
+<p>donde \(\delta(\vec{x},  \vec{y})\) es a delta de Kronecker.</p>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Similitud</h2></hgroup><article  id="variables-faltantes-similitud-2">
+
+<ul>
+<li><p>Una vez definida la similitud, debemos de definir el valor que imputar al <code>NA</code>.</p></li>
+<li><p>Una opción es utilizar una medida de centralidad de los \(k\) observaciones más cercanas.</p></li>
+<li><p>El Promedio con pesode los valores de los vecinos, es otra opción. El peso se puede determinar de varias maneras, pero usar como <span class="blue">
+kernel</span> una función gaussiana.</p></li>
+</ul>
+
+<p>\[
+peso(d) = e^{-d}
+\]</p>
+
+<p>donde \(d\) es la distancia de una observación a la que estamos considerando.</p>
+
+</article></slide><slide class=''><hgroup><h2>Variables faltantes: Similitud</h2></hgroup><article  id="variables-faltantes-similitud-3">
+
+<ul>
+<li>Es importante normalizar los valores numéricos antes de calcular las distancias.</li>
+</ul>
+
+<p>\[
+\vec{x}_{normalizado} = \frac{\vec{x}_i - \bar{x}}{\sigma_{x}}
+\]</p>
+
+<p><span class="blue">
+Ejercicio:</span> ¿Por qué?</p>
+
+</article></slide><slide class=''><hgroup><h2>Tarea</h2></hgroup><article  id="tarea-4" class="flexbox vcenter">
+
+<ul>
+<li>Formen equipos de dos personas, implementen una función que impute por similitud con la firma</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>imputarSimilitud &lt;- function(data, num_vecinos) { ... }</pre>
+
+<ul>
+<li><p>Aplíquelo a <code>algas</code> y <code>german</code>.</p></li>
+<li><p>¿Son muy diferentes las estadísticas ignorando los <code>NAs</code> comparadas con este método?</p></li>
+<li><p>Agréguelo a su reporte de exploración de ambos datasets. Explíque cuál método de imputació usó y por qué.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Resumen de EDA</h2></hgroup><article  id="resumen-de-eda" class="flexbox vcenter">
+
+<ul>
+<li>En general la exploración de datos se divide en tres pasos:
+
+<ul>
+<li>Verificar la distribución de las variables individuales
+
+<ul>
+<li>Identificando outliers, valores faltantes \(\to\) transformación, eliminación del data set, etc.</li>
+</ul></li>
+<li>Verificar la relación entre las variables dependientes y los predictores
+
+<ul>
+<li>Se podrá usar en <code>feature selection</code></li>
+</ul></li>
+<li>Relación entre los predictores
+
+<ul>
+<li>Eliminación de variables redundantes</li>
+</ul></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2>Preparación para modelado</h2></hgroup><article  id="preparacion-para-modelado">
+
+</article></slide><slide class=''><hgroup><h2>Hasta ahora&#8230;</h2></hgroup><article  id="hasta-ahora...">
+
+<ul>
+<li><p>Deberías de contar en este momento con dos documentos, de análisis exploratorio. Estos documentos son internos y son para que te familiarices con los datos.</p></li>
+<li>El siguiente paso es preparar los datos. Esta actividad también genera un reporte, pero este reporte servirá (además de bitácora) como herramienta de comunicación con otros equipos y de estandarización para el modelado.
+
+<ul>
+<li>e.g. Podría ser la base de un documento de diseño de ETL.</li>
+</ul></li>
+<li><p>En la carpeta <code>plantillas</code> está el archivo <code>data_preparation.Rmd</code> este funge como plantilla para el reporte.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Tarea</h2></hgroup><article  id="tarea-5" class="flexbox vcenter smaller">
+
+<ul>
+<li><p>¿Recuerdas el ejercicio de arreglar los nombres de variables? Crea una función que lo haga, y además agrega la funcionalidad de que cambie los nombres de variables <code>camelCase</code> a <code>camel.case</code>.</p></li>
+<li><p>La firma de dicha función debe de ser</p></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>normalizarNombres &lt;- function(nombres_de_columnas) { ... }</pre>
+
+<p><span class="yellow">
+NOTA: El paquete <code>rattle</code> tiene una función llamada <code>nomVarNames</code> que hace exactamente esto, puedes ver su código para inspirarte.</span></p>
+
+<ul>
+<li>En este momento es quizá una buena idea, dejar de duplicar código y concentrar todas las funciones de <code>utils.r</code> que se puedan reutilizar en un archivo <code>functions.r</code>.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Transformación de datos</h2></hgroup><article  id="transformacion-de-datos-2">
+
+<ul>
+<li>Normalizar
+
+<ul>
+<li>Es útil cuando las cantidades absolutas son menos importantes que las relativas.</li>
+</ul></li>
+<li>Normalizar y reescalar
+
+<ul>
+<li>Usar la desviación estándar como unidad de medida.</li>
+<li>Tiene mucho sentido si la distribución es simétrica.</li>
+<li>Si no lo es, es posible que sea <span class="green">
+lognormally distributed</span> (como el ingreso monetario o los gastos), una transformación <code>log10()</code> lo hará útil.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Transformación de datos</h2></hgroup><article  id="transformacion-de-datos-3">
+
+<ul>
+<li>Es una buena idea usar <code>log</code> si el rango de tus datos cubre varios ordenes de magnitud.
+
+<ul>
+<li>Regularmente, estas variables vienen de procesos <span class="blue">
+multiplicativos</span> en lugar de aditivos.</li>
+</ul></li>
+<li>Si el rango incluye cantidades negativas, usa (crea) una función <code>signedLog10</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>signedLog10 &lt;- function(x) {
+  ifelse(abs(x) &lt;= 1.0, sign(x)*log10(abs(x)))
+}</pre>
+
+</article></slide><slide class=''><hgroup><h2>Columnas de procedencia</h2></hgroup><article  id="columnas-de-procedencia">
+
+<ul>
+<li><p>Un aspecto que siempre es olvidado, o que no se considera importante debido a los <code>blogs</code>, es el <span class="red">versionado de control de los datos</red>.</p></li>
+<li>Esto se puede implementar, agregando columnas para indicar de donde vienen los datos, o con qué procedimiento de limpieza se generaron, etc.
+
+<ul>
+<li>Se puede utilizar el mismo <code>id</code> del código del ETL guardado en <code>github</code>.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2><code>data_preparation.Rmd</code></h2></hgroup><article  id="data_preparation.rmd">
+
+</article></slide><slide class=''><hgroup><h2>Tarea</h2></hgroup><article  id="tarea-6" class="flexbox vcenter">
+
+<ul>
+<li><p>Realiza los reportes para <code>algas</code> y <code>german</code> usando la plantilla <code>data_preparation.Rmd</code>.</p></li>
+<li><p>Se va a presentar por equipo.</p></li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="a-explorando_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="a-explorando_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="a-explorando_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="a-explorando_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="a-explorando_files/ioslides-13.5.1/js/hammer.js"></script>
+<script src="a-explorando_files/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="a-explorando_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "a-explorando_files/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

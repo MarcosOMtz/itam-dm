@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Modelando</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+  <meta name="date" content="2014-01-11" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="a-modelando_files/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="a-modelando_files/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="a-modelando_files/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Modelando',
+                        useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+              },
+
+      // Author information
+      presenters: [
+            {
+        name: 'Adolfo De Unánue T.'
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+  </style>
+
+  <link rel="stylesheet" href="../css/itam.css" type="text/css" />
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides>
+
+  <slide class="title-slide segue nobackground">
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+            <p style="margin-top: 6px; margin-left: -2px;">01/11/2014</p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Recuerda&#8230;</h2></hgroup><article  id="recuerda..." class="flexbox vcenter">
+
+<ul>
+<li><p>Tu objetivo final es resolver un problema de negocio concreto.</p></li>
+<li><p>Tu tarea es mapear un problema de negocio a una técnica de modelado.</p></li>
+<li><p>Cada método estadístico tendrá sus ventajas y desventajas respecto a un conjunto dado de metas de negocio y restricciones de negocio.</p></li>
+<li><p>Debes de ser capaz de medir la calidad de tu modelo durante el entrenamiento y también asegurar que tu modelo funcionará bien en un ambiente productivo.</p></li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2>Modelando</h2></hgroup><article  id="modelando">
+
+</article></slide><slide class=''><hgroup><h2>Procedimiento</h2></hgroup><article  id="procedimiento" class="flexbox vcenter">
+
+<p><img src="images/Diagramas_0.jpg" alt="Simple..." style="width:800px;height:500px"/></p>
+
+</article></slide><slide class=''><hgroup><h2>Procedimiento</h2></hgroup><article  id="procedimiento-1" class="flexbox vcenter">
+
+<p><img src="images/Diagramas_4.jpg" alt="Un poco más real..." style="width:800px;height:500px"/></p>
+
+</article></slide><slide class=''><hgroup><h2>Procedimiento</h2></hgroup><article  id="procedimiento-2">
+
+<ul>
+<li><p>Mapeamos el problema de negocio a una técnica de modelado.</p></li>
+<li><p>Dividimos (por lo menos) a los datos en dos: <span class="blue">
+training</span> y <span class="green">
+testing</span></p></li>
+<li>Esto lo hacemos para hacer pruebas en el modelo + datos:
+
+<ul>
+<li>Evaluación del modelo</li>
+<li>Valudación del modelo</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación del modelo</h2></hgroup><article  id="evaluacion-del-modelo" class="flexbox vcenter">
+
+<ul>
+<li><span class="blue">
+Evaluación</span> del modelo
+
+<ul>
+<li>Cuantificación del desempeño del modelo.</li>
+<li>Encontrar medidas que sean apropiadas para la meta de negocio y para la técnica que estamos usando.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Validación del modelo</h2></hgroup><article  id="validacion-del-modelo" class="flexbox vcenter">
+
+<ul>
+<li><span class="green">
+Validación</span> del modelo
+
+<ul>
+<li>Procedimiento para verificar (con una medida de certidumbre) de que el modelo se comportará en producción tan bien como lo hizo en entrenamiento.</li>
+<li>Un problema muy grande para este procedimiento pueden ser:
+
+<ul>
+<li>No hay suficientes datos para tener un conjunto de <span class="yellow">
+ training </span> data.</li>
+<li>Los datos de entrenamiento no tienen la suficiente variedad comparada con producción.</li>
+</ul></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2>Métodos</h2></hgroup><article  id="metodos">
+
+</article></slide><slide class=''><hgroup><h2>Clasificación</h2></hgroup><article  id="clasificacion" class="flexbox vcenter">
+
+<ul>
+<li><p>¿Qué tipo es?</p></li>
+<li><p>Pertenece a las técnicas de <span class="yellow">
+supervised learning</span>.</p></li>
+<li><p>Crear un conjunto de datos para entrenamiento es muy caro (en <code>$</code>), a este proceso se le conoce como <span class="red">
+ etiquetado </span>.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Clasificación</h2></hgroup><article  id="clasificacion-1" class="flexbox vcenter tiny">
+
+<p>Algunos ejemplos</p>
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left">Técnica</th>
+<th align="left">Notas</th>
+</tr>
+<tr class="odd">
+<td align="left">Naïve Bayes</td>
+<td align="left">Muchas variables de entrada, categóricas con muchos niveles, clasificación de texto</td>
+</tr>
+<tr class="even">
+<td align="left">Árboles de decisión</td>
+<td align="left">Variables de entrada interactúan con la salida de manera <code>if-then</code>. Las variables de entrada son redundantes o están correlacionadas.</td>
+</tr>
+<tr class="odd">
+<td align="left">Regresión Logística</td>
+<td align="left">Estimar las probabilidades de pertenencia a la clase de salida. Quieres conocer el impacto relativo de las variables de entrada a las de salida.</td>
+</tr>
+<tr class="even">
+<td align="left">SVM</td>
+<td align="left">Muchas variables de entrada que interactuan de maneras complicadas o no-lineales. Hace pocas suposiciones sobre la distribución de las variables, lo cual lo hace bueno cuando no los datos de entrenamiento no sean tan representativos de lo que pasa en producción.</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Regresión/Scoring</h2></hgroup><article  id="regresionscoring" class="flexbox vcenter">
+
+<ul>
+<li>¿Cuánto?
+
+<ul>
+<li>Ejemplo: ¿Cuánto van a aumentar las ventas por esta campaña?</li>
+<li>Aunque Detección de fraude, puede ser considerado scoring: Tratas de estimar la probabilidad de que una transacción en particular sea fraudulenta.</li>
+</ul></li>
+<li>Ejemplos son la regresión logística y la regresión lineal.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Cuando no hay variable de salida (<em>target</em>)</h2></hgroup><article  id="cuando-no-hay-variable-de-salida-target" class="smaller">
+
+<ul>
+<li><p>Pertenece a las técnicas de <span class="yellow">
+unsupervised learning</span>.</p></li>
+<li><p>En lugar de predecir las variables de salida usando las variables de entrada, el objetivo es descubir similitudes y relaciones en los datos.</p></li>
+<li>Ejemplos:
+
+<ul>
+<li>Agrupamiento por <code>k-means</code>
+
+<ul>
+<li>Segmentar <code>clientes</code> por patrones similares de compra.</li>
+</ul></li>
+<li>Algoritmo <code>apriori</code>.
+
+<ul>
+<li>Segmentar <code>productos</code> que se compran juntos.</li>
+</ul></li>
+<li>Vecinos cercanos.
+
+<ul>
+<li>Decir algo sobre el punto <code>p</code> respecto a puntos que más se parecen a <code>p</code>.</li>
+</ul></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio</h2></hgroup><article  id="ejercicio" class="flexbox vcenter tiny">
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left">Tarea a realizar</th>
+<th align="left">¿Descripción?</th>
+<th align="left">¿Tipo de método?</th>
+</tr>
+<tr class="odd">
+<td align="left">Identificar <code>spam</code>. Asignar productos a un catálogo existente. Identificar préstamos que pueden fallar. Asignar clientes a <code>clusters</code> de clientes.</td>
+<td align="left">Asignar etiquetas a objetos</td>
+<td align="left">Clasificación</td>
+</tr>
+<tr class="even">
+<td align="left">Predecir el valor de <code>AdWords</code>. Estimar la probabilidad de que un préstamo haga <code>default</code>. Predecir cuánto una campaña va a aumentar el tráfico de un portal.</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Encontrar que productos son comprados juntos. Identificar que páginas son visitadas en la misma sesión. Identificar que combinaciones de páginas y AdWords son exitosas</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Identificar grupos de clientes con los mismos patrones de compra. Identificar grupos de productos que son populares en las mismas regiones o en los mismos clusters de clientes.</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio (continuación)</h2></hgroup><article  id="ejercicio-continuacion" class="flexbox vcenter tiny">
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left">Tarea a realizar</th>
+<th align="left">¿Descripción?</th>
+<th align="left">¿Tipo de método?</th>
+</tr>
+<tr class="odd">
+<td align="left">Hacer recomendaciones de productos para un cliente, basado en lo que otro cliente a comprado. Predecir el precio final de un producto en una subasta, basado en productos similares que se han subastado en el pasado</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Predecir que van a comprar un cliente basado en sus compras pasadas</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Determinar la elasticidad del precio</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">¿Cuánto debemos de gastar en una campaña de <code>AdWords</code>?</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Organizar productos en un catálogo no existente</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+</table>
+
+</article></slide><slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2>Evaluación</h2></hgroup><article  id="evaluacion">
+
+</article></slide><slide class=''><hgroup><h2>Generalidades</h2></hgroup><article  id="generalidades" class="flexbox vcenter">
+
+<ul>
+<li><p>Después de construir un modelo, hay que verificar que por lo menos funcione con los datos con los que fué creado (entrenado).</p></li>
+<li><p>Para cuantificar el &quot;que funcione&quot; debemos de escoger algunas metricas.</p></li>
+<li><p>La métrica a elegir dependerá de que método (y dataset) y meta de negocio.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>¿Cómo saber si es bueno?</h2></hgroup><article  id="como-saber-si-es-bueno">
+
+<ul>
+<li>Utilizaremos algunos modelos idealizados:
+
+<ul>
+<li>Modelo nulo
+
+<ul>
+<li>Nos enseña cuál es el mínimo.</li>
+</ul></li>
+<li>Modelo <code>Bayes rate</code>
+
+<ul>
+<li>Indica cuál puede ser el máximo posible.</li>
+</ul></li>
+<li>El mejor modelo de una sóla variable.
+
+<ul>
+<li>Indica que es lo mejor que puede hacer un modelo simple.</li>
+</ul></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Modelo nulo</h2></hgroup><article  id="modelo-nulo">
+
+<ul>
+<li><p>Es aquel modelo que quieres vencer (es el mínimo, <code>lower bound</code>).</p></li>
+<li><p>Dos modelos típicos: <span class="red">
+constante</span> e <span class="blue">
+independiente</span>.</p></li>
+<li>El modelo constante, siempre devuelve la misma respuesta para todas las ocasiones.
+
+<ul>
+<li>e.g. Si es categórica la salida, el modelo siempre devuelve el valor más popular (se equivoca menos). Si es numérica regresará la media (su desviación cuadrática es menor).</li>
+</ul></li>
+<li><p>El modelo independiente, no guarda ninguna relación o interacción entre las variables de entrada y salida, puede ser un modelo al azar (e.g. tirando una moneda para decidir en una clasificación binaria).</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Modelo Bayes rate</h2></hgroup><article  id="modelo-bayes-rate">
+
+<ul>
+<li><p>También se conoce como <span class="green2">
+Modelo Saturado</span>.</p></li>
+<li><p>El mejor modelo posible con los datos disponibles, de hecho, es el modelo perfecto: sólo se equivoca cuando no hay unicidad en \(x \to y\) (el mismo conjunto de \(x\) da diferentes \(y\) ).</p></li>
+<li><p>Nos da el <code>upper bound</code>.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Mejor modelo de una variable</h2></hgroup><article  id="mejor-modelo-de-una-variable">
+
+<ul>
+<li><p>Un modelo complicado no puede justificarse si no puede mejorar un modelo simple de una sola variable.</p></li>
+<li><p>Muchos clientes o usuarios que pueden manejar MS Excel y sus <code>pivot tables</code> pueden generar modelos de una sola variable, ellos querrán comparar a este nivel, por lo que siempre es bueno tenerlos en mente.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de clasificación</h2></hgroup><article  id="evaluacion-de-modelos-de-clasificacion" class="flexbox vcenter smaller">
+
+<ul>
+<li><p>La herramienta más usada para evaluar modelos de clasificación es la <span class="blue3">
+ matriz de confusión</span>.</p></li>
+<li><p>Resume todas las predicciones del modelo, contra las categorías conocidas.</p></li>
+</ul>
+
+<p><img src="images/Diagramas_1.jpg" alt="Simple..." style="width:800px;height:500px"/></p>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de clasificación</h2></hgroup><article  id="evaluacion-de-modelos-de-clasificacion-1" class="flexbox vcenter">
+
+<ul>
+<li><p><code>Accuracy</code>:</p></li>
+<li><p><strong>Pregunta de negocio</strong>: <em>Necesitamos que la mayoría de las decisiones sean las correctas</em>.</p></li>
+</ul>
+
+<p>\[
+acc = \frac{TP  + TN}{TP+FP+TN+FN}
+\]</p>
+
+<ul>
+<li>No sirve para dataset no balanceados (por ejemplo en detección de fraude).
+
+<ul>
+<li>En este caso el modelo nulo es muy preciso (very accurate). Esto no lo hace el mejor modelo.</li>
+<li>Hay que considerar una función de costo.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de clasificación</h2></hgroup><article  id="evaluacion-de-modelos-de-clasificacion-2" class="flexbox vcenter smaller">
+
+<ul>
+<li><code>Precision</code>
+
+<ul>
+<li><strong>Pregunta de negocio</strong>: <em>Lo que marquemos como \(x\), más vale que sea \(x\)</em>.</li>
+<li>¿Qué fracción clasificada por el modelo están en la clase?</li>
+<li>Cuando el modelo dice <code>está en la clase</code>, que tan frecuentemente le atina.</li>
+</ul></li>
+</ul>
+
+<p>\[
+prec = \frac{TP}{TP+FP}
+\]</p>
+
+<ul>
+<li><code>Recall</code>
+
+<ul>
+<li><strong>Pregunta de negocio</strong>: <em>Queremos reducir \(x\) por en un tanto por ciento</em>.</li>
+<li>¿Qué fracción que están en la clase fueron detectadas por el modelo?</li>
+<li>que tan frecuentemente el clasificador encuentra lo que debe de encontrar.</li>
+</ul></li>
+</ul>
+
+<p>\[
+rec = \frac{TP}{TP+FN}
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de clasificación</h2></hgroup><article  id="evaluacion-de-modelos-de-clasificacion-3" class="flexbox vcenter">
+
+<ul>
+<li><code>F1 score</code>
+
+<ul>
+<li>Se usa en conjunto con <code>precision</code> y <code>recall</code>.</li>
+<li>Mide el sacrificio de <code>recall</code> y/o <code>precision</code> uno respecto al otro.</li>
+</ul></li>
+</ul>
+
+<p>\[
+F1 = \frac{2*prec*rec}{prec + rec}
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de clasificación</h2></hgroup><article  id="evaluacion-de-modelos-de-clasificacion-4" class="flexbox vcenter smaller">
+
+<ul>
+<li><code>Sensitivity</code>
+
+<ul>
+<li><strong>Pregunta de negocio</strong>: <em>Necesitamos reducir la clase \(x\) o no hay negocio</em>.</li>
+<li>Conocida como <code>true positive rate</code> (TPR) es igual al <code>recall</code>.</li>
+</ul></li>
+<li><code>Specificity</code>
+
+<ul>
+<li><strong>Pregunta de negocio</strong>: <em>No podemos equivocarnos en \(\sim x\), el sistema (o el usuario) deben de tener este servicio altísimo</em>.</li>
+<li>Conocida también como <code>true negative rate</code></li>
+</ul></li>
+</ul>
+
+<p>\[
+spec = \frac{TN}{TN+FP}
+\]</p>
+
+<ul>
+<li>El modelo nulo regularmente clasifica con \(0\) en una de los dos, por lo que los modelos que no sirven, tienen muy bajo uno de estas métricas.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Ejercicio</h2></hgroup><article  id="ejercicio-1" class="flexbox vcenter">
+
+<ul>
+<li><p>Para una aplicación muy desbalanceada (digamos <code>1%</code> de la clase \(x\) y <code>99%</code> de la clase \(\sim x\))</p>
+
+<ul>
+<li>e.g. detección de spam, fraude, etc.</li>
+</ul></li>
+<li><p>¿Cuáles serían las mejores métricas a discutir con el cliente?</p></li>
+<li><p>¿Cuáles serían los valores de las metricas para el modelo nulo?</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de regresión</h2></hgroup><article  id="evaluacion-de-modelos-de-regresion" class="flexbox vcenter smaller">
+
+<ul>
+<li><code>residuos</code> es la palabra clave.
+
+<ul>
+<li>Diferencia entre nuestras predicciones \(\hat{y}\) y los valores reales de salida \(y\).</li>
+</ul></li>
+<li><code>RMSE</code>: Root mean square error
+
+<ul>
+<li><strong>Pregunta de negocio</strong>: <em>Queremos un error (en promedio) menor de tantos miles por unidad estudiada</em>.</li>
+<li>Se puede pensar como una desviación estándar.</li>
+<li>Está en las mismas unidades que \(y\).</li>
+<li>Hay que corregir por <code>bias</code> o complejidad, o tamaño de la muestra.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de regresión</h2></hgroup><article  id="evaluacion-de-modelos-de-regresion-1" class="flexbox vcenter smaller">
+
+<ul>
+<li>\(R^2\)
+
+<ul>
+<li><strong>Pregunta de negocio</strong>: <em>Queremos un modelo que explique tanto porcentaje del valor de tal</em>.</li>
+<li>1.0 menos cuanta varianza no estamos explicando por el modelo. \[ 1 - \frac{\sum(\hat{y} - y)}{[\sum(\bar{y} - y)]^2} \]</li>
+<li>No tiene unidades.</li>
+<li>Cerca de cero o negativa significa que el modelo es lo peor que nos pudo pasar.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de probabilidad</h2></hgroup><article  id="evaluacion-de-modelos-de-probabilidad" class="flexbox vcenter">
+
+<ul>
+<li>Sirven para clasificación o para regresión.</li>
+<li>Indican la probabilidad estimada (confianza, vamos) de que la observación pertenezca a una clase.</li>
+<li>Hay que elegir un <code>cut-off</code>.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de probabilidad</h2></hgroup><article  id="evaluacion-de-modelos-de-probabilidad-1" class="vcenter tiny">
+
+<ul>
+<li>Gráfica de doble densidad</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'># Ejemplo para generar una gráfica de doble densidad
+ggplot(data=ds) + geom_density(aes(x=pred, color=clase, linetype=clase))</pre>
+
+<p><img src="images/Diagramas_2.jpg" alt="Simple..." style="width:700px;height:450px"/></p>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de probabilidad</h2></hgroup><article  id="evaluacion-de-modelos-de-probabilidad-2" class="flexbox vcenter smaller">
+
+<ul>
+<li><code>ROC curve</code>: <em>Receiver operating characteristic curve</em>
+
+<ul>
+<li>Una buena explicación está <a href='http://www.anaesthetist.com/mnm/stats/roc/Findex.htm' title=''>aquí</a></li>
+</ul></li>
+<li><code>AUC</code>: <em>area under the curve</em>
+
+<ul>
+<li>No recomendable ver críticas <a href='http://www2.unil.ch/biomapper/Download/Lobo-GloEcoBioGeo-2007.pdf' title=''>aquí</a></li>
+</ul></li>
+</ul>
+
+<p><img src="images/Diagramas_3.jpg" alt="Simple..." style="width:600px;height:500px"/></p>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de probabilidad</h2></hgroup><article  id="evaluacion-de-modelos-de-probabilidad-3" class="flexbox vcenter">
+
+<pre class = 'prettyprint lang-r'># código para dibujar el ROC con ggplot</pre>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de probabilidad</h2></hgroup><article  id="evaluacion-de-modelos-de-probabilidad-4" class="flexbox vcenter tiny">
+
+<pre class = 'prettyprint lang-r'>library(ROCR,quietly = TRUE)
+data(ROCR.simple)  # Datos de prueba
+
+pred &lt;- prediction(ROCR.simple$predictions, ROCR.simple$labels)
+perf &lt;- performance(pred, &quot;tpr&quot;, &quot;fpr&quot;)  # Graficamos ROC, este paquete permite muchas gráficas
+plot(perf, colorize=TRUE)</pre>
+
+<p><img src="a-modelando_files/figure-html/rocr-1.png" title="" alt="" width="720" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de probabilidad</h2></hgroup><article  id="evaluacion-de-modelos-de-probabilidad-5" class="flexbox vcenter smaller">
+
+<ul>
+<li><code>log likelihood</code>
+
+<ul>
+<li>El logaritmo del producto de la probabilidad que asigna el modelo a cada ejemplo. (Regularmente se rescala por el número de puntos)</li>
+<li>Siempre es negativo, y el modelo es mejor si se acerca a \(0\).</li>
+</ul></li>
+<li><code>entropía condicional</code>
+
+<ul>
+<li>Se mide en <code>bits</code>.</li>
+<li>Es una medidad de <strong>sorpresa</strong> en los datos&#8230;</li>
+<li>Si <code>p</code> es un vector conteniendo la probabilidad de cada posible evento, la entropía es</li>
+</ul>
+
+\[
+    entropia(p) = \sum_i (p_i*log_2(p_i))
+  \]
+
+<ul>
+<li>Indica que tan buena es la predicción de cada categoría, pesada por que tan frecuente predice la categoría.</li>
+</ul>
+
+\[ 
+  \frac{pos * entropia(pos) + neg * entropia(neg) }{observaciones}
+  \]</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Evaluación de modelos de clustering</h2></hgroup><article  id="evaluacion-de-modelos-de-clustering" class="flexbox vcenter">
+
+<ul>
+<li><p>Son difíciles de evaluar \(\to\) verificar resumenes de la clusterización.</p></li>
+<li><p>Número de clusters</p></li>
+<li>Número de observaciones por cluster.
+
+<ul>
+<li><code>hair clusters</code> : Muy pocas observaciones</li>
+<li><code>waste clusters</code>: Muchos puntos</li>
+</ul></li>
+<li>Compactos
+
+<ul>
+<li>Comparar la distancia entre dos puntos en el cluster con la distancia típica entre dos clusters.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground'><hgroup class = 'auto-fadein'><h2>Validación</h2></hgroup><article  id="validacion">
+
+</article></slide><slide class=''><hgroup><h2>Validación</h2></hgroup><article  id="validacion-1" class="vcenter flexbox">
+
+<p>¿Mostrará el mismo desempeño el modelo en producción que con los datos de entrenamiento?</p>
+
+</article></slide><slide class=''><hgroup><h2>Problemas con el modelo</h2></hgroup><article  id="problemas-con-el-modelo">
+
+<ul>
+<li><p><code>Bias</code></p></li>
+<li><p><code>Variance</code></p></li>
+<li><p><code>Overfit</code></p></li>
+<li><p><code>Nonsignificance</code></p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Problemas con el modelo</h2></hgroup><article  id="problemas-con-el-modelo-1" class="flexbox vcenter tiny">
+
+<p><img src="images/Diagramas_5.jpg" alt="Simple..." style="width:600px;height:500px"/></p>
+
+<p><span class="blue3">
+Basado en la imagen de &quot;A few useful things to know about machine learning&quot; de Pedro Domingos</span></p>
+
+</article></slide><slide class=''><hgroup><h2>Validación: Hold-out data</h2></hgroup><article  id="validacion-hold-out-data">
+
+<ul>
+<li>Los datos de entrenamiento no son la mejor manera de probar el desempeño del modelo.</li>
+<li>Si lo haces obtendrás mediciones exageradas. (Tienen un <span class="red">
+bias</span>)</li>
+<li>Por eso dividimos en entrenamiento y prueba los datos.
+
+<ul>
+<li>Inclusive se puede dividir en entrenamiento, calibración y prueba.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Validación: K-fold cross-validation</h2></hgroup><article  id="validacion-k-fold-cross-validation" class="smaller">
+
+<ul>
+<li>El problema con el método anterior es que sólo te da un punto para estimar el desempeño
+
+<ul>
+<li>e.g &quot;El modelo tuvo un desempeño en accuracy del 83% en los datos de prueba&quot;</li>
+</ul></li>
+<li><p>Además de querer un estimado sin <span class="red">
+bias</span> queremos un estimado de la distribución de este estimado.</p></li>
+<li><p>La idea del <span class="blue">
+k-fold cross-validation</span> es repetir la construcción del modelo en diferentes subconjuntos de los datos de entrenamiento y evaluarlo en datos que no se usaron para entrenar.</p></li>
+<li><p>Dividimos los datos en \(k\) subconjuntos del mismo tamaño, construimos el modelo \(k\) veces y en cada iteración dejamos un subconjunto como <span class="green">
+prueba</span></p></li>
+<li><p>Debido a que esto es repetitivo es necesario automatizar la construcción del modelo.</p></li>
+<li><code>Leave one out</code>, ocurre cuando \(k\) es igual al tamaño de los datos
+
+<ul>
+<li>e.g. entrenamos con todos salvo uno y probamos con ese uno.</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Validación: Test de significacia</h2></hgroup><article  id="validacion-test-de-significacia">
+
+<ul>
+<li><p>Probar estadísticamente que el desempeño de nuestro modelo es bueno \(\to\) es muy poco probable que el modelo nulo tuviera el mismo desempeño.</p></li>
+<li><p>Queremos probar que si nuestro modelo fué mejor que el modelo nulo, no haya sido casualidad.</p></li>
+<li><p>La <span class="green3">
+hipótesis nula</span> sería, por ejemplo, \[\mathcal{H}_o = (error.modelo - error.nulo) == 0\] en promedio.</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Tarea</h2></hgroup><article  id="tarea">
+
+<ul>
+<li><p>Formen cuatro equipos, escojan bien, serán sus compañeros el resto del curso.</p></li>
+<li><p>Cada equipo escogerá (no se puede repetir) una lectura de la carpeta <code>readings</code>.</p></li>
+<li><p>Expondrán el contenido la siguiente clase. 45 minutos de exposición.</p></li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="a-modelando_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="a-modelando_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="a-modelando_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="a-modelando_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="a-modelando_files/ioslides-13.5.1/js/hammer.js"></script>
+<script src="a-modelando_files/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="a-modelando_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "a-modelando_files/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

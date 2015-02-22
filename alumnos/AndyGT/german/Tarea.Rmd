@@ -1,0 +1,17 @@
+Leemos los archivos 
+```{r}
+library(ggplot2)
+setwd("~/itam-dm/alumnos/AndyGT/german")
+source(file = 'utils.r')
+source(file = '0_load_data.r')
+source(file = '1-preparation.r')
+```
+
+Veamos los datos y si hay algo raro
+
+```{r}
+
+head(german.data)
+summary(german.data$Good.Loan)
+
+

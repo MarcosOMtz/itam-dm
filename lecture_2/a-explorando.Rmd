@@ -1,0 +1,795 @@
+---
+title: "Explorando"
+subtitle: "los datos y el proceso"
+author: "Adolfo J. De Unánue T."
+date: "21/10/2014"
+output: 
+  ioslides_presentation:
+    css: ../css/itam.css
+    mathjax: local
+    self_contained: false
+---
+
+# Proceso
+
+## CRISP-DM {.flexbox .vcenter}
+
+<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/CRISP-DM_Process_Diagram.png/479px-CRISP-DM_Process_Diagram.png" align="center"/>
+
+[Cross Industry Standard Process for Data Mining](http://en.wikipedia.org/wiki/Cross_Industry_Standard_Process_for_Data_Mining)
+
+## Metas  {.flexbox .vcenter}
+
+- ¿Por qué quieren el proyecto?¿Qué les falta? ¿Qué necesitan?
+- ¿Qué hacen para resolver el problema ahora?¿Por qué no es suficiente?
+- ¿Qué recursos existen?¿Tendrás acceso a expertos del dominio?
+- ¿Cómo planean utilizar los resultados?¿Cómo harán el _deploy_? ¿Qué restricciones existen?
+- ¿La meta es específica y medible?
+
+## Métricas
+
+- <span class="blue">Exactitud (_Accuracy_)</span>
+
+- <span class="blue2">Recall</span>
+
+- <span class="blue3">Precisión</span>
+
+- <span class="blue"> False positive rate (FPR)</span>
+
+## Expectativas  {.flexbox .vcenter}
+
+- Establecer las expectativas es una parte <span class="red2">crucial</span> al definir el proyecto y los criterios de éxito.
+
+- Entender lo que el modelo  <span class="blue2">debe</span> hacer para tener un desempeño aceptable es importante.
+
+- Entender lo que el modelo <span class="green2">puede</span> hacer con los datos disponibles también.
+
+## Expectativas: El mínimo  {.flexbox .vcenter}
+
+- El mínimo esperado se puede definir usando <span class="blue3">el modelo nulo</span>.
+
+- Se puede entender como el "educated guess".
+
+- Si ya hay un modelo o una solución, ese es el <span class="blue3">modelo nulo</span>.
+
+- Si no lo hay, es el modelo más simple: 
+    
+    - adivinando la variable dependiente,   
+    - predecir siempre con la media,     
+    - prediciendo siempre una clase en particular,  etc.
+
+## Expectativas: El mínimo  {.flexbox .vcenter}
+
+- Cuando tengas un modelo debe de ser mejor que el modelo nulo.
+
+- Para saber si es verdaderamente mejor, es necesario correr una <span class="blue">prueba de hipótesis</span>.
+
+## Expectativas: El máximo {.flexbox .vcenter}
+
+- Debes de saber, al principio del proyecto, que tienes los datos para cubrir con las metas planteadas.
+
+- La cantidad a determinar es la <span class="green">Varianza Inexplicable (unexplained variance)</span>: ¿Cuánto de la variación de tus datos de salida no puede ser explicado por tus variables de entrada?
+
+- El límite de exactitud (_accuracy_) debido a la _unexplained variance_ se conoce como <span class="blue">Tasa de Bayes</span> (_Bayes rate_).
+
+- Claro esto tiene sentido, si lo que están pidiendo está en función del _accuracy_.
+
+- Se puede aproximar por un clasificador de vecinos cercanos o construyendo una tabla con las combinaciones de variables posibles.
+
+
+## Data {.flexbox .vcenter}
+
+- ¿Los datos están disponibles?
+- ¿Los datos me ayudarán a resolver el problema?
+- ¿Son suficientes?
+- ¿La calidad es buena?
+
+## IMPORTANTE {.flexbox .vcenter}
+
+<span class="large">Reproductibilidad</span>
+
+Debes de ser capaz (o cualquier otro) de repetir tu trabajo sin depender de resultados intermedios.
+
+Todo debe de estar comentado con como reproducirlo o con documentación de donde se obtuvo.
+
+Debes de poder defender tu trabajo
+
+Manten tus `scripts` bajo control de versiones
+
+## IMPORTANTE {.flexbox .vcenter}
+
+<span class="large">Estilo y Convención</span>
+
+[Style Guide](http://r-pkgs.had.co.nz/style.html)
+
+Salvo el asunto de la terminación en `.R`, usa `.r`
+
+
+## IMPORTANTE {.flexbox .vcenter .large}
+
+Pruebas
+
+
+## IMPORTANTE {.flexbox .vcenter .large}
+
+Comunicación
+
+# Ejemplo
+
+## ¿Quién eres? {.flexbox .vcenter}
+
+Eres el científico de datos de un banco alemán, el banco tiene muchas pérdidas debido a malos créditos y quiere reducir sus pérdidas. Te piden realizar esta tarea, indicando que quieren reducir la tasa de pérdidas en un 10%.
+
+## Datos  {.flexbox .vcenter}
+
+- Usaremos para este ejemplo, los datos de crédito aleman (*German data set*). Los datos ya se encuentran en  `data/german`.
+
+[German Credit Data](https://archive.ics.uci.edu/ml/datasets/Statlog+%28German+Credit+Data%29)
+
+
+## Ejercicio
+
+En tu carpeta, crea una subcarpeta `german`.
+
+## Carga de datos {.tiny}
+
+```{r, cache=TRUE}
+
+german.url <- paste('http://archive.ics.uci.edu/ml',
+                    '/machine-learning-databases/statlog',
+                    '/german/german.data',
+                    sep='')
+
+german.data <- read.table(german.url, 
+                          stringsAsFactors = FALSE, 
+                          header = FALSE)
+```
+Los datos son un asco...
+```{r}
+head(german.data)
+```
+
+## Ejercicio {.flexbox .vcenter}
+
+- Crea una función `load` en `utils.r` en tu carpeta, que descargue, si y sólo si no existe
+un archivo `german.rds`. Si no existe, descarga y guarda el archivo.
+
+- `?saveRDS`, `?readRDS`
+
+## Transformación de datos {.smaller}
+Los nombres de las columnas fueron copiados a mano desde `german.odt`
+```{r}
+german.colnames <- c('Status of existing checking account', 
+                     'Duration in month',
+                     'Credit history',
+                     'Purpose',
+                     'Credit amount',
+                     'Savings account/bonds',
+                     'Present employment since',
+                     'Installment rate in percentage of disposable income',
+                     'Personal status and sex',
+                     'Other debtors / guarantors',
+                     'Present residence since',
+                     'Property',
+                     'Age in years',
+                     'Other installment plans',
+                     'Housing',
+                     'Number of existing credits at this bank',
+                     'Job',
+                     'Number of people being liable to provide maintenance for',
+                     'Telephone',
+                     'foreign worker',
+                     'Good.Loan'
+                     )
+```
+
+## Transformación de datos {.smaller}
+
+La variable de salida la estoy definiendo como categórica (`factor` en `R`)
+```{r}
+colnames(german.data) <- german.colnames
+german.data$Good.Loan <- as.factor(
+                          ifelse(
+                            german.data$Good.Loan == 1, 
+                            'GoodLoan', 
+                            'BadLoan'
+                            )
+                          )
+```
+
+## Decodificar {.tiny}
+```{r}
+german.codes <- list('A11'='... < 0 DM',
+ 'A12'='0 <= ... < 200 DM', 
+ 'A13'='... >= 200 DM / salary assignments for at least 1 year',
+ 'A14'='no checking account', 
+ 'A30'='no credits taken/all credits paid back duly',
+ 'A31'='all credits at this bank paid back duly', 
+ 'A32'='existing credits paid back duly till now',
+ 'A33'='delay in paying off in the past', 
+ 'A34'='critical account/other credits existing (not at this bank)',
+ 'A40'='car (new)', 
+ 'A41'='car (used)', 
+ 'A42'='furniture/equipment',
+ 'A43'='radio/television', 'A44'='domestic appliances', 'A45'='repairs',
+ 'A46'='education', 'A47'='(vacation - does not exist?)',
+ 'A48'='retraining', 'A49'='business', 'A410'='others', 'A61'='... < 100 DM',
+ 'A62'='100 <= ... < 500 DM', 'A63'='500 <= ... < 1000 DM',
+ 'A64'='.. >= 1000 DM', 'A65'='unknown/ no savings account',
+ 'A71'='unemployed', 'A72'='... < 1 year', 'A73'='1 <= ... < 4 years', 
+ 'A74'='4 <= ... < 7 years', 'A75'='.. >= 7 years', 'A91'='male : divorced/separated',
+ 'A92'='female : divorced/separated/married',
+ 'A93'='male : single',
+ 'A94'='male : married/widowed', 
+ 'A95'='female : single',
+ 'A101'='none', 
+ 'A102'='co-applicant',
+ 'A103'='guarantor', 'A121'='real estate',
+ 'A122'='if not A121 : building society savings agreement/life insurance',
+ 'A123'='if not A121/A122 : car or other, not in attribute 6',
+ 'A124'='unknown / no property', 
+ 'A141'='bank', 'A142'='stores',  'A143'='none', 'A151'='rent', 'A152'='own',
+ 'A153'='for free', 'A171'='unemployed/ unskilled - non-resident',
+ 'A172'='unskilled - resident', 'A173'='skilled employee / official',
+ 'A174'='management/ self-employed/highly qualified employee/ officer',
+ 'A191'='none', 'A192'='yes, registered under the customers name',
+ 'A201'='yes', 'A202'='no')
+```
+
+
+## Ejercicio {.flexbox .vcenter }
+
+- Crea una función `german.decode` en un archivo `utils.r` dentro de tu carpeta, esta función debe de utilizar `german.codes` para decodificar los elementos de todas las columnas (por ejemplo `A201` -> `yes`)
+
+- Utiliza `lapply` para decodificar todas las columnas de `german.data`
+
+- Utiliza `dplyr` para decodificar todas las columnas de `german.data`
+
+
+## Datos manejables {.flexbox .vcenter}
+
+
+En este momento deberás de tener archivos `0-load.r`, `1-prepare.r` y un archivo `utils.r` dentro de `german`.  Además deberías de tener un archivo `german.rds`.
+
+
+## Ejercicio {.flexbox .vcenter}
+
+- ¿Hay algo raro con los datos de préstamo?
+
+- ¿Cuál crees que debería ser la distribución del resultado del préstamo `Good.Loan` respecto a `Credit history`?
+
+- Grafícalo y comenta tus resultados.
+
+- Si lo vas a hacer con `ggplot2` usa esta [guía](http://zevross.com/blog/2014/08/04/beautiful-plotting-in-r-a-ggplot2-cheatsheet-3/) o este [cheatsheet](http://rforpublichealth.blogspot.mx/2014/02/ggplot2-cheatsheet-for-visualizing.html)
+
+## Tarea {.flexbox .vcenter}
+
+- Fue terrible poder hacer la gráfica con `ggplot` utilizando los nombres de columnas que pusimos (`german.colnames`).
+
+- Modifica el archivo donde tengas `german.colnames` (puede ser `utils.r` o `metadata.r`) y sustituye (usando quizá `stringr` o `grep`) los `' '` y `'/'` por `'.'` (ve la guía de estilo) y pasa todo a minúsculas.
+
+- Ejecuta todo de nuevo (¡la ventaja de ser reproducible!)
+
+
+
+## Intermedio { .smaller}
+
+- Si te quedó desacomodado, este código ordena los `bar charts`
+
+```{r,eval=FALSE}
+credit.history.tbl <- table(german.data$'Credit history')
+credit.history.df <- as.data.frame(credit.history.tbl)
+colnames(credit.history.df) <- c('credit.history', 'count')
+summary(credit.history.df)
+
+credit.history.df <- transform(credit.history.df, 
+                               credit.history=reorder(credit.history, count)
+                               )
+summary(credit.history.df)
+
+ggplot(credit.history.df) + 
+  geom_bar(aes(x=credit.history, y=count), stat="identity", fill="gray") + 
+    coord_flip() + 
+      theme(axis.text.y=element_text(size=rel(0.8)))
+```
+
+- Aunque no lo colorea ¿Cómo hay que modificarlo?
+
+## Ejercicio {.flexbox .vcenter}
+
+Modifica el ejercico anterior para mostrar la gráfica de manera ordenada y sea más claro tu caso.
+
+## Sanidad de los datos
+
+- El nombre de la columna no significa lo que tu crees que significa
+
+- El significado de la columna cambia con el paso del tiempo o la metodología para medir esa variable.
+
+- Mucha / muy poca resolución
+
+- Los valores `missing` no son realmente faltantes (`NAs`), si no que significan algo
+    - Regularmente no documentado
+    
+- Si es un `csv` de seguro a alguien ya le pareció chistoso ponerle comas 
+    - Existe una historia parecida para los `tsv`, `psv`, etc.
+
+
+## `summary` {.build}
+
+Un uso del  `summary()` es detectar problemas en los datos.
+
+- ¿Valores faltantes?
+    - ¿Hay una variable con muchos faltantes?¿Por qué?¿Es un error? ¿Significa algo?
+    
+- ¿Valores inválidos?
+    - ¿Hay negativos donde no debería de haber? (Como en edad, ingreso, estatura)
+    - ¿Texto en lugar de números?
+
+
+- ¿Outliers?
+    - Son aquellos valores que no crees que deberían de estar (En el ejemplo de edad 1400 años)
+
+
+## `summary` {.build}
+
+- ¿Rangos?
+    - Es importante saber cuanto varía la variable.
+    - Si es muy amplio, puede ser un problema para algunos algoritmos de modelado.
+    - Si varía muy poco (o nada) no puede ser usado como predictor.
+    
+- ¿Unidades?
+    - ¿El salario es mensual?¿Quincenal?¿Por hora?
+    - ¿Los intervalos de tiempo están en segundos?¿Años?
+    - ¿Las longitudes? ¿La moneda?
+
+
+## Ejercicio {.flexbox .vcenter}
+
+Revisa `german.data` con `summary()`, reporta alguna anomalía.
+
+## ¿Quién eres? {.flexbox .vcenter}
+
+Como el dinero no alcanza, tomas otro trabajo rápido para una ONG. Quieren predecir la concentración 
+de algas en ríos de la región. Tomaron datos durante un año. 
+
+Cada observación es el efecto de agregar varias muestras de agua recolectadas en el mismo río por un periodo de 3 meses en la misma estación del año.
+
+
+## Más datos {.flexbox .vcenter}
+
+- Usaremos, además del *German data set*, los datos de la competición COIL de 1999 sobre contaminación de ríos 
+
+- Ya se encuentran en  `data/algas`.
+
+[Coil 1999 Competition Data](https://archive.ics.uci.edu/ml/datasets/Coil+1999+Competition+Data)
+
+
+## Ejercicio {.flexbox .vcenter}
+
+- Repite los pasos realizados para `german.data` con `algas`.
+
+- Revisa con `summary()`, reporta alguna anomalía.
+
+
+## Usando gráficas
+
+- El resumen estadístico quizá no cuente toda la historia.
+
+- El siguiente paso es explorar mediante gráficas.
+
+- Es un proceso iterativo.
+
+## Una sola variable {.smaller}
+
+- ¿Cuál es el pico? ¿Coincide con la media? ¿La mediana? ¿Existe?
+- ¿Cuántos picos?
+  - Si es `bimodal` o `multimodal` quizá haya varias poblaciones en lugar de una y será mejor modelar por separado.
+- ¿Qué tan normal es? ¿El log-normal? 
+    - Utiliza una gráfica `Q-Q`
+- ¿Cuánto varía? ¿Está concentrada en un intervalo o una categoría?
+- ¿Outliers? -> Usa gráficas de `boxplot`.
+- Da preferencia a los `density plots`, en esta gráfica es más importante la forma que los valores actuales del eje vertical.
+- Si los datos están concentrados en un solo lado de la gráfica (`skewed`) y es no negativa es bueno representarla en `log10`.
+- Una grafica de barras no da más información que  `summary()`, aunque alguna gente las prefiere.
+    - Es bueno mostrarla horizontal y ordenada.
+
+## Tarea {.flexbox .vcenter}
+
+- Es importante en la etapa de exploración, poder generar varias gráficas de manera automática y simple para analizarlas visualmente y tener una idea de los datos. 
+- Crea una función que genere los tipos de gráfica correspondiente para cada variable del `data.frame`. 
+- Guárdala en `utils.r`. 
+- Úsala en `2-eda.r` en ambas carpetas: `algas` y `german`.
+
+## Dos variables
+- ¿Existe relación entre dos variables de entrada? ¿entre una entrada y la variable de salida?
+- ¿Qué tan fuerte?
+- ¿Qué tipo de relación?
+- `Scatter plot` entre dos variables numéricas, calcular la correlación de Pearson en un conjunto `sano` de los datos, visualizar la curva que mejor representa los datos.
+- `Stacked bar charts` para dos variables categóricas.
+    - Si quieres comparar razones a lo largo de las categorías lo mejor es usar un `filled bar chart`. En este caso se recomienda agregar un  `rug` para tener una idea de la cantidad de individuos.
+    - Si hay múltiples categorías por variable, es mejor usar `facets`.
+- Para variable categórica y numérica es recomendable usar `boxplot` (en su versión de `violin` o `jitter`).
+
+## Tarea {.flexbox .vcenter}
+
+- Es importante en la etapa de exploración, poder generar varias gráficas de manera automática y simple para analizarlas visualmente y tener una idea de los datos. 
+- Crea una función que genere los tipos de gráfica para cada par de variables del `data.frame`. Esta función debe de recibir dos parámetros, uno que indique si genera todas las combinaciones de dos variables o recibe una lista de variables en las cuales generar las combinaciones.
+- Guárdala en `utils.r`. 
+- Úsala en `2-eda.r` en ambas carpetas: `algas` y `german`.
+
+
+## Valores faltantes: `NAs`
+
+- Los pasos son los siguientes:
+    - Identificar los datos faltantes.
+    - Examinar las causas de los datos faltantes. 
+        - Preguntar al domain expert, etc.
+    - Borrar los casos (o columnas) que contienen los `NAs` o reemplazar (imputar) los `NAs` con valores razonables.
+    
+- La teoría la veremos más adelante en el curso.
+
+<span class="yellow">NOTA: Todas estás recomendaciones aplican igual para outliers</span>
+
+## Valores faltantes: `NAs`
+
+- Es importante recordar que en `R` la operación `x == NA` nunca regresa `TRUE`, siempre hay que utilizar las funciones `is.na()`, `is.nan()` e `is.infinite()`.
+
+- El método `complete.cases` identifica los renglones (individuos) del `data.frame` que no tienen ningún `NA` en sus columnas (variables).
+
+- Es posible usar `sum` y `mean` con `is.na` para obtener el total por columna de faltantes y el porcentaje.
+    - ¿Por qué?
+    
+## Valores faltantes {.smaller}
+
+Aunque más adelante veremos técnicas más poderosas, vale la pena mencionar el ejemplo mostrado en `R in action`, cap. 15. 
+
+La técnica nos permite determinar si los faltantes en una variable están correlacionados con otra.
+```{r, eval=FALSE}
+x <- as.data.frame(abs(is.na(df))) # df es un data.frame
+
+head(df)
+
+head(x)
+
+# Extrae las variables que tienen algunas celdas con NAs
+y <- x[which(sapply(x, sd) > 0)] 
+
+# Da la correación un valor alto positivo significa que desaparecen juntas.
+cor(y) 
+```
+
+## Ejercicio {.flexbox .vcenter}
+
+- Genera un reporte para ambos conjuntos de datos que reporte el estado de los valores missing.
+
+- Muestra la matriz de correlación faltante en una gráfica.
+
+- ¿Qué puedes entender?
+
+```{r,echo=FALSE, cache=TRUE}
+algas <- read.table(file = "../data/algas/algas.txt", 
+                    header = FALSE,
+                    dec = ".",
+                    col.names = c('temporada', 'tamaño', 'velocidad', 'mxPH',
+                                  'mnO2', 'Cl', 'NO3', 'NO4', 'oPO4', 'PO4',
+                                  'Chla', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7'),
+                    na.strings=c('XXXXXXX')
+                    )
+```
+
+## Variables faltantes: Remover observaciones {.tiny}
+
+Las variables con más faltantes son Promedio de Cloruro `Cl` (10) y Promedio de Clorofila `Chla` (12).
+
+```{r}
+summary(algas[-grep(colnames(algas),pattern = "^a[1-9]")]) # Nota el uso del grep
+```
+
+## Variables faltantes: Remover observaciones 
+
+Antes de removerlas es recomendable verlos, guardarlos y contarlos:
+
+```{r, eval=FALSE}
+nrow(algas[!complete.cases(algas),])
+```
+Hay `r nrow(algas[!complete.cases(algas),])` observaciones en las cuales tienen `NAs`
+
+```{r}
+algas.con.NAs <- algas[!complete.cases(algas),]
+```
+Siempre es bueno guardarlas, si se piensan eliminar del dataset.
+
+## Variables faltantes: Remover observaciones {.tiny}
+
+Las observaciones con `NAs`son las siguientes:
+
+```{r}
+algas.con.NAs[c('mxPH', 'mnO2', 'Cl', 'NO3', 'NO4', 'oPO4', 'PO4', 'Chla')]
+```
+
+de los cuales, `62` y `199` tienen más del `50%` (`6`) de las variables independientes nulas.
+
+<span class="green">Aunque remover las observaciones con `NAs` NO sea la estrategia, quitar las observaciones con muchas columnas vacías, puede ser recomendable.
+</span>
+
+## Variables faltantes: Remover observaciones {.tiny}
+En los casos en los que no es posible hacer una explorarción visual, se puede utilizar el siguiente código
+```{r}
+# ¿Cuántos NAs hay por observación?
+apply(algas, 1, function(x) sum(is.na(x)))
+```
+Si queremos ver las observaciones:
+```{r}
+algas[apply(algas, 1, function(x) sum(is.na(x))) > 2,]
+```
+Lo cual confirma nuestra exploración visual.
+
+## Variables faltantes: Remover observaciones {.smaller}
+Si eliminar las observaciones con `NAs` va a ser el camino que vamos a tomar, habrá que hacerlo de manera
+reproducible
+
+```{r}
+indicesConNAs <- function(data, porcentaje=0.2) {
+  n <- if (porcentaje < 1) {
+    as.integer(porcentaje  * ncol(data))
+  } else {
+    stop("Debes de introducir el porcentaje de columnas con NAs.")
+  }
+  indices <- which( apply(data, 1, function(x) sum(is.na(x))) > n )
+  if (!length(indices)) {
+    warning("No hay observaciones con tantos NAs 
+            (la respuesta de la función es vacía),
+            no se recomienda indexar el data.frame con esto")
+  }
+  indices
+}
+```
+
+<span class="blue">Ejercicio</span>: ¿Qué hace esta función?
+
+
+## Variables faltantes: Remover observaciones {.smaller}
+
+```{r}
+indicesConNAs(algas, 0.2)
+```
+
+```{r}
+indicesConNAs(algas, 0.8)
+```
+
+```{r, eval=FALSE}
+# Si queremos remover las que tengan más del 20% de NAs...
+algas <- algas[-indicesConNAs(algas, 0.2),]
+```
+
+
+<span class="blue">Ejercicio</span>: Agrega esta función a tu archivo `utils.r`.
+
+## Variables faltantes: Renivelar {.smaller}
+
+- Si la variable es categórica (`factor`), puedes crear una nueva variable y poner los `NA`s a un nuevo `level`, e.g. `missing`
+
+    - Por ejemplo, suponiendo que hubiese una variable categórica con faltantes en nuestros dataset
+  
+```{r eval=FALSE}
+dataset$cat.with.NAs.fix <- ifelse(is.na(dataset$cat.with.NAs),
+                              "missing",
+                              ifelse(dataset$ccat.with.NAs == TRUE,    
+                                                # o el valor que sea
+                                                "level_1",
+                                                "level_2"))
+```   
+
+- Sólo recuerda que es posible que el valor de `NA` signifique algo.
+
+- Esto también se puede hacer con variables numéricas, si primero las vuelves categóricas (<span class="blue">binning</span>)
+
+## Variables faltantes: Central
+
+- Una estrategia es rellenar los valores faltantes con alguna medida de centralidad.
+    - Media, mediana, moda, etc.
+
+- Para variables distribuidas normalmente, esta opción es la mejor.
+
+- Pero para variables <span class="red2">skewed</span>  o con <span class="red">outliers</span> esta decisión puede ser desastrosa.
+
+- Por lo tanto, esta estrategia no se debe de utilizar salvo una exploración previa de las variables.
+
+## Tarea {.flexbox .vcenter}
+
+- ¿A qué variables le puedes de `algas` le puedes aplicar este procedimiento?
+
+- ¿Qué puedes decir de `german`?
+
+- A las variables que no se les puede aplicar, explica por qué no.
+
+- Esta decisión debe de ser reproducible, agrega a `utils.r` una función que impute en las variables con  `NAs` el valor central (`median` si es numérica, `moda` si es categórica). La función debe de tener la siguiente firma:
+
+```{r, eval=FALSE}
+imputarValorCentral <- function(data, colnames) {...}
+```
+
+## Variables faltantes: Correlación {.smaller}
+
+Calculando rápidamente la correlación
+
+```{r}
+symnum(
+  cor(algas[c('mxPH', 'mnO2', 'Cl', 'NO3', 'NO4', 'oPO4', 'PO4', 'Chla')], 
+      use="complete.obs")
+  )
+```
+
+Observamos que `NO3` y `NO4` y `oPO4` y `PO4` están altamente relacionadas (`> 0.9`).
+
+<span class="yellow">Si removiste las observaciones `62` y `199` no hay columnas que tengan vacíos a `NO3` y `NO4` a la vez.</span>
+
+
+## Variables faltantes: Correlación {.tiny}
+```{r correlacion, warning=FALSE,fig.height=4, fig.width=8}
+library(ggplot2)
+ggplot(data=algas) + 
+  aes(x=oPO4, y=PO4) + 
+  geom_point(shape=1) + # Usamos una bolita para los puntos
+  geom_smooth(method=lm, se=FALSE) 
+  # Mostramos la linea de la regresión y no mostramos la región de confianza
+```
+
+## Variables faltantes: Correlación {.smaller}
+
+```{r}
+algas <- algas[-indicesConNAs(algas),]
+lm(PO4 ~ oPO4, data=algas)
+```
+
+Entonces la fórmula es
+
+$$
+PO4 = 42.897 + 1.293*oPO4
+$$
+
+<span class="blue2">Ejercicio</span>: Crea una función que sustituya los `NAs` con el valor dado por la regresión lineal recién calculada (No automatices la regresión lineal)
+<span>
+
+## Variables faltantes: Similitud
+
+- Podemos suponer que si dos observaciones son similares y una de ellas tiene `NAs` en alguna variable, hay una alta probabilidad de que esa variable tenga un valor similar al valor de esa variable en la otra observación.
+    - Obviamente es una suposición...
+    
+- Debemos definir la noción de similar
+    - Y esto significa definir un espacio métrico en el espacio que usamos para describir las observaciones.
+    - Obviamente, otra gran suposición...
+
+## Variables faltantes: Similitud
+
+- Para variables numéricas se puede usar la distancia euclídea
+
+$$
+d(\vec{x}, \vec{y}) = \sqrt{\sum_{i=1}^p(\vec{x}_i - \vec{y}_i)}
+$$
+
+- Si son nominales las variables
+
+$$
+d(\vec{x}, \vec{y}) = \sqrt{\sum_{i=1}^p \delta_i(\vec{x}_i, \vec{y}_i)}
+$$
+
+donde $\delta(\vec{x},  \vec{y})$ es a delta de Kronecker.
+
+## Variables faltantes: Similitud
+
+- Una vez definida la similitud, debemos de definir el valor que imputar al `NA`.
+    
+- Una opción es utilizar una medida de centralidad de los $k$ observaciones más cercanas. 
+
+- El Promedio con pesode los valores de los vecinos, es otra opción. El peso se puede determinar de varias
+maneras, pero usar como <span class="blue">kernel</span> una función gaussiana.
+
+$$
+peso(d) = e^{-d}
+$$
+
+donde $d$ es la distancia de una observación a la que estamos considerando.
+
+## Variables faltantes: Similitud
+
+- Es importante normalizar los valores numéricos antes de calcular las distancias.
+
+$$
+\vec{x}_{normalizado} = \frac{\vec{x}_i - \bar{x}}{\sigma_{x}}
+$$
+
+<span class="blue">Ejercicio:</span> ¿Por qué?
+
+
+## Tarea {.flexbox .vcenter}
+
+- Formen equipos de dos personas, implementen una función que impute por similitud con la firma
+
+```{r, eval=FALSE}
+imputarSimilitud <- function(data, num_vecinos) { ... }
+```
+
+- Aplíquelo a `algas` y `german`. 
+
+- ¿Son muy diferentes las estadísticas ignorando los `NAs` comparadas con este método?
+
+- Agréguelo a su reporte de exploración de ambos datasets. Explíque cuál método de imputació usó y por qué.
+
+## Resumen de EDA  {.flexbox .vcenter}
+
+- En general la exploración de datos se divide en tres pasos:
+    - Verificar la distribución de las variables individuales
+        - Identificando outliers, valores faltantes $\to$ transformación, eliminación del data set, etc.
+    - Verificar la relación entre las variables dependientes y los predictores 
+        - Se podrá usar en `feature selection`
+    - Relación entre los predictores
+        - Eliminación de variables redundantes
+
+
+
+# Preparación para modelado
+
+## Hasta ahora... 
+
+- Deberías de contar en este momento con dos documentos, de análisis exploratorio. Estos documentos son internos y son para que te familiarices con los datos. 
+
+- El siguiente paso es preparar los datos. Esta actividad también genera un reporte, pero este reporte servirá (además de bitácora) como herramienta de comunicación con otros equipos y de estandarización para el modelado.
+    - e.g. Podría ser la base de un documento de diseño de ETL.
+
+- En la carpeta `plantillas` está el archivo `data_preparation.Rmd` este funge como plantilla para el reporte. 
+
+## Tarea {.flexbox .vcenter .smaller}
+
+- ¿Recuerdas el ejercicio de arreglar los nombres de variables? Crea una función que lo haga, y además agrega la funcionalidad de que cambie los nombres de variables `camelCase` a `camel.case`.
+
+- La firma de dicha función debe de ser
+
+```{r, eval=FALSE}
+normalizarNombres <- function(nombres_de_columnas) { ... }
+```
+
+<span class="yellow">NOTA: El paquete `rattle` tiene una función llamada `nomVarNames` que hace exactamente esto, puedes ver su código para inspirarte.</span>
+
+- En este momento es quizá una buena idea, dejar de duplicar código y concentrar todas las funciones de `utils.r` que se puedan reutilizar en un archivo `functions.r`.
+
+## Transformación de datos 
+
+- Normalizar
+    - Es útil cuando las cantidades absolutas son menos importantes que las relativas.
+    
+- Normalizar y reescalar 
+    - Usar la desviación estándar como unidad de medida.
+    - Tiene mucho sentido si la distribución es simétrica.
+    - Si no lo es, es posible que sea <span class="green">lognormally distributed</span> (como el ingreso monetario o los gastos), una transformación `log10()` lo hará útil.
+
+## Transformación de datos 
+
+- Es una buena idea usar `log` si el rango de tus datos cubre varios ordenes de magnitud. 
+    - Regularmente, estas variables vienen de procesos <span class="blue">multiplicativos</span> en lugar de aditivos. 
+
+- Si el rango incluye cantidades negativas, usa (crea) una función `signedLog10`
+
+```{r eval=FALSE}
+signedLog10 <- function(x) {
+  ifelse(abs(x) <= 1.0, sign(x)*log10(abs(x)))
+}
+```
+
+## Columnas de procedencia  
+
+- Un aspecto que siempre es olvidado, o que no se considera importante debido a los `blogs`, es el <span class="red">versionado de control de los datos</red>.
+
+- Esto se puede implementar, agregando columnas para indicar de donde vienen los datos, o con qué procedimiento de limpieza se generaron, etc.
+    - Se puede utilizar el mismo `id` del código del ETL guardado en `github`.
+    
+
+
+# `data_preparation.Rmd`
+
+## Tarea {.flexbox .vcenter }
+
+- Realiza los reportes para `algas` y `german` usando la plantilla `data_preparation.Rmd`.
+
+- Se va a presentar por equipo.

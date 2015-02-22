@@ -1,0 +1,166 @@
+---
+title: "Lecture 6"
+author: "Adolfo De Unánue T."
+date: "17/12/2014"
+output: ioslides_presentation
+---
+
+# Deployment
+
+## Show, don't tell
+
+- Blog -> One time
+
+- Contar historias
+
+- Presentaciones
+
+- Producción
+
+- Producto
+
+# Producción
+
+## Batch
+
+Se leen los datos en `R`, se realiza el <span class="yellow">scoring</span> y este <span class="yellow">score</span> se escribe a base de datos, archivo, etc.
+
+## Ligar con otros lenguajes
+
+Otros lenguajes (`C/C++`, `Java`, `Python`, `bash`, etc.) se conectan a `R` usando las ligas o API implementadas en el lenguaje (`Rpy`, `Rcpp`) y continuan con su ejecución.
+
+Mas información:
+
+- [Rcpp now used by 300 CRAN packages](http://dirk.eddelbuettel.com/blog/2014/11/25/#rcpp_300_packages)
+
+- [High performance functions with Rcpp](http://adv-r.had.co.nz/Rcpp.html)
+
+- [Rcpp for Seamless R and C++ Integration](http://www.rcpp.org/)
+
+- [R, C++ and Rcpp](http://dirk.eddelbuettel.com/papers/useR2014_keynote.pdf)
+
+## Servicios Web
+
+`R` es expuesto a través de un servicio HTTP
+
+- `Rook`
+
+- `Shiny`
+
+## Exportar
+
+A veces, la evaluación del modelo es simple comparada con la construcción del modelo. En este caso, es posible (o deseable) transformar la evaluación a otro lenguaje (`SQL`, `Java`, `etc`)
+
+Para árboles:
+
+- [Mi respuesta en Stackoverflow](http://stackoverflow.com/questions/11831794/testing-rules-generated-by-rpart-package)
+
+## PMML
+
+- Predictive Model Markup Language.
+
+- Formato en XML.
+
+- Data Mining Group.
+
+- Depende del paquete `pmml`
+
+- Se exporta a otra herramienta que soporte el estandar.
+    - Desktop: Weka, Zementis ADAPA.
+    - Nube: Amazon, IBM, FICO.
+    - BD: IBM Netezza, Pivotal,Sybase IQ, Teradata and Teradata Aster.
+    - Hadoop: Datameer and Hive.
+
+- Funciona en ambas direcciones.
+
+## Ejemplo{.smaller}
+
+```{r}
+data(iris)
+
+str(iris)
+
+idx <- sample(2, nrow(iris), replace=TRUE, prob=c(0.7, 0.3))
+train <- iris[idx==1,]
+test <- iris[idx==2,]
+```
+
+## Ejemplo{.smaller}
+
+```{r}
+library(randomForest)
+
+iris.rf <- randomForest(Species ~ ., data = train, ntree= 100, proximity=TRUE)
+
+table(predict(iris.rf), train$Species)
+```
+
+## Ejemplo{.smaller}
+
+```{r}
+print(iris.rf)
+```
+
+## Ejemplo{.smaller}
+
+```{r}
+plot(iris.rf)
+```
+
+
+## Ejemplo{.smaller}
+
+```{r}
+importance(iris.rf)
+```
+
+
+## Ejemplo{.smaller}
+
+```{r}
+varImpPlot(iris.rf)
+```
+
+## Ejemplo
+
+```{r}
+saveRDS(object = iris.rf, file = "iris_rf.rds")
+```
+
+## Ejemplo: PMML{.smaller}
+
+```{r eval=TRUE, message=FALSE,results='hide'}
+library(pmml)
+
+rf.pmml <- pmml(iris.rf)
+xml.path <- file.path("rf-pmml.xml")
+saveXML(rf.pmml, xml.path)
+```
+
+## Ejemplo: Exportar{.smaller}
+
+```{r}
+extraer.rf <- function(rf.model) {
+  arbol_extraido <- function(i) {
+    ti <- getTree(rf.model, k = i, labelVar = TRUE)
+    ti$nodeid <- 1:dim(ti)[[1]]
+    ti$treeid <- i
+    ti
+  }
+  num.trees <- rf.model$ntre
+  do.call('rbind', sapply(1:num.trees, arbol_extraido, simplify=FALSE))
+}
+
+write.table(extraer.rf(iris.rf), file='modelo_rf.tsv',
+            row.names=FALSE, sep='\t', quote=FALSE)
+```
+
+## Ejemplo: Web Service
+
+- Se podría hacer con el paquete `Rook` (puro `R`).
+
+- También se podría exponer mediante otro servicio `HTTP` en otro lenguaje.
+
+- O usar `shiny`:
+    - Ver archivo: `ejemplo_ws.Rmd`
+    - Aunque esto es más una aplicación web, se puede accesar mediante `curl`.

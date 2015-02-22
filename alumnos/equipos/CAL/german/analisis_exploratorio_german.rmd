@@ -1,0 +1,230 @@
+---
+title: 'Análisis exploratorio: german'
+author: "Equipo CAL (Carlos, Amanda, Liliana)"
+date: "Noviembre 2014"
+output: html_document
+---
+
+```{r, echo = FALSE, eval=TRUE}
+# Limpiamos objetos
+rm(list = ls())  
+
+# Cerramos gráficas
+graphics.off()
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+# Cargamos las librerías necesarias para el proceso
+library(plyr)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(directlabels)
+library(lubridate)
+library(stringr)
+library(corrplot)
+```
+
+```{r, echo = FALSE, eval=TRUE}
+# Guardamos la ruta de trabajo
+ds.path <- 'C:/Users/Amanda/Documents/GitHub/itam-dm/alumnos/equipos/CAL/german'
+#ds.path <- 'J:/Maestria/2_Mineria_Datos_II/CAL/german'
+
+# Definimos directorio de trabajo
+setwd(ds.path)
+
+# Definimos nombre de la base
+ds.name <- 'german'
+
+# Definimos la ruta de donde se obtendrán los datos
+ds.url <- 'http://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data'
+
+# Cargamos nuestro archivo de funciones utils_algas.r
+source('utils_german.r')
+
+# Cargamos la base de análisis
+source('0-load_german.r')
+
+# Para obtener un print mejorado
+ds <- tbl_df(ds)
+```
+
+# Introducción
+
+Archivo german con 1000 observaciones, que se puede obtener en: [http://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data](http://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data).
+
+Este set de datos clasifica a clientes como buenos o malos riesgos para otorgarles créditos bancarios.
+
+## Variables
+
+La base consta de 21 variables que corresponden a diferentes observaciones sobre el historial crediticio de una muestra de personas.  
+
+
+|campo|atributo|valores|tipo|
+|:---:|:------:|:--:|:---:|
+|1|estatus de su cuenta actual|A11,A12,A13,A14|categórica|
+|2|duración en meses|enteros positivos|numérica|
+|3|historia creditica|A30,A31,A32,A33,A34|categórica|
+|4|propósito|A40,A41,A42,A43,A44,A45,A46,A47,A48,A49,A410|categórica|
+|5|monto crediticio|reales positivos|numérica|
+|6|cuenta de ahorro/bonos|A61,A62,A63,A64,A65|categórica|
+|7|empleo actual desde|A71,A72,A73,A74,A75|categórica|
+|8|porcentaje de capacidad de pago|reales positivos|numérica|
+|9|estado civil y género|A91,A92,A93,A94,A95|categórica|
+|10|otros acreedores|A101,A102,A103|categórica|
+|11|vivienda actual desde|entero positivos|numérica|
+|12|propiedad|A121,A122,A123,A124|categórica|
+|13|edad en años|enteros positivos|numérica|
+|14|otros planes de pago|A141,A142,A143|categórica|
+|15|tipo de vivienda|A151,A152,A153|categórica|
+|16|número de créditos que tiene en este banco|enteros positivos|numérica|
+|17|trabajo|A171,A172,A173,A174,A175|categórica|
+|18|número de dependientes económicos|enteros positivos|numérica|
+|19|teléfono|A191,A192|categórica|
+|20|trabajador extranjero|A201,A202|categórica|
+|21|crédito bueno/crédito malo|1,2|categórica|
+
+# Estructura general
+
+Se muestra la estructura general de la base
+
+```{r, echo = FALSE, eval=TRUE}
+ds
+```
+
+Podemos observar las 21 diferentes variables, donde 13 de ellas parecen ser categóricas y el resto numéricas (8 variables), aunque una de las variables numéricas en realidad es categórica.
+
+## Tamaño
+
+Se muestra la dimensión de la base.
+
+```{r, echo = FALSE, eval=TRUE}
+dim(ds)
+```
+
+La base contiene 1000 registros para cada una de las 21 variables.
+
+## Columnas
+
+Se muestran los nombres de la base.
+
+```{r, echo = FALSE, eval=TRUE}
+names(ds)
+```
+
+## Estructura
+
+Se muestra la estructura de la base.
+
+```{r, echo = FALSE, eval=TRUE}
+str(ds)
+```
+
+Tenemos que la base se encuentra codificada, por lo que no podemos saber si hay alguna discrepancia entre los datos y los correspondientes nombres de las variables, por lo que más adelante se llevará a cabo una decodificación.
+
+## Observaciones
+
+Se muestran las primeras observaciones que contiene la base.
+
+```{r, echo = FALSE, eval=TRUE}
+head(ds)
+```
+
+Se muestran las últimas observaciones que contiene la base.
+
+```{r, echo = FALSE, eval=TRUE}
+tail(ds)
+```
+
+Se muestra un grupo de observaciones que contiene la base que fueron seleccionadas aleatoriamente.
+
+```{r, echo = FALSE, eval=TRUE}
+sample_n(ds,6)
+```
+
+# Sumario Estadístico
+
+Se muestra el resumen estadístico de la base, donde aparentemente no se observa algo raro.
+
+```{r, echo = FALSE, eval=TRUE}
+summary(ds)
+```
+
+# Identificación de id
+
+Dado que la base no cuenta con una columna correspondiente al id, agregamos la variable correspondiente.
+
+# Limpieza de metadatos
+
+Verificamos el formato de los nombres de las variables y observamos que no todos tienen el formato deseado, por lo que aplicaremos una limpieza.
+
+```{r, echo = FALSE, eval=TRUE}
+names(ds)
+```
+
+# Recodificación
+
+Realizamos la recodificación correspondiente para entender mejor cada una de las variables.
+
+# Ajuste de formatos
+
+Se muestran las diferentes clases de las variables.
+
+```{r, echo = FALSE, eval=TRUE}
+sapply(ds, class)
+```
+
+Tenemos que hay varias variables de tipo caracter y otras numéricas, aparentemente el único ajuste que debemos realizar es definir como factores a las variables tipo caracter, para que posteriormente puedan ser utilizadas en el análisis. 
+
+# Normalizar niveles
+
+Removemos espacios, puntuaciones, etc. en los niveles de los factores. En este caso, además de la normalización se lleva a cabo un cambio en la variable `Good.Loan`, que aparentemente es numérica pero realmente representa 2 categorías.
+
+# Transformación de variables
+
+Aparentemente no es necesario hacer ninguna transformación a los datos. En el análisis gráfico trataremos de identificar si se requiere alguna transformación.
+
+```{r, echo=FALSE, eval=TRUE}
+# Realizamos los cambios que requiera la base
+source('1-prepare_german.r')
+```
+
+## Verificación de los cambios
+
+Una vez aplicado nuestro proceso de preparación para limpieza de metadatos y ajuste de formatos tenemos lo siguiente:
+
+Verificamos como quedan los nombres de las variables de la base.
+
+```{r, echo = FALSE, eval=TRUE}
+names(ds)
+```
+
+Así queda el ajuste sobre el tipo de variables.
+
+```{r, echo = FALSE, eval=TRUE}
+sapply(ds, class)  
+```
+
+Y nuevamente observamos el sumario estadístico.
+
+```{r, echo = FALSE, eval=TRUE}
+summary(ds)
+```
+
+# Análisis gráfico
+
+Con la finalidad de observar el comportamiento de las variables que contiene la base, se obtienen las gráficas correspondientes para cada una de las variables.
+
+Asimismo, se obtienen gráficas de la relación entre cada par de variables.
+
+Dado que en nuestra base arreglada los nombres de las categorías de algunas variables son muy largos, vamos a utilizar la base codificada original para que las gráficas se puedan observar mejor.
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+source('2-eda_german.r')
+```
+
+### Apéndice: Ambiente
+
+```{r, echo=FALSE, eval=TRUE}
+sessionInfo()
+```

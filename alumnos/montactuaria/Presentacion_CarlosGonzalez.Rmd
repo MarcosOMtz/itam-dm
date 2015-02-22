@@ -1,0 +1,135 @@
+---
+title: "Tarea"
+author: "Carlos González Munguía"
+date: "Diciembre 2014"
+output: ioslides_presentation
+---
+
+##Carga de datos
+
+-Se cargan los datos
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+library(dplyr)
+library(plyr)
+library(ggplot2)
+#library(tidyr)
+library(lattice)
+library(scales)
+library(Hmisc)
+library(lubridate)
+library(gridExtra)
+library(ggthemes)
+library(knitr)
+library(car)
+library(stringr)
+
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+
+datos <- read.table("C:/Users/Mont/itam-dm/alumnos/montactuaria/cup98lrn.txt", header=TRUE, sep=",")
+
+saveRDS(datos,"ds.rds")
+
+ds  <- readRDS("ds.rds")
+
+
+```
+
+
+
+
+```{r, warning=TRUE, message=FALSE, error=FALSE, eval=FALSE,echo=TRUE}
+ds.path <- "cup98lrn.txt" 
+
+ds.name <- "cup98lrn" 
+
+ds <- loadData(name=ds.name, full_path=ds.path, sep=",", head=TRUE)
+
+ds <- tbl_df(ds)
+
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+dim(ds)
+```
+
+## Exploración de datos
+
+Se tienen identificadas 3 variables target:\n
+
+- TARGET_B: Binaria, si es que se tuvo respuesta o no.\n
+
+- TARGET_D: Monto de donación asociada con la variable TARGET B.\n
+
+- HPHONE_D: Binario, indicador de un número telefónico publicado.\n
+
+
+
+## Variables demográficas
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+summary((ds[,1:8]))
+
+```
+
+## Variables demográficas
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+summary((ds[,9:16]))
+
+```
+
+##Número de veces que el donador respondió a otras campañas
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+summary((ds[,29:36]))
+
+```
+
+##Número de veces que el donador respondió a otras campañas
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+summary((ds[,37:44]))
+
+```
+
+
+##Descripción de las variables de salida
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+(porcentaje.respuesta.b <- round(100 * prop.table(table(ds$TARGET_B)), digits=1))
+
+etiquetas <- paste("TARGET_B=", names(porcentaje.respuesta.b), "\n", porcentaje.respuesta.b, "%", sep=" ")
+
+ds.positive <- ds[ds$TARGET_D >0, ]
+
+target.d.positive <- ds.positive$TARGET_D
+
+summary(target.d.positive)
+
+donaciones.positivas <- length(target.d.positive)
+
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE,fig.width=7, fig.height=4.5}
+
+pie(porcentaje.respuesta.b, labels = etiquetas)
+
+```
+
+##Descripción de las variables de salida
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE,fig.width=7, fig.height=4.5}
+
+boxplot(target.d.positive)
+```
+

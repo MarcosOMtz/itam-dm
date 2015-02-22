@@ -1,0 +1,83 @@
+---
+title: "Modelando (Primer Intento)"
+author: "Adolfo De Unánue T."
+date: "26/11/2014"
+output: html_document
+---
+
+### Notas
+
+- Usaremos la base de datos de **KDD 2009** contenidos en la carpeta `data/KDD2009`.
+
+- Esto lo estamos haciendo rápido, no debería de ser así. Hay que preparar los documentos exploratorios y de preparación.
+
+## Preparación de los datos
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(ROCR)
+```
+
+```{r}
+set.seed(789345)
+```
+
+
+Cargamos los datos
+
+```{r}
+data <- read.table('../data/KDD2009/orange_small_train.data.gz', header=TRUE, sep="\t", na.strings=c('NA', ''))
+```
+
+y las variables dependientes (en este caso son 3: `churn`, `appetency` y `upselling`).
+
+```{r}
+churn <- read.table('../data/KDD2009/orange_small_train_churn.labels', header=FALSE, sep = '\t')
+appetency <- read.table('../data/KDD2009/orange_small_train_appetency.labels', header=FALSE, sep='\t')
+upselling <- read.table('../data/KDD2009/orange_small_train_upselling.labels', header=FALSE, sep='\t')
+
+data$churn <- churn$V1
+data$appetency <- appetency$V1
+data$upselling <- upselling$V1
+```
+
+
+Dividimos en entrenamiento, calibración y prueba.
+
+```{r}
+
+data$rgroup <- runif(dim(data)[1])
+
+train <-subset(data, rgroup <= 0.9)
+test <- subset(data, rgroup > 0.9)
+
+outcomes <- c('churn', 'appetency', 'upselling')
+vars <- setdiff(colnames(train), c(outcomes, 'rgroup'))
+cat.vars <- vars[sapply(train[,vars],class) %in% c('factor', 'character')]
+num.vars <- vars[sapply(train[,vars],class) %in% c('numeric','integer')]
+
+use.for.calibration <- rbinom(n=dim(train)[[1]], size=1, prob=0.1) > 0
+
+calibration <- subset(train, use.for.calibration)
+
+train <- subset(train, !use.for.calibration)
+
+```
+
+En este ejemplo, sólo querremos predecir el `churn`
+
+```{r}
+outcome <- 'churn'
+
+pos <- '1'
+```
+
+Limpiamos el `enbvironment` de `R`
+
+```{r}
+rm(list=c('data', 'churn', 'appetency', 'upselling', 'use.for.calibration'))
+```
+
+
+## Modelo de una sola variable.

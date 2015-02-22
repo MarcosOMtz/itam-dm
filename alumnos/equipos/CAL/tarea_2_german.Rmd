@@ -1,0 +1,384 @@
+---
+title: "tarea 2 german"
+author: "equipo CAL: Carlos Petricioli, Amanda Balderas, Liliana Millán"
+date: "16 de noviembre de 2014"
+output: html_document
+---
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+# Este bloque debería de tener la bandera de echo a FALSE
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+library(stringr)
+library(corrgram)
+```
+
+
+
+```{r, echo=FALSE}
+
+# Este bloque debería de tener la bandera de echo a FALSE
+
+# NOTA: Todos los bloques de este documento, tienen eval a FALSE, se debería de eliminar
+
+# Cargamos el dataset
+
+ds.path <- "german/" # Puede ser un URL o una dirección en el directorio
+
+ds.name <- "german" # Nombre de nuestro conjunto de datos, e.g. algas, german
+
+source(paste(ds.path, "utils.r", sep="/"))
+
+df <- load_file()
+
+ds <- readRDS('german/german.rds')# Leemos el dataset, usando readRDS (ya que ya lo tenemos en disco debido a nuestro EDA)
+   # Hay que utilizar el data set al que no se le han removido las observaciones NAs
+   # Lo guardamos en la variable ds para hacer más genérico los pasos.
+
+ds <- tbl_df(ds) # Para obtener un print mejorado
+```
+
+
+# Introducción
+
+Archivo german 1000 observaciones, obtenido del repositorio de Adolfo de Unanue Tiscareño [https://github.com/nanounanue/itam-dm/tree/master/data/german](https://github.com/nanounanue/itam-dm/tree/master/data/german).
+
+Este set de datos clasifica a clientes como buenos o malos riesgos para otorgarles créditos bancarios.
+
+## Variables
+
+El set contiene 20 atributos en el siguiente orden: 
+
+|campo|atributo|valores|tipo|
+|:---:|:------:|:--:|:---:|
+|1|estatus de su cuenta actual|A11,A12,A13,A14| categrórica|
+|2|duración en meses|reales positivos|numérica|
+|3|historia creditica|A30,A31,A32,A33,A34|categórica|
+|4|próposito|A40,A41,A42,A43,A44,A45,A46,A47,A48,A49,A410|categórica|
+|5|monto crediticio|reales positivos|numérica|
+|6|cuenta de ahorro/bonos|A61,A62,A63,A64,A65|categórica|
+|7|empleo actual desde|A71,A72,A73,A74,A75|categórica|
+|8|porcentaje de capacidad de pago|reales positivos|numérica|
+|9|estado civil y género|A91,A92,A93,A94,A95|categórica|
+|10|otros acreedores|A101,A102,A103|categórica|
+|11|vivienda actual desde|reales positivos|numérica|
+|12|propiedad|A121,A122,A123,A124|categórica|
+|13|edad en años|reales positivos|numérica|
+|14|otros planes de pago|A141,A142,A143|categórica|
+|15|tipo de vivienda|A151,A152,A153|categórica|
+|16|número de créditos que tiene en este banco|reales positivos|numérica|
+|17|trabajo|A171,A172,A173,A174,A175|categórica|
+|18|número de dependientes económicos|reales positivos|numérica|
+|19|teléfono|A191,A192|categórica|
+|20|trabajador extranjero|A201,A202|categórica|
+|21|crédito bueno/crédito malo|1,2|categórica|
+
+
+# Estructura General
+
+```{r}
+ds
+```
+
+
+## Tamaño
+```{r}
+dim(ds)
+```
+
+## Columnas
+
+Agregaremos los nombres a las columnas
+```{r}
+names(ds) <- german.colnames()
+
+names(ds)
+```
+
+## Estructura
+
+Verificaremos si los contenidos tienen sentido con respecto a lo que debería almacenar cada variable, para ello decodificamos cada valor categórico por su descripción.
+
+Todas las variables coinciden en sus tipos.
+```{r, echo=FALSE}
+ds <- german.decode(ds)
+
+str(ds)
+```
+
+
+## Observaciones
+
+```{r}
+head(ds)
+```
+
+```{r}
+tail(ds)
+```
+
+```{r}
+ds[sample(1:dim(ds)[1],6),]
+```
+
+# Sumario Estadístico
+
+```{r}
+summary(ds)
+```
+
+
+# Limpieza de metadatos
+
+Quitando espacios, diagonales y mayúsculas a minúsculas.
+```{r, echo=FALSE}
+# Usaremos la función que hiciste de ejercicio
+names(ds) <- format_headers(names(ds))
+
+names(ds)
+```
+
+
+# Ajuste de formatos
+
+Las clases de las variables son
+
+```{r}
+sapply(ds, class)
+```
+
+Cambiaremos los tipos de character a factor.
+
+```{r, echo=FALSE}
+tipos <- lapply(ds, function(x) class(x))
+t <- which(ifelse(tipos == 'character', TRUE,FALSE))
+ds[t] <- lapply(ds[t], function(x) as.factor(x))
+
+sapply(ds, class)
+```
+
+En este set de datos no hay fechas.
+
+# Transformación de variables
+
+En el set de datos de german no se realizó ninguna transformación de variable.
+
+Se ocupó como id el rowname.
+
+En el set de datos de german no hay una variable risk ni costo asociada a la variable target.
+```{r, echo=FALSE}
+vars <- names(ds) # Guardamos los nombres de variables
+
+target <- 'good.loan'  # Si el modelo es supervisado
+risk <- "" # Si se proveé, es la importancia de la observación respecto a la variable (es una variable de salida)
+costo <- "" # Costo de equivocarse en la predicción (Si se proveé) (es una variable de salida)
+id <- rownames(ds) # Armar una id con columnas, o seleccionar el id del dataset
+```
+
+
+# Recodificación
+
+No se requirió recodificar las variables categóricas ya que tienen a lo más 10 niveles (Purpose) y no hay variables de fechas.
+
+```{r}
+str(ds)
+```
+
+
+# Variables a ignorar
+
+Ignoraremos las última columna (Good.Loan) que es la variable que queremos inferir.
+```{r, echo = FALSE}
+vars_ignoradas <- names(ds['good.loan'])
+```
+
+
+### IDs y variables de salida
+
+```{r, echo=FALSE}
+if (exists("risk") || exists("costo")) {
+  vars.a.ignorar <- union(union(id, if (exists("risk")) risk), if (exists("costo")) costo)
+} else {
+  vars.a.ignorar <- id
+}
+```
+
+### Constantes y valores únicos por observación
+
+En el set de datos de german no se encontraron muchos niveles, el de mayor nivel tiene 10 niveles diferentes (Purpose), tampoco se encontraron variables que sean constantes.
+
+```{r, echo=FALSE}
+# Ignoramos las que tengan un único valor por cada observación, pueden ser IDs
+# IMPORTANTE: Esto puede eliminar fechas, ver sección anterior
+
+ids <- names(which(sapply(ds, function(x) length(unique(x)) == nrow(ds))))
+
+# Ignoramos los factores que tengan muchos niveles
+# IMPORTANTE: ver sección anterior
+
+factors <- which(sapply(ds[vars], is.factor))
+niveles <- sapply(factors, function(x) length(levels(ds[[x]])))
+(muchos.niveles <- names(which(niveles > 20)))
+
+vars.a.ignorar <- union(vars.a.ignorar, muchos.niveles)
+
+# Constantes
+constantes <- names(which(sapply(ds[vars], function(x) all(x == x[1L]))))
+
+var.a.ignorar <- union(union(vars.a.ignorar, ids), constantes)
+```
+
+
+### Faltantes
+
+```{r}
+# Las que sean puros NAs
+ids.nas.count <- sapply(ds[vars], function(x) sum(is.na(x)))
+ids.nas <- names(which(ids.nas.count == nrow(ds)))
+
+vars.a.ignorar <- union(ids.nas, vars.a.ignorar)
+
+# Las que tengan muchos NAs (un 70% o más)
+ids.many.nas <- names(which(ids.nas.count >= 0.7*nrow(ds)))
+
+vars.a.ignorar <- union(ids.many.nas, vars.a.ignorar)
+```
+
+### Variable de salida (`target`) 
+
+La varaible target ya es categórica.
+
+```{r, echo=FALSE}
+class(ds$good.loan)
+```
+
+No hubo NA's en las columna target.
+
+```{r, echo=FALSE}
+dim(ds)
+ds <- ds[!is.na(ds[target]),]
+dim(ds)
+```
+
+
+Mostramos la distribución (esto nos indicará si el problema no está balanceado). Para el data set de german, hay un poco más del doble de casos con 'Good.Loan' que de casos con 'Bad.Loan'
+
+```{r, echo=FALSE}
+#reacomodar los datos para graficarlos en ggplot
+
+ggplot(data=ds, aes(x=good.loan)) + geom_bar(width=0.3) 
+
+```
+
+
+# Variables correlacionadas
+
+```{r, eval=FALSE}
+vars.cor <- cor(ds[which(sapply(ds, is.numeric))], use="complete.obs")
+vars.cor[upper.tri(vars.cor, diag=TRUE)] <- NA
+
+vars.cor <- vars.cor                                  %>%
+            abs()                                     %>%   
+            data.frame()                              %>%
+            mutate(var1=row.names(vars.cor))          %>%
+            gather(var2, cor, -var1)                  %>%
+            na.omit()
+            
+
+vars.cor <- vars.cor[order(-abs(vars.cor$cor)), ]
+
+(muy.cor <- filter(vars.cor, cor > 0.95)) # Mostramos las que tengan más del 95% de correlación
+
+# Habría que decidir si se remueven y cuales se remueven (var1 o var2)
+vars.a.ignorar <- union(vars.a.ignorar, muy.cor$var2)
+```
+
+No hubo columnas que tuvieran mas del 95% de correlacion entre ellas para las variables numéricas.
+
+
+# Valores faltantes
+
+En el set de datos german no hay valores faltantes en los datos numéricos (de acuerdo al summary)
+
+```{r, echo=FALSE}
+summary(ds)
+```
+
+Para las variables categoricas tampoco hay faltantes :)
+
+```{r, echo=FALSE}
+tipos <- lapply(ds, function(x) class(x))
+t <- which(ifelse(tipos == 'factor', TRUE,FALSE))
+sapply(ds[t], function(x) unique(x))
+
+observaciones.omitidas =""
+```
+
+# Normalizar niveles
+
+Removemos espacios, puntuaciones, camelCase, etc. en los niveles de los factores supervivientes.
+
+
+```{r}
+ds[t] <- lapply(ds[t], function(x) format_headers(x))
+#regresamos a factor
+ds[t] <- lapply(ds[t], function(x) as.factor(x))
+
+sapply(ds[t], function(x) unique(x))
+```
+
+
+# Identificación de Variables
+
+```{r, echo=FALSE}
+(vars.input <- setdiff(vars, target))
+idxs.input <- sapply(vars.input, function(x) which(x == names(ds)), USE.NAMES=FALSE)
+
+idxs.numericas <- intersect(idxs.input, which(sapply(ds, is.numeric)))
+(vars.numericas <- names(ds)[idxs.numericas])
+
+idxs.categoricas <- intersect(idxs.input, which(sapply(ds, is.factor)))
+(vars.categoricas <- names(ds)[idxs.categoricas])
+
+# Por conveniencia guardamos el número de observaciones supervivientes
+num.observaciones <- nrow(ds)
+
+```
+
+
+```{r,echo=FALSE}
+
+# Guardamos todo en la carpeta 
+ds.date <- paste0("_", format(Sys.Date(), "%y%m%d"))
+ds.rdata <- paste0(ds.name, ds.date, ".RData") # Guardamos todo en un RData para poder automatizar el modelado
+
+if (!file.exists("clean")) dir.create("clean") # Creamos la carpeta clean, si no existe
+
+save(ds, ds.name, ds.path, ds.date, target, risk, costo, 
+     id, vars.a.ignorar, vars, num.observaciones, 
+     vars.input, idxs.input,
+     observaciones.omitidas,
+     vars.numericas, idxs.numericas,
+     vars.categoricas, idxs.categoricas,
+     file=paste0("clean/", ds.rdata)
+     )
+```
+Guardamos todo en 
+
+```{r, echo=FALSE}
+ds.rdata
+```
+
+
+### Apéndice: Ambiente
+
+```{r, echo=FALSE}
+sessionInfo()
+```
+
+
+

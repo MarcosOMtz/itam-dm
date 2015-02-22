@@ -1,0 +1,36 @@
+---
+title: "Eda"
+author: "Carlos Petricioli"
+date: "15 de noviembre de 2014"
+output: md_document
+---
+
+```{r}
+source('../utils.r')
+source('0_lectura.r')
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(corrgram)
+```
+
+```{r, echo=FALSE}
+#Sólos
+eda_1(algas, 'V1')
+eda_1(algas, 'V2')
+eda_1(algas, 'V3')
+
+#Parejas
+eda_1(algas, 'V2','V3')
+eda_1(algas, 'V3','V2')
+eda_1(algas,'V1','V2',)
+eda_1(algas,'V2','V1',)
+eda_1(algas,'V1','V3')
+eda_1(algas,'V3','V1')
+
+#Trios
+eda_1(algas, 'V2','V3','V1')
+eda_1(algas,'V1','V2','V3')
+eda_1(algas,'V3','V1','V2')
+```
+

@@ -1,0 +1,61 @@
+---
+title: "Tareas"
+author: "Adolfo De Unánue"
+date: "08/12/2014"
+output: ioslides_presentation
+---
+
+## Exploración de datos
+
+- Ejecuta el archivo de EDA en el  `dataset`.
+
+- Describe las variables según la documentación del `dataset`.
+
+## Preparación de datos
+
+En el archivo `data_preparation`:
+
+- Elimina las partes del documento que ya están en el EDA.
+- Arreglar (transformar) las variables de tipo fecha.
+- Dividir las variables de tipo fecha como sugiere el texto (mes, año, etc.)
+    - En este caso en particular ¿Crees que tenga sentido?
+- Plantea el código para extraer el estado y la ciudad del `zipcode` 
+    - En este caso en particular ¿Crees que tenga sentido?
+
+## Modelado
+
+En el archivo `modelado`:
+
+- Agregar selección de variables: Implementa  el algoritmo <span class="blue">Fast correlation-based filtering</blue>.
+
+- Agregar selección de variables: Usa `randomForest` para esto.
+
+- Crea las funciones que se piden en la sección de <span class="green">Metaparámetros</span>.
+
+- Cambiar el código de <span class="yellow">hold-out</span> a <span class="green">10 cross-validation</span>.
+
+- Compara los resultados del `randomForest` y `rpart` en ambos casos: con y sin selección de variables.
+
+## Scoring
+
+- Automatizar el /scoring/ usando las funciones pasadas.
+
+- Usando el archivo `valtargt.txt` ¿Cuánto se hubiera recaudado si se mandan correos a todas las personas?
+
+- ¿Cuánto con el mejor modelo? ¿Es mejor?
+
+
+## Cosas a intentar
+
+- Debido a que la base de datos no está balanceada, trata de usar `downsampling` u `oversampling`
+    - ¿Que opinas de está técnica?
+    
+- Crea las siguientes variables: días desde la última donación, número de donaciones en el pasado (quizá "difuminada" en el tiempo)
+
+- Agrupa los códigos postales en un nuevo nivel con aquellos que tengan poca población ¿Hay otras variables categóricas con muchos niveles que puedan seguir una técnica parecida? Discute.
+
+## Cosas a intentar
+
+- El ganador utilizó un modelo en dos fases, primero predijo la probabilidad de donar, y luego predijo el monto condicional de donación y la multiplicación de ambos da la probabilidad de monto de donación. Podemos implementar algo parecido con `epsilon`, usando la variable que más discrimina, reduce el tamaño del `dataset` y luego entrena con el modelo. Luego realiza lo mismo en validación.
+
+- Implementa el módelo ganador.

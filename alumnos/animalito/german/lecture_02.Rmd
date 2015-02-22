@@ -1,0 +1,22 @@
+---
+title: "german"
+author: "Andrea Fernandez"
+date: "22/10/2014"
+output: html_document
+---
+
+```{r}
+german.url <- paste('http://archive.ics.uci.edu/ml',
+                    '/machine-learning-databases/statlog',
+                    '/german/german.data',
+                    sep='')
+
+source("utils.r")
+german.data <- load("german/data/german.rds", german.url)
+```
+
+Limpiamos
+```{r}
+
+
+

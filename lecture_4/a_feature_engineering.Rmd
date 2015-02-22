@@ -1,0 +1,340 @@
+---
+title: "Feature Engineering"
+author: "Adolfo J. De Unánue T."
+date: "11/11/2014"
+output: ioslides_presentation
+---
+
+# Data munging
+
+## Introducción
+
+- <span class="yellow2">data munging</span> es lo que hiciste antes, es a lo que le llamamos **preparación de datos**
+
+- <span class="yellow2">data munging</span> se realiza ya que los datos pueden no estar en la forma requerida para el modelado.
+
+- El tiempo dedicado a <span class="yellow2">data munging</span> dependera de que tan limpia y completa estén los datos.
+
+- Debido a esto último debe de buscarse la automatización e incorporación al **pipeline**.
+
+## Algunos pasos de data munging {.smaller}
+
+- Data sampling.
+- Crear nuevas variables.
+- Discretizar variables cuantitativas.
+- Convertir a numéricas las variables cuantitativas.
+- Manejo de variables de fecha.
+- Unir (`merge`), ordenar, reshape los conjuntos de datos
+- Cambiar las variables categóricas a múltiples variables binarias. 
+    - Ver paquete `dummy`.
+- Resolver que se hará con los datos faltantes.
+- Escalamiento y normalización, otras transformaciones.
+- Reducción de dimensionalidad.
+    - PCA, Factor Analysis, Clustering, MCA, CA, etc.
+    - Ver más adelante <span class="red">La maldición de la dimensionalidad</span>.
+- etc.
+
+
+# Feature Engineering
+
+## ¿Qué es? {.smaller}
+
+- Es el proceso de determinar que variables productivas contribuyen mejor al poder predictivo del algoritmo.
+- **FE** es, quizá, la parte más importante del proceso de minería de datos.
+    - Con buenas variables, un modelo simple puede ser mejor que un modelo complicado con malas variables.
+
+- Es el elemento humano en el modelado: El entendimiento de los datos, más la intuición y la creatividad, hacen toda la diferencia.    
+
+- Es más un arte que una ciencia.
+
+- Regularmente es un proceso iterativo con el EDA.
+
+- Un <span class="gray">domain expert</span> puede ser de mucha utilidad en esta etapa.
+
+## Métodos comúnes usados
+
+- Existen dos métodos utilizados comunmente para este menester.
+
+- <span class='green'>Forward Selection</span>
+    - El cual inicia sin variables y va agregando una a una las variables, hasta que no mejora la metrica de evaluación.
+    
+- <span class="blue">Backward Selection</span>
+    - Empieza con todas las variables en el modelo, y se van removiendo.
+    
+- Más adelante sobre estos métodos.
+
+## La maldición de la dimensionalidad
+
+- El número de combinaciones  valores-variables puede ser muy grande en un problema típico de DM.
+
+- Sea $n$ el número de variables  y sea $a_i$ el número de posibles valores de la variable $i$, $1 \leq i \leq n$. El número de combinaciones está dado por
+
+$$
+m = \Pi_i^n a_i
+$$
+
+- Para $100$ variables con $10$ valores cada uno,  $m$ es mayor que el número de partículas en el Universo ($\sim 10^{80}$).
+
+- Posibles soluciones:
+    - Reducir el espacio de búsqueda.
+    - Realizar búsqueda inteligente (heurística, GA, etc.)
+
+
+# Feature generation
+
+## Proceso Manual
+
+- Brainstorming
+    - No juzguen en esta etapa
+    - Permitan y promuevan ideas muy locas.
+    - Construyan en las ideas de otros
+    - No divaguen
+    - No mantengan conversaciones en paralelo
+    - Sean visuales
+    - Vayan por cantidad, la calidad se verá luego
+    - Otros consejos [aquí](http://www.openideo.com/fieldnotes/openideo-team-notes/sevent-tips-on-better-brainstorming)
+
+## Proceso Manual (continuación)
+
+- Decidir que features crear
+    - No hay tiempo infinito 
+
+- Crear esos features
+
+- Estudiar el impacto de los features en el modelo
+
+- Iterar
+
+## Ejercicio
+
+- De la base de datos localizada en `credit_card`
+    - ¿Qué variables puedes sugerir?
+
+
+## Proceso Automatizado
+
+- Interacción multiplicativa
+    - $C = A \cdot B $
+    - Hacer para todas las posibles combinaciones.
+    
+- Interacción de razón
+    - $C = A / B $
+    - Tener cuidado con dividir por cero $\to$ hay que tomar una decisión
+    - Hacer para todas las posibles combinaciones.
+    
+```{r, eval=FALSE}
+# ejemplo
+div<-function(a,b) ifelse(b == 0, b, a/b)
+```
+
+## Proceso Automatizado (continuación)
+
+- Transformar una variable numérica en una binaria.
+    - Se trata de encontrar el `cut-off` que maximize tu variable dependiente.
+    - Muy parecido a lo que hacen algoritmos como el  `J48` (en su versión comercial se conoce como `C5`).
+    - Hay un paquete de `R` que lo implementa: `C50`.
+
+- Numérica $\to$ bin.
+
+- Otras
+    - $X^2$
+    - $\log X$
+    - etc.
+    
+# Feature Selection
+
+## ¿Qué es?
+
+- El proceso de seleccionar variables <span class="blue">antes</span> que ejecutar los algoritmos.
+
+- Realiza `cross-validation`
+    - Realizar `cross-validation` sólo en una parte del proceso (i.e. el modelo) es hacer trampa.
+
+- <span class="red3">¡Cuidado!</span> No hagas `feature selection` en todos tus datos antes de construir el modelo.
+    - Aumenta el riesgo de `over-fitting`.
+    - Aún realizando `cross-validation`.
+
+## Filtrado basado en las propiedades de la distribución
+
+- Si hay poca variabilidad, no pueden ser usados para distinguir entre clases.
+
+- Podemos utilizar como medidas de variabilidad a la mediana y al <span class="yellow">inter-quartile range</span> IQR.
+
+## Filtrado basado en las propiedades de la distribución (Algoritmo) {.smaller}
+
+- Obtenga para cada variable su mediana.
+- Obtenga para cada variable sus `quartiles`, en particular, reste el tercer `quartile` del primero, para obtener el `IQR`.
+- Realice un scatter-plot entre ambas variables, esta gráfica nos da una visión de la distribución de las variables.
+- Eliminemos las variables que tengan "baja variabilidad" i.e. que sean menores que un porcentaje del `IQR` global. 
+    - e.g. $< 1/5$ ó $< 1/6$.
+
+- <span class="red3">¡Cuidado!</span> Que las variables <span class="blue">individuales</span> tengan baja variabilidad, no significa que unidas con otras variables la tengan. Para una posible solución ver ["A practical approach to Feature Selection"](http://sci2s.ugr.es/keel/pdf/algorithm/congreso/kira1992.pdf) de Kira and  Rendell, 1992.
+
+## Ejercicio
+
+- Implementar el método `low.variability()` en `utils.r`.
+
+## Correlation Filtering
+
+- Tira la variable que estén muy correlacionadas.
+- Problema: ¿Cuál tiras? 
+    - No hay criterio establecido
+    - A veces se puede tirar la mejor ...
+    
+- Ya implementamos esto en el documento de `data_preparation`.
+
+
+## Ejercicio
+
+- Implementar el método `correlation.filtering()` en `utils.r`.
+
+
+## Fast correlation-based filtering
+
+- Descrito en ["Feature Selection for High-Dimensional Data:
+A Fast Correlation-Based Filter Solution"](http://pdf.aminer.org/000/335/746/feature_selection_for_high_dimensional_data_a_fast_correlation_based.pdf) Yu & Liu ICML 2003
+
+- Obtienes un conjunto de variables no muy relacionado entre sí, pero altamente relacionado a la variable de salida.
+
+## Fast correlation-based filtering (Algoritmo)
+
+- Encuentra una medida de relación entre cada par de variables.
+    - Aquí usaremos la correlación, el artículo usa otra cosa.
+- Encuentra la correlación de cada variable con la variable de salida.
+- Ordena las variables según su correlación con la variable de salida.
+- Elige la mejor variable (la de hasta arriba).
+- Tira las variables muy correlacionadas con esta.
+- Repite el proceso.
+
+
+## Ejercicio
+
+- Implementar el método `FCB.filtering()` en `utils.r`.
+
+
+## Forward selection {.smaller}
+
+Algoritmo:
+
+- Ejecuta el algoritmo con cada variable (i.e. de manera individual) 
+    - Si tienes $x$ número de variables, ejecutas el algoritmo $x$ veces.
+    - Como siempre, usando `cross-validation`.
+
+- Elige  el mejor modelo y quédate con esa variable.  
+
+- Ahora, ejecuta el modelo de nuevo, pero ahora con la variable recién seleccionada y con cada variable restante.
+
+- Elige el mejor modelo y quédate con esas dos variables.
+
+- Repite hasta que no mejore el modelo agregando más variables.
+  
+- <span class="yellow"> Backward selection </span> es el mismo algoritmo, pero invertido 
+    - kind-of ... 
+
+
+## Ejercicio
+
+- Implementar el método `forward.filtering()` en `utils.r`.
+
+
+## Filtros ANOVA
+
+- Si la variable tiene una distribución similar para los posibles valores de la variable a predecir, seguramente no sirve para discriminar.
+
+- Compararemos la media condicionada a los valores de la variable de salida.
+
+- Para las variables que tengamos una confianza estadística elevada de que son iguales a lo largo de los valores de la variable dependiente, serán descartados.
+
+- Para eso usaremos métodos `ANOVA`, si es multivaluada, otra prueba estadística si es binaria la salida.
+
+- `ANOVA`  tiene varias suposiciones para ser válida, y existen varias implementaciones en `R` (`aov()`, `Anova()`, etc.)
+
+## Random Forest
+
+- El algoritmo del `RF` puede ser usado para obtener un rankeo de las variables en términos de su utilidad para la tarea de clasificación.
+
+```{r, eval=FALSE}
+library(randomForest)
+rf <- randomForest(formula, df, importance=TRUE)
+imp <- importance(rf)
+rf.vars <- names(imp)[order(imp, decreasing=TRUE)[1:30]]
+# Gráfica
+varImpPlot(fmodel, type=1)
+```
+
+- Esto puede ser usado para no tener árboles tan pesados y lentos o pueden ser usados para selección de variables de otros algoritmos (como la regresión logística)
+
+## Épsilon {.smaller}
+
+- Descrita en el artículo <span class="blue2">"An Introduction to Data Mining"</span> de Stephens and Sukumar, 2006.
+
+- Para obtener un perfil o una predicción de la pertenencia de individuos con rasgos
+descritos en un vector $X$ a una clase dada por un vector $C$ se define una función que se
+llamará Epsilon.
+
+- La idea es identificar para la clase de interés: $C$, los
+factores $X_i$ que están más correlaciones con ella, considerando la probabilidad condicional
+$P (C|X)$ y midiéndola con el punto de referencia $P(C)$ que representa la hipótesis nula; de
+esta manera, al calcular $P(C|X) − P (C)$, se estará midiendo la incidencia de clase en la
+población general.
+
+- Se aplica a variables categoricas, pero puede adaptarse para variables numéricas. 
+
+## Épsilon
+
+- Como se está considerando la pertenencia de clase, cada individuo representa un ensayo
+Bernoulli (1 = pertence a la clase, 0 = no pertenece a la clase) y la distribución de probabilidad asociada es una distribución binomial, de esta manera, la significancia estadística para $P(C|X) − P (C)$ se puede determinar utilizando la prueba binomial Épsilon:
+
+$$
+\epsilon(C|X; C) = \frac{
+N_X [P (C|X) − P (C)]}{
+\sqrt{N_X P (C)(1 − P (C))}}
+$$
+
+
+- El valor resultante indica cuantas desviaciones estándar se aleja el valor de lo que se
+observa $N_X P (C|X)$ del valor de lo que se espera observar $N_X P (C)$.
+
+## Épsilon 
+
+Para variables métricas
+
+$$
+\epsilon' = \frac{\left<x_i \right>_C - \left<x_i \right>_{\sim C}}{\sqrt{\frac{\sigma^2_{iC}}{N_{iC}} - \frac{\sigma^2_{i\sim C}}{N_{i\sim C}}}}
+$$
+
+## Épsilon 
+
+- Para el caso bivariado (cfr. <span class="blue2">ANÁLISIS DEL SISTEMA CIUDADANO DE MONITOREO DE ENFERMEDADES RESPIRATORIAS –REPORTA CON MINERÍA DE DATOS"</span>, R. Rodríguez, Tesis , 2012.)
+
+- Considerar las probabilidades condicionales
+$P (C|X_i X_j )$ y $P (X_i X_j |C)$ en relación con diferentes hipótesis de nulidad que pueden proporcionar información complementaria. Las distribuciones de referencia serán: $P (C)$, $P (C|X i )$,
+$P (C|X j )$ y $P (X_i |C)P (X_j |C)$.
+
+## Épsilon {.smaller}
+
+- $P (C|X_i X_j ) − P (C)$ determinará la importancia de la presencia conjunta de las variables $X_i$ y $X_j$ en la pertenencia a la clase en relación con la población
+general. 
+
+- $P (C|X_i X_j )−P (C|X_i )$ será una medida del efecto de $X_j$ en presencia de $X_i$.
+ 
+- $P (X_i X_j |C) − P (X_i |C)P (X_j |C)$ refleja que tan correlacionas están $X_i$ y $X_j$ respecto a la clase $C$.
+
+- Las pruebas serían: $ε(C|X_i , X_j ; C)$ , $ε(C|X_i X_j ; C|X_i )$, $ε(C|X_i X_j ; C|X_j )$ y
+$ε(X_i X_j |C; X_i |CX_j |C)$.
+
+
+
+## Ejercicio
+
+- Implementar el método `epsilon()` en `utils.r`, para el caso de una variable, tnato numérico como categórico.
+
+
+## Aglomeración
+
+- Si tenemos muchas variables y muchas muy correlacionadas, podemos formar clústers con ellas.
+
+- Elegir sólo una de cada grupo.
+
+- Se puede combinar con métodos de ensamble.
+

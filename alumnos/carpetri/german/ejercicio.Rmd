@@ -1,0 +1,65 @@
+---
+title: "Ejercicio"
+author: "Carlos Petricioli"
+date: "October 22, 2014"
+output: 
+  md_document:
+      toc: true
+---
+
+Para leer los datos.
+```{r}
+#library(knitr)
+rm(list=ls())
+gc()
+source(file = '0_load_data.r')
+ls()
+```
+
+Para limpiar datos.
+```{r}
+source(file = '1_prepare_data.R')
+```
+
+Veamos los datos:
+```{r}
+#kable( head(german.data),  format = 'markdown')
+head(german.data)
+```
+
+- ¿Hay algo raro con los datos de préstamo?
+
+Parece que hay muchos clientes con buenos prestamos.
+
+```{r}
+nrow(german.data)
+ncol(german.data)
+summary(german.data)
+str(german.data)
+summary(german.data$Good.Loan)
+```
+
+Esto debería ser congruente con el riesgo crediticio.
+
+```{r}
+table(german.data[,'Credit history'],german.data[,'Good.Loan'] )
+```
+
+
+- ¿Cuál crees que debería ser la distribución del resultado del préstamo `Good.Loan` respecto a `Credit history`?
+
+- Grafícalo y comenta tus resultados.
+
+En la gráfica a continuación se ven las distribiciones por Good y Bad Loan. Se puede ver que las distribuciones práctimante son iguales. Esto no debería ser así, deberían de ser contrarias.
+
+```{r}
+names(german.data) <- tolower(gsub(names(german.data),pattern = ' ', replacement = '.'))
+
+library(ggplot2)
+df <- as.data.frame(prop.table(table(german.data[,'credit.history'],german.data[,'good.loan'] )))
+ggplot(df, aes(x=Var1, y=Freq)) +
+  geom_bar(stat='identity') +
+  facet_wrap( ~Var2)+
+  coord_flip()
+```
+

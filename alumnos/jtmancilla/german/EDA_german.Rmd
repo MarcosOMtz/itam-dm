@@ -1,0 +1,27 @@
+---
+title: "Eda_german"
+author: "nosomos muchos pero somos machos"
+date: "18 de noviembre de 2014"
+output: html_document
+---
+
+# Exploración
+
+```{r, echo=TRUE}
+source("0-load.r")
+source("2-eda.r")
+```
+
+## Exploración general de 5 variables
+
+```{r, echo=TRUE, warning=FALSE, message=TRUE, error=FALSE}
+german.data  <- load()
+
+eda1(german.data,c(3,9,5,11,16))
+```
+
+## Exploración gernal, tomando como base a comparar good.loan
+
+```{r, echo=TRUE,warning=FALSE, message=TRUE, error=FALSE}
+eda2(german.data,21,c(1,6,11,9,6))
+```

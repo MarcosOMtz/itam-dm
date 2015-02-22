@@ -1,0 +1,220 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1250">
+<TITLE>Medical Data description:</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<IMG SRC="razitko.gif" WIDTH=170 HEIGHT=162 ALIGN="LEFT" HSPACE=9
+VSPACE=-10>
+
+<p>&nbsp;&nbsp;</p>
+<H1>PKDD'99 Discovery Challenge</H1>
+<H1>Guide to the Medical Data Set</H1>
+
+<p>&nbsp;&nbsp;&nbsp;</p>
+<H2>Domain</H2>
+
+<p>Databases are collected at the University hospital. Each patient 
+came to the outpatient clinic on collagen diseases, who is introduced
+by some home doctors or general physicians in the local hospitals.</p>
+
+<p>Collagen diseases are auto-immune diseases whose patients generate
+antibodies attacking to their bodies. For example, if a patient generates
+antibodies to lung, he/she will lose the respiratory function in a
+chronic course and finally lose their lives. The disease mechanisms are only
+partially known and their classification are still fuzzy. Some patients
+may generate many kinds of antibodies and their manifestations may
+include all the characteristics of collagen diseases.</p>
+<p>&nbsp;</p>
+
+<p>In these diseases, thrombosis is one of the most important and severe
+complications, one of the major cause of death in collagen diseases.
+Recently, this complication is closely related with anti-cardiolipin
+antibodies, which was discovered by the medical physicians, one of
+whom donated the datasets for discovery challenge.</P>
+
+<p>Thrombosis is emergency and
+it is important to detect and predict the possibilities of thrombosis.
+However, such database analysis has not been made by any experts on
+immunology.
+Domain experts are very much interested in discovering some regularities
+behind patients' observations, which may be a really new discovery in
+the world.</P>
+
+&nbsp;
+<H2>Goal</H2>
+
+<OL>
+<LI>Search for good patterns which detect and predict thrombosis.</LI>
+<LI>Search for temporal patterns specific/sensitive to thrombosis.
+   (Examination date is very close to the date on thrombosis.
+    If we can find specific/sensitive patterns before/after the
+    thrombosis, they are very useful.)
+<LI>Search for good features which classifies collagen diseases correctly.
+<LI>Search for temporal patterns specific/sensitive to each collagen diseases.
+</OL>
+
+<p>Domain experts told us that if useful patterns are discovered 
+then they are acceptable in major journals on rheumatology(collagen
+diseases.)</p>
+
+&nbsp;
+<H2>Evaluation Scheme</H2>
+
+<p>One of the domain experts, who is well known for rheumatology, 
+will attend PKDD'99 conference and evaluate all the results.
+The results will be also evaluated in the clinical environment in the
+future.</p>
+
+&nbsp;
+<H2>Databases</H2>
+
+<p>Databases consists of three tables. 
+(tsumoto_a.csv, tsumoto_b.csv, tsumoto_c.csv).
+The patients in these three tables are connected by ID number.</p>
+
+<p>&nbsp;</p>
+<H3>tsumoto_a.csv</H3>
+<p>Basic Information about Patients (Input by Experts).
+This dataset includes all patients.</p>
+
+<TABLE CELLSPACING=0 BORDER CELLPADDING=4 WIDTH=85%>
+<TR><TH>item</TH><TH>meaning</TH><TH>remark</TH></TR>
+<TR><TD>ID</TD><TD>identification of the patient</TD><TD></TD></TR>
+<TR><TD>Sex</TD><TD></TD><TD></TD></TR>
+<TR><TD>Birthday</TD><TD></TD><TD>YYYY/M/D</TD></TR>
+<TR><TD>Description date</TD><TD>the date when a patient was input</TD><TD></TD></TR>
+<TR><TD>First date</TD><TD>the date when a patient came to the hospital</TD><TD></TD></TR>
+<TR><TD>Admission</TD><TD>patient was admitted to the hospital or followed
+at the outpatient clinic</TD><TD></TD></TR>
+<TR><TD>Diagnosis</TD><TD>some patients may suffer from several
+diseases</TD><TD>multivalued attribute</TD></TR>
+</TABLE>
+
+<p>&nbsp;</p>
+<H3>tsumoto_b.csv</H3>
+<p>Special Laboratory Examinations (Input by Experts)
+   (Measured by the Laboratory on Collagen Diseases)This 
+dataset does not include all the patients,
+ but includes the patients with these special tests.</P>
+
+<TABLE CELLSPACING=0 BORDER CELLPADDING=4 WIDTH=85%>
+<TR><TH>item</TH><TH>meaning</TH><TH>remark</TH></TR>
+<TR><TD>ID</TD><TD>identification of the patient</TD><TD></TD></TR>
+<TR><TD>Examination Date</TD><TD>date of the test</TD><TD>YYYY/MM/DD</TD></TR>
+<TR><TD>aCL IgG</TD><TD>anti-Cardiolipin antibody (IgG)<TD></TD></TR>
+<TR><TD>aCL IgM</TD><TD>anti-Cardiolipin antibody (IgM)<TD></TD></TR>
+<TR><TD>ANA</TD><TD>anti-nucleus antibody</TD><TD></TD></TR>
+<TR><TD>ANA Pattern</TD><TD> pattern observed in the sheet of ANA
+examination</TD><TD></TD></TR>
+<TR><TD>aCL IgA</TD><TD>anti-Cardiolipin antibody (IgA)</TD><TD></TD></TR>
+<TR><TD>Diagnosis</TD><TD></TD><TD>multivalued attribute</TD></TR>
+<TR><TD>KCT</TD><TD>meassure of degree of coagulation</TD><TD></TD></TR>
+<TR><TD>RVVT</TD><TD>meassure of degree of coagulation</TD><TD></TD></TR> 
+<TR><TD>LAC</TD><TD>meassure of degree of coagulation</TD><TD></TD></TR>
+<TR><TD>Symptoms</TD><TD>other symptoms observed in each patient</TD><TD></TD></TR>
+<TR><TD>Thrombosis</TD><TD>degree of thrombosis (the Target)</TD>
+<TD>0: negative <br> 1: positive <br> 2: positive and very severe</TD></TR>
+</TABLE>
+<br>
+Examination date is very close to the date on thrombosis. In negative examples, these tests are 
+examined when thrombosis is suspected.
+
+<p>&nbsp;</p>
+<H3>tsumoto_c.csv</H3>
+<p> Laboratory Examinations stored in Hospital Information Systems
+(Stored from 1980 to 1999.3) All the data includes ordinary laboratory examinations
+and have temporal stamps.</p>
+
+
+<TABLE CELLSPACING=0 BORDER CELLPADDING=4 WIDTH=85%>
+<TR><TH>item</TH><TH>meaning</TH><TH>normal range</TH></TR>
+<TR><TD>ID</TD><TD>identification of the patient</TD><TD></TD></TR>
+<TR><TD>Date</TD><TD>Date of the laboratory tests (YYMMDD)</TD><TD></TD></TR>
+<TR><TD>GOT</TD><TD>AST glutamic oxaloacetic transaminase</TD><TD>N < 60</TD></TR>
+<TR><TD>GPT</TD><TD>ALT glutamic pylvic transaminase</TD><TD>N < 60</TD></TR>
+<TR><TD>LDH</TD><TD>lactate dehydrogenase</TD><TD>N < 500</TD></TR>
+<TR><TD>ALP</TD><TD>alkaliphophatase</TD><TD>N < 300</TD></TR>
+<TR><TD>TP</TD><TD>total protein</TD><TD>6.0 < N < 8.5</TD></TR>
+<TR><TD>ALB</TD><TD>albumin</TD><TD>3.5 < N < 5.5</TD></TR>
+<TR><TD>UA</TD><TD>uric acid</TD><TD>N > 8.0 (Male) <br> N > 6.5 (Female)</TD></TR>
+<TR><TD>UN</TD><TD>urea nitrogen</TD><TD>N > 30</TD></TR>
+<TR><TD>CRE</TD><TD>creatinine</TD><TD>N > 1.5</TD></TR>
+<TR><TD>T-BIL</TD><TD>total bilirubin</TD><TD>N < 2.0</TD></TR>
+<TR><TD>T-CHO</TD><TD>total cholesterol</TD><TD>N < 250</TD></TR>
+<TR><TD>TG</TD><TD>triglyceride</TD><TD>N < 200</TD></TR>
+<TR><TD>CPK</TD><TD>creatinine phosphokinase</TD><TD>N < 250</TD></TR>
+<TR><TD>GLU</TD><TD>blood glucose</TD><TD>N < 180</TD></TR>
+<TR><TD>WBC</TD><TD>White blood cell</TD><TD>3500 < N < 9000</TD></TR>
+<TR><TD>RBC</TD><TD>Red blood cell</TD><TD>350 < N < 600</TD></TR>
+<TR><TD>HGB</TD><TD>Hemoglobin</TD><TD>10 < N < 17</TD></TR>
+<TR><TD>HCT</TD><TD>Hematoclit</TD><TD>29 < N < 52</TD></TR>
+<TR><TD>PLT</TD><TD>platelet</TD><TD>100 < N < 400</TD></TR>
+<TR><TD>PT</TD><TD>prothrombin time</TD><TD>N < 14</TD></TR>
+<TR><TD>APTT</TD><TD>activated partial prothrombin time</TD><TD>N < 45</TD></TR>
+<TR><TD>FG</TD><TD>fibrinogen</TD><TD>150 < N < 450</TD></TR>
+<TR><TD>PIC</TD><TD>plasmininhibitor-plasmin complex</TD><TD>N < 0.8</TD></TR>
+<TR><TD>TAT</TD><TD>thrombin-antithrombin III complex</TD><TD>N < 3.0</TD></TR>
+<TR><TD>U-PRO</TD><TD>proteinuria</TD><TD>0 < N 30</TD></TR>
+<TR><TD>IGG</TD><TD>Ig G</TD><TD>900 < N < 2000</TD></TR>
+<TR><TD>IGA</TD><TD>Ig A</TD><TD>80 < N < 500</TD></TR>
+<TR><TD>IGM</TD><TD>Ig M</TD><TD>40 < N < 400</TD></TR>
+<TR><TD>CRP</TD><TD>C-reactive protein</TD><TD>N= -, +-,   or  N < 1.0</TD></TR>
+<TR><TD>RA</TD><TD>Rhuematoid Factor</TD><TD>N= -, +-</TD></TR>
+<TR><TD>RF</TD><TD>RAHA</TD><TD>N < 20</TD></TR>
+<TR><TD>C3</TD><TD>complement 3</TD><TD>N > 35</TD></TR>
+<TR><TD>C4</TD><TD>complement 4</TD><TD>N > 10</TD></TR>
+<TR><TD>RNP</TD><TD>anti-ribonuclear protein</TD><TD>N= -, +-</TD></TR>
+<TR><TD>SM</TD><TD>anti-SM</TD><TD>N= -, +-</TD></TR>
+<TR><TD>SCl70</TD><TD>anti-scl70</TD><TD>N= -, +-</TD></TR>
+<TR><TD>SSA</TD><TD>anti-SSA</TD><TD>N= -, +-</TD></TR>
+<TR><TD>SSB</TD><TD>anti-SSB</TD><TD>N= -, +-</TD></TR>
+<TR><TD>CENTROMEA</TD><TD>anti-centromere</TD><TD>N= -, +-</TD></TR>
+<TR><TD>DNA</TD><TD>anti-DNA</TD><TD>N < 8</TD></TR>
+<TR><TD>DNA-II</TD><TD>anti-DNA</TD><TD>N < 8</TD></TR>
+</TABLE>
+
+<!--
+<p>
+All the temporal data are stored in tabular form as bellow:
+<br>
+
+ID,Date,GOT,GPT,LDH,ALP,TP  .............<br>
+2110,860419,24,12,152,63,7.5 ............ <br>
+2110,860430,25,12,162,76,7.9 ............ <br>
+2110,860502,22,8,144,68,7 ............... <br>
+...........................................<br>
+</p>
+-->
+
+<p>&nbsp;</p>
+<H4>This database was donated by dr. Katsuhiko Takabayashi and prepared by
+prof. Shusaku Tsumoto</H4>
+For more details on the data description, please use following contact 
+addresses: 
+
+<p></p>
+
+<TABLE CELLSPACING=0 CELLPADDING=0 WIDTH=100%>
+
+
+<TR><TD>Katsuhiko Takabayashi</TD><TD>Shusaku Tsumoto, M.D., Ph.D(Comp
+Sci)</TD></TR> 
+<!--  Associate Professor                     <br> -->
+<TR><TD>
+Email: <a href="mailto:takaba@ho.chiba-u.ac.jp">takaba@ho.chiba-u.ac.jp</a>
+</TD><TD>
+Email: <a href="mailto:tsumoto@computer.org"> tsumoto@computer.org</a>
+</TD></TR>
+<TR><TD>Department of Internal Medicine II</TD><TD>Department of Medical
+Informatics</TD></TR>
+<TR><TD>Chiba University Hospital</TD><TD>Shimane Medical University,             
+  School of Medicine</TD></TR>
+<TR><TD></TD><TD>89-1 Enya-cho, Izumo-city</TD></TR>
+<TR><TD></TD><TD>Shimane 693-8501 Japan</TD></TR>
+<TR><TD></TD><TD>TEL +81-853-20-2172</TD></TR>
+<TR><TD></TD><TD>FAX +81-853-20-2170</TD></TR>
+</TABLE>
+
+</BODY>
+</HTML>

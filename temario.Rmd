@@ -1,0 +1,38 @@
+---
+title: "Temario"
+author: "Adolfo J. De Unánue T."
+date: "14/10/2014"
+output: html_document
+---
+
+1. Introducción
+
+2. Exploración inicial
+
+3. Removiendo observaciones con valores sospechosos
+
+4. Dependencia temporal
+
+5. Supervisado, Sin supervisar y semisupervisado
+
+6. Medidas de desempeño
+
+7. _Outlier_ detection
+
+8. Clases no balanceadas
+
+9. Feature Engineering
+
+10. Modelado
+
+11. Minería de grafos
+
+12. Series de tiempo
+
+13. Reglas de asociación
+
+14. Minería de texto
+
+15. _Social Network Analysis_
+
+16. Caso de estudio

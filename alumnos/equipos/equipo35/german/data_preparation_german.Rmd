@@ -1,0 +1,105 @@
+---
+title: "Preparación de los Datos German"
+author: "Andrea Fernández, Edwin Chazaro, Andrea García"
+date: "29/10/2014"
+output: html_document
+---
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+library(stringr)
+library(GGally)
+library(corrplot)
+library(knitr)
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE}
+# Cargamos el dataset
+source('../utils.r', chdir=TRUE)
+source('utils.r')
+ds <-load()
+ds <- as.data.frame(sapply(ds, FUN=german.decode))
+ds <- arreglacols(ds)
+
+ds.path <- '../../../../data/german/german.data' # Puede ser un URL o una dirección en el directorio
+
+ds.name <- "german" # Nombre de nuestro conjunto de datos, e.g. algas, german
+
+
+# ds # <- # Leemos el dataset, usando readRDS (ya que ya lo tenemos en disco debido a nuestro EDA)
+   # Hay que utilizar el data set al que no se le han removido las observaciones NAs
+   # Lo guardamos en la variable ds para hacer más genérico los pasos.
+
+ds <- tbl_df(ds) # Para obtener un print mejorado
+```
+
+
+# Introducción
+
+La base de datos de *German credit data* es una base de datos financiera, donada en 1994 gracias al Profesor Dr. Hans Hofmann de la Universidad de Hamburgo.
+
+# Estructura General
+
+```{r, eval=FALSE}
+ds
+```
+
+## Tamaño
+```{r}
+dim(ds)
+```
+
+## Columnas
+```{r}
+names(ds)
+```
+
+## Estructura
+
+```{r}
+str(ds)
+```
+
+## Observaciones
+
+```{r}
+head(ds)
+```
+
+```{r}
+tail(ds)
+```
+
+# Sumario Estadístico
+
+```{r, warning=FALSE}
+summary(ds)
+```
+
+# Limpieza de metadatos
+
+```{r}
+names(ds) <- normalizarNombres(names(ds))
+names(ds)
+```
+
+# EDA
+
+## Gráficos por variable
+
+```{r, warning=FALSE, error=FALSE, echo=FALSE, message=FALSE}
+# unigrafica
+sapply(ds,FUN = graficas)
+```
+ 
+
+## Gráficos por pares de variables
+
+```{r, warning=TRUE, echo=FALSE, error=FALSE, message=FALSE}
+two_plots(ds)
+```

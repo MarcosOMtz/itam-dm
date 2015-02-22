@@ -1,0 +1,41 @@
+---
+title: "Ejemplo"
+author: "Adolfo De Unánue T."
+date: "17/12/2014"
+output: html_document
+runtime: shiny
+---
+
+```{r echo=FALSE}
+library(randomForest)
+iris.rf <- readRDS('iris_rf.rds')
+```
+
+
+## Clasificador de Plantas
+
+Obviamente esto debería de ser una aplicación `Shiny`, pero lo simularemos aquí con un documento.
+
+```{r, echo=FALSE}
+inputPanel(
+  numericInput('Sepal.Length', 'Sepal Length: ', 5.8, step=0.1, min=0),
+  numericInput('Sepal.Width', 'Sepal Width: ', 3.0, step=0.1,min=0),
+  numericInput('Petal.Length', 'Petal Length: ', 4.35, step=0.1,min=0),
+  numericInput('Petal.Width', 'Petal Width: ', 1.3, step=0.1,min=0)
+)
+
+
+h2("Predicción:")
+
+h2(renderText({
+  
+  to.score <- data.frame(
+    Sepal.Length = as.numeric(input$Sepal.Length), 
+    Sepal.Width=as.numeric(input$Sepal.Width),
+    Petal.Length = as.numeric(input$Petal.Length),
+    Petal.Width = as.numeric(input$Petal.Width)
+    )
+  
+  as.character(predict(iris.rf, newdata=to.score))
+}))
+```

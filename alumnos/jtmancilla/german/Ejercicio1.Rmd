@@ -1,0 +1,172 @@
+---
+title: "Ejercicio1"
+author: "Jose Antonio Mancilla"
+date: "2 de noviembre de 2014"
+output: html_document
+---
+
+# DataMining: Exploración de datos GERMAN BANK
+
+```{r}
+#Cargando recursos para realizar el análisis
+
+source("0-load.r")
+source("1-prepare.r")
+source("metadata.r")
+
+library(ggplot2)
+library(gridExtra)
+```
+
+### Carga y limpieza de datos
+
+```{r}
+# carga de datos con función definida en 0-load.r
+german.data  <-  load()
+
+# Reasigando nombre de las columnas trabajadas en metada.r (letras en minículas y sustituyendo la digonal y espacios en blanco por un punto)
+colnames(german.data) <- german.colnames
+
+#haciendo factor a la columna good.loan
+german.data$good.loan <- as.factor(
+    ifelse(
+        german.data$good.loan == 1, 
+        'GoodLoan', 
+        'BadLoan'
+    )
+)
+```
+
+Codifciando los valores de las columnas
+
+```{r, echo=FALSE}
+
+# Utilizando datos proporcionados para re-codificar los valores de las columnas.
+
+german.codes <- list('A11'='... < 0 DM',
+                     'A12'='0 <= ... < 200 DM', 
+                     'A13'='... >= 200 DM / salary assignments for at least 1 year',
+                     'A14'='no checking account', 
+                     'A30'='no credits taken/all credits paid back duly',
+                     'A31'='all credits at this bank paid back duly', 
+                     'A32'='existing credits paid back duly till now',
+                     'A33'='delay in paying off in the past', 
+                     'A34'='critical account/other credits existing (not at this bank)',
+                     'A40'='car (new)', 
+                     'A41'='car (used)', 
+                     'A42'='furniture/equipment',
+                     'A43'='radio/television', 'A44'='domestic appliances', 'A45'='repairs',
+                     'A46'='education', 'A47'='(vacation - does not exist?)',
+                     'A48'='retraining', 'A49'='business', 'A410'='others', 'A61'='... < 100 DM',
+                     'A62'='100 <= ... < 500 DM', 'A63'='500 <= ... < 1000 DM',
+                     'A64'='.. >= 1000 DM', 'A65'='unknown/ no savings account',
+                     'A71'='unemployed', 'A72'='... < 1 year', 'A73'='1 <= ... < 4 years', 
+                     'A74'='4 <= ... < 7 years', 'A75'='.. >= 7 years', 'A91'='male : divorced/separated',
+                     'A92'='female : divorced/separated/married',
+                     'A93'='male : single',
+                     'A94'='male : married/widowed', 
+                     'A95'='female : single',
+                     'A101'='none', 
+                     'A102'='co-applicant',
+                     'A103'='guarantor', 'A121'='real estate',
+                     'A122'='if not A121 : building society savings agreement/life insurance',
+                     'A123'='if not A121/A122 : car or other, not in attribute 6',
+                     'A124'='unknown / no property', 
+                     'A141'='bank', 'A142'='stores',  'A143'='none', 'A151'='rent', 'A152'='own',
+                     'A153'='for free', 'A171'='unemployed/ unskilled - non-resident',
+                     'A172'='unskilled - resident', 'A173'='skilled employee / official',
+                     'A174'='management/ self-employed/highly qualified employee/ officer',
+                     'A191'='none', 'A192'='yes, registered under the customers name',
+                     'A201'='yes', 'A202'='no')
+
+
+# utilizando la función definida en 1-prepare.r para codificar los nuevos valores en todas las columnas que aplique
+
+german.data  <-  german.decode(german.data,german.codes)
+
+```
+
+
+
+### Exploración: Relación entre el historial crediticio (credit.history) y  la calificación del acreditado (good.loan)
+
+Primera visualización
+
+```{r}
+
+# visualización de credit.history
+credit.history.df  <- german.data %>%
+    group_by(credit.history) %>%
+    summarise(count = n()) %>%
+    arrange(desc(count))
+
+g1  <- ggplot(credit.history.df, aes(x= reorder(credit.history,count), y=count)) + 
+    geom_bar(stat="identity", fill="steelblue") + 
+    coord_flip() + 
+    theme(axis.text.y=element_text(size=rel(0.9)))+
+    xlab("Historial de Crédito") + ylab("Numero de créditos")
+
+# visualizando good.loan
+
+good.loan.df  <-  german.data %>%
+    count(good.loan)
+
+g2  <- ggplot(good.loan.df, aes(x= reorder(good.loan,n), y=n)) + 
+    geom_bar(stat="identity", fill="steelblue")+
+    xlab("Calificación") + ylab("Numero de créditos")
+
+# visualizando 
+grid.arrange(g1, g2, nrow=2)
+
+```
+
+Segunda visualización
+
+```{r}
+# Visualización combinando las 2 variables
+
+credit.good.loan  <- german.data %>%
+    group_by(credit.history,good.loan) %>%
+    summarise(count = n())
+
+g3  <- ggplot(credit.good.loan, aes(x= reorder(credit.history,count), y=count, fill = good.loan)) + 
+    geom_bar(stat="identity") + 
+    coord_flip() + 
+    theme(axis.text.y=element_text(size=rel(0.9)),legend.title=element_blank())+
+    xlab("Historial de Crédito") + ylab("Numero de créditos")
+
+# g4  <- ggplot(credit.good.loan, aes(x = reorder(credit.history,count), y = count)) + 
+#     geom_bar(stat = "identity", fill = "steelblue") +
+#     facet_wrap(~ good.loan) +
+#     xlab("Historial de Crédito") + ylab("Numero de créditos") + 
+#     theme(axis.text.x = element_text(angle = 90,size=14))+ 
+#     coord_flip()
+
+g5  <- ggplot(credit.good.loan, aes(x = good.loan, y = count, color =credit.history, group=credit.history)) +
+    geom_line()+
+    xlab("Calificación") + ylab("Conteo")+
+    theme(legend.title=element_blank())
+
+grid.arrange(g3, g5, nrow=2)
+
+```
+
+# Ejercicio 05 NOV 2014. visualización rápida.
+
+```{r, echo=FALSE}
+
+# convertir a factores para poder visualizar las variables.
+
+str(german.data[1])
+
+summary(german.data)
+
+
+```
+
+
+## Conclusiones:
+
+Hasta este momento no tenemos suficiente información para dar una recomendación concreta con respecto a mejorar en 10% la situación de los créditos para disminuir la perdida de malos créditos.
+Sin embargo en estas primeras visualizaciones podemos observar que 1/3 de los creditos solicitados por clientes que han pagado bien son calificados como malos similar en proporción a los créditos solicitados por clientes que han tenido retraso en sus pagos.
+

@@ -1,0 +1,102 @@
+---
+title: "Ejercicio german"
+author: "Amanda Balderas"
+output: html_document
+---
+
+**Cargamos librerias**
+
+````{r, message=FALSE}
+library(dplyr)
+library(stringr)
+library(ggplot2)
+```
+
+**Definimos directorio de trabajo**
+
+```{r}
+setwd("~/GitHub/itam-dm/alumnos/Amanda/german")
+```
+
+**Leemos los datos utilizando 0-load.r**
+
+```{r}
+source(file = '0-load.r')
+```
+
+**Veamos la estructura original de los datos**
+
+```{r}
+head(german.data)
+```
+
+**Preparamos la base utilizando 1-prepare.r**
+
+```{r}
+source(file = '1-prepare.r')
+```
+
+**Veamos la estructura final de los datos**
+
+head(german.data)
+
+### Ejercicio
+
+* ¿Hay algo raro con los datos de préstamo?
+
+Para verificar como se comportan los datos de préstamo, obtenemos un resumen
+
+```{r}
+summary(german.data$Good.Loan)
+```
+
+Se puede observar que hay una mayor cantidad de buenos, teniendo un 70%.
+
+* ¿Cuál crees que debería ser la distribución del resultado del préstamo Good.Loan respecto a Credit history?
+
+A mejor historial crediticio, un buen resultado de préstamo.
+
+Obtenemos un resumen de resultados de préstamo agrupando por historial crediticio y observamos que en cuentas criticas/ con otros creditos, representan una importante catidad de préstamos buenos.
+
+```{r}
+agrupa<- group_by(german.data, 'Good.Loan','Credit history')
+conteo_agrupa <- summarise(agrupa, n=n())
+credit.history.df <- as.data.frame(conteo_agrupa)
+credit.history.df
+```
+
+**Obtenemos la gráfica**
+
+```{r}
+ggplot(credit.history.df, aes(x=reorder(credit.history.df[,2],n), y = n)) + 
+  geom_bar(stat="identity", fill = c("red", "blue", "green", "orange", "pink")) + 
+  facet_wrap(~ Good.Loan) +
+  coord_flip() + 
+  theme(axis.text.y=element_text(size=rel(0.8)))
+```
+
+Para facilitar la creación de la gráfica vamos a modificar los nombres de la base usando la función rename.
+
+```{r}
+source('utils.r')
+nombres <- colnames(german.data)
+colnames(german.data) <- rename(nombres)
+```
+Con lo cambios obtenemos nuevamente nuestra tabla con el resumen de resultados de préstamo agrupando por historial crediticio y observamos que en cuentas criticas/ con otros creditos, representan una importante catidad de préstamos buenos.
+
+```{r}
+agrupa<- group_by(german.data, 'good.loan','credit.history')
+conteo_agrupa <- summarise(agrupa, n=n())
+credit.history.df <- as.data.frame(conteo_agrupa)
+credit.history.df
+```
+
+Ahora obtenemos la misma gráfica de manera más sencilla utilizando los nombres de las variables
+
+```{r}
+ggplot(credit.history.df, aes(x=reorder(credit.history, n), y = n)) + 
+  geom_bar(stat="identity", fill = c("red", "blue", "green", "orange", "pink")) + 
+  facet_wrap(~ good.loan) +
+  coord_flip() + 
+  theme(axis.text.y=element_text(size=rel(0.8)))
+```

@@ -1,0 +1,373 @@
+---
+title: "Modelado"
+author: "Adolfo De Unánue T."
+date: "03/12/2014"
+output: html_document
+---
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+library(Hmisc)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+library(stringr)
+library(party)
+library(rpart)
+```
+
+```{r, eval=TRUE, echo=FALSE, include=TRUE,warning=FALSE, message=FALSE,}
+source(file = "../lib/utils.r", chdir = TRUE)
+```
+
+
+# Data set
+
+```{r, echo=TRUE}
+(load("clean/cup98_141203.RData"))
+```
+
+```{r, echo=TRUE}
+ds.name
+ds.path
+dim(ds)
+id
+target
+risk
+vars.a.ignorar
+vars.input
+```
+
+# Semilla
+
+Generamos una secuencia aleatoria y seleccionamos una al azar como la semilla. Así podremos repetir el análisis si lo deseamos.
+
+```{r, echo=TRUE}
+(seed <- sample(1:1000000, 1))
+```
+
+Alternativamente, podemos establecer una semilla por _default_.
+
+```{r, echo=TRUE, eval=FALSE}
+# Este código no hace nada, no se está ejecutando
+seed <- 12345
+```
+
+# Variable de salida
+
+Para este estudio, predeciremos la variable `target.d`.
+
+```{r}
+ds <- as.data.frame(ds)
+(outcome <- target[2])
+```
+
+El costo de cada contacto es `$0.68` USD.
+
+```{r}
+cost <- 0.68
+```
+
+# Prueba y entrenamiento
+
+```{r}
+train.size <- round(num.observaciones*0.7)
+test.size <- num.observaciones - train.size
+```
+
+Guardamos las columnas de salida
+
+```{r}
+ds.targets <- ds[, target]
+dim(ds.targets)
+```
+
+Eliminamos las variables a ignorar
+
+```{r}
+ds <- ds[,c(vars.input, outcome)]
+dim(ds)
+```
+
+# Feature Engineering
+
+# Modelos
+
+## Árbol de decisión
+
+Usaremos, para fines de ilustración, la función `rpart()` del paquete `party`. Este árbol tiene los siguientes parámetros:
+
+- `Minsplit`: Mínimo número de instancias en un nodo para considerar su división.
+- `MinBucket` Mínimo número de instancias en el nodo terminal.
+- `MaxSurrogate`: Número de _splits_ a evaluar.
+- `MaxDepth`: Controla la máxima profundidad del árbol.
+
+## Fórmula
+
+```{r}
+(form <- formula(paste(outcome, "~ ", paste(vars.input[1:50], collapse = ' + '), sep='')))
+```
+
+
+### Entrenamiento
+
+```{r echo=FALSE}
+num.iteraciones <- 5
+```
+
+
+El entrenamiento consistirá en un `hold-out` repetido `r num.iteraciones` veces. 
+
+Inicio de entrenamiento: `r date()`
+
+Tamaño de los datos de entrenamiento: `r format(train.size, scientific=FALSE, big.mark=",")`
+
+Tamaño de los datos de prueba: `r format(test.size, scientific=FALSE, big.mark=",")`
+
+Parámetros del árbol:
+
+```{r}
+model <- 'rpart'
+
+MinSplit <- 1000
+MinBucket <- 400
+MaxSurrogate <- 4
+MaxDepth <- 10
+```
+
+```{r echo=FALSE}
+parametros <- paste(MinSplit, MinBucket, MaxSurrogate, MaxDepth, sep="-")
+
+run.donaciones <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+run.promedios <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+run.percentiles <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+```
+
+
+```{r eval=TRUE, fig.height=6, fig.align='center', fig.width=8,echo=FALSE}
+for (iteracion in 1:num.iteraciones) {
+  cat( "Iteracion: ", iteracion, " iniciada el ", date(), "\n")
+  
+  ## Dividimos en entrenamiento y prueba
+  train.idx <- sample(1:num.observaciones, train.size)
+  train <- ds[train.idx,]
+  test <- ds[-train.idx,]
+  
+  train.targets <- ds.targets[train.idx,]
+  test.targets <- ds.targets[-train.idx,]
+  
+  ## Parámetros
+  controls <- rpart.control(minsplit = MinSplit, minbucket = MinBucket, maxsurrogate=MaxSurrogate, maxdepth = MaxDepth)
+  
+  ## Entrenamos un árbol
+  cat("Tiempo para entrenar: ", system.time(arbol <- rpart(form, data=train, control=controls)), "\n\n")
+  
+  ## Tamaño del árbol
+  cat("Tamaño del modelo en memoria: ", format(object.size(arbol), units="MB"), "\n\n")
+  
+  ## Guardamos el árbol
+  if (!file.exists("modelos")) dir.create("modelos") # Creamos la carpeta modelos, si no existe
+  
+  save(arbol, file=paste("modelos", "/", model, "-", parametros, "-iteracion-", iteracion, ".rdata", sep=""))
+  
+  fig.title <- paste("Árbol ", iteracion)
+  
+  tryCatch(plot(arbol, main=fig.title, type="simple",
+                gp = gpar(fontsize = 4),
+                ip_args=list(pval=FALSE),
+                ep_args=list(digits=0, abbreviate=TRUE)
+                ),
+            error = function(e) cat("El árbol ", iteracion, " no creció más allá del nodo raíz\n\n\n")
+          )
+           
+  
+  ## Test
+  pred <- predict(arbol, newdata=test)
+  
+  #cat(sum(test[outcome][pred > cost] - cost), "\n")
+  
+  s1 <- sort(pred, decreasing=TRUE, method="quick", index.return=TRUE)
+  
+  donacion.total <- cumsum(test[,outcome][s1$ix])
+  
+  donacion.promedio <- donacion.total / (1:test.size)
+  
+  donacion.percentil <- 100 * donacion.total / sum(test[,outcome])
+  
+  run.donaciones[, iteracion] <- donacion.total
+  
+  run.promedios[, iteracion] <- donacion.promedio
+  
+  run.percentiles[, iteracion] <- donacion.percentil
+  
+  cat( "Iteracion: ", iteracion, " terminada el ", date(), "\n\n\n\n")
+}
+
+cat(date(), ": Terminada las iteraciones\n\n\n")
+```
+
+```{r echo=FALSE}
+donacion.final <- rowMeans(run.donaciones)
+promedio.final <- rowMeans(run.promedios)
+percentil.final <- rowMeans(run.percentiles)
+
+resultados <- data.frame(cbind(run.donaciones, donacion.final))
+names(resultados) <- c(paste("run", 1:num.iteraciones), "Promedio")
+
+if (!file.exists("resultados")) dir.create("resultados") # Creamos la carpeta resultados, si no existe
+write.csv(resultados, paste("resultados", "/", "evaluacion-donacion-total-", parametros, ".csv", sep=""))
+```
+
+
+## Evaluación
+
+### Monto total
+
+```{r}
+head(resultados)
+```
+
+Restamos el costo ($ `r cost`) de las llamadas
+
+```{r}
+resultados[,1:(num.iteraciones)] <- resultados[,1:(num.iteraciones)] - cost*(1:test.size)
+head(resultados)
+tail(resultados)
+```
+
+```{r,echo=FALSE}
+plot(resultados[,(num.iteraciones+1)], type="l", lty=1, col=1, ylim=c(0, 4500), xlab="Número de correos", ylab="Monto en donaciones ($)")
+
+for(iteracion in 1:num.iteraciones) {
+  lines(resultados[,iteracion], pty=".", type="l", lty=1+iteracion, col=1+iteracion)
+}
+
+legend("bottomright", col=1:(num.iteraciones+1), lty=1:(num.iteraciones+1), legend=c("Promedio", paste("Iteracion", 1:num.iteraciones)))
+```
+
+### Percentiles
+
+```{r echo=FALSE}
+percentil.donaciones <- sapply(1:num.iteraciones, function(i) 100*resultados[,i]/resultados[test.size, i])
+percentil <- 100*(1:test.size)/test.size
+
+plot(percentil, percentil.donaciones[,num.iteraciones], pty=".", type="l", lty=1, col=1, ylim=c(0,170), xlab = "Percentil de Contactos (%)", ylab = "Percentil de Donaciones (%)")
+
+grid(col="gray", lty="dotted")
+
+for(iteracion in 1:num.iteraciones) {
+  lines(percentil, percentil.donaciones[,iteracion], pty=".", type="l", lty = 1+iteracion, col=1+iteracion)
+}
+
+legend("bottomright", col=1:(num.iteraciones+1), lty=1:(num.iteraciones+1), legend=c("Promedio", paste("Iteracion", 1:num.iteraciones)))
+```
+
+### Promedios
+
+```{r echo=FALSE}
+donacion.promedio <- sapply(1:num.iteraciones, function(i) resultados[,i]/(1:test.size))
+
+yTitle <- c("Percentil de Donaciones Totales (%)", "Promedio de donación por contacto ($)")
+
+par(mar=c(5,4,4,5) + 0.1)
+
+plot(percentil, percentil.donaciones[,2], pty=".", type="l", lty="solid", col="red", ylab=yTitle[1], xlab="Percentil de Contactos (%)")
+
+grid(col="gray", lty="dotted")
+
+par(new=TRUE)
+
+plot(percentil, donacion.promedio[,2], pty=".", type="l", lty="dashed", col="blue", xaxt="n", yaxt="n", xlab="", ylab="", ylim=c(0, max(donacion.promedio[,2])))
+
+axis(4)
+
+mtext(yTitle[2], side=4, line=2)
+
+legend("right", col=c("red", "blue"), lty=c("solid", "dashed"), legend=yTitle)
+```
+
+## Metaparámetros
+
+```{r, echo=TRUE, eval=FALSE}
+
+## Crea una función para el hold-out que reciban como parámetro los parámetros del modelo.
+## Crea una función para la evaluación.
+
+## Intenta con los siguientes parámetros
+parametros <- c("1000-400-4-5", "1000-400-4-6", "700-200-4-8", "200-50-4-10", "1000-400-4-10")
+
+## Aquí irían los resultados...
+```
+
+
+## Selección del modelo
+
+## Scoring
+
+Uno de los pasos importantes en el /scoring/ es verificar que los datos de validación (o productivos)
+estén el mismo formato de los datos de entrenamiento y prueba. En particular, en este ejercicio, valores categóricos nuevos serán puestos a `NA`.
+
+```{r, eval=TRUE, echo=TRUE}
+# Cargamos el dataset
+
+ds.score.path <- "../data/KDD1998/cup98val.txt" # Puede ser un URL o una dirección en el directorio
+
+ds.score.name <- "cup98-score" # Nombre de nuestro conjunto de datos, e.g. algas, german
+
+ds.score <- loadData(name=ds.score.name, full_path=ds.score.path, sep=",", head=TRUE)
+               
+ds.score <- tbl_df(ds.score) # Para obtener un print mejorado
+
+## Prepara la base de datos de scoring -> limpia los nombres de las columnas.
+```
+
+Verificamos que tengamos la misma estructura de datos
+
+```{r echo=TRUE}
+train.cols <- names(ds)
+score.cols <- names(ds.score)
+
+idx <- which(train.cols %in% score.cols)
+
+cat("Columnas no encontradas: ", train.cols[-idx])
+```
+
+Verificamos que las variables categóricas tengan los mismos niveles
+
+```{r echo=TRUE}
+vars <- intersect(train.cols, score.cols)
+if(length(vars) != 0) {
+  for(i in 1:length(vars)) {
+    varname <- vars[i]
+    
+    train.levels <- levels(ds[varname])
+    
+    score.levels <- levels(ds.score[varname])
+    
+    if(is.factor(ds[varname]) & setequal(train.levels, score.levels) == FALSE) {
+      cat("\n\n\n¡Advertencia: Existen nuevos niveles en los datos y serán cambiados a NA!\n")
+      cat(varname, "\n")
+      cat("Entrenamiento: ", length(train.levels), ", ", train.levels, "\n\n")
+      cat("Validación: ", length(score.levels), ", ", score.levels, "\n\n")
+      
+      ds.score[varname] <- factor(ds.score[varname], levels=train.levels)
+    }
+  }
+}
+```
+
+```{r echo = TRUE}
+## Realiza la predicción ...
+```
+
+```{r echo = TRUE}
+## Pega la "respuesta" valtargt.txt usando el id como variable y calcula las métricas.
+```
+
+
+### Apéndice: Ambiente
+
+```{r, echo=FALSE}
+sessionInfo()
+```

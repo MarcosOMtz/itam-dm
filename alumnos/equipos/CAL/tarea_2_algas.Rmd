@@ -1,0 +1,482 @@
+---
+title: "tarea 2"
+author: "Equipo CAL: Carlos Petricioli, Amanda Balderas, Liliana Millán"
+date: "15 de noviembre de 2014"
+output: html_document
+---
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+# Este bloque debería de tener la bandera de echo a FALSE
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+library(stringr)
+library(corrgram)
+```
+
+
+
+```{r, echo=FALSE}
+# Cargamos el dataset
+
+ds.path <- "algas/" # Puede ser un URL o una dirección en el directorio
+
+ds.name <- "algas" # Nombre de nuestro conjunto de datos, e.g. algas, german
+
+df <- read.table(paste(ds.path,'algas.txt',sep=''), na.strings="XXXXXXX")  
+saveRDS(df, paste(ds.path,'algas.rds', sep=''))
+
+ds <- readRDS('algas/algas.rds')# Leemos el dataset, usando readRDS (ya que ya lo tenemos en disco debido a nuestro EDA)
+   # Hay que utilizar el data set al que no se le han removido las observaciones NAs
+   # Lo guardamos en la variable ds para hacer más genérico los pasos.
+
+ds <- tbl_df(ds) # Para obtener un print mejorado
+```
+
+
+# Introducción
+
+Archivo algas 200 observaciones, obtenido del repositorio de Adolfo de Unanue Tiscareño [](https://github.com/nanounanue/itam-dm/tree/master/data/algas).
+
+Este set de datos corresonde a muestras de agua tomadas de diferenes ríos de Europa por un año para realizar un estudio de calidad de agua, al mismo tiempo se tomaron muestras de algas en estos ríos para determinar las distribuciónes de población de algas en estos ríos.
+
+## Variables
+
+El set contiene 18 atributos en el siguiente orden: 
+
+|campo|atributo|valores|tipo|
+|:---:|:------:|:--:|:---:|
+|1|temporada|spring, summer, autumn, winter| categrórica|
+|2|tamaño del río| small, medium, large| categórica|
+|3|velocidad|low, medium, large|categórica|
+|4-11|concentraciones químicas| Reales positivos|continua|
+|12-18|distribución de diferentes tipos de algas|Reales positivos|continua|
+
+Los NA están codificados como XXXXXXX.
+
+
+# Estructura General
+
+```{r}
+ds
+```
+
+
+## Tamaño
+```{r}
+dim(ds)
+```
+
+## Columnas
+
+```{r}
+names(ds)
+```
+
+## Estructura
+
+```{r}
+str(ds)
+```
+
+```{r}
+#temporada
+unique(ds$V1)
+
+#tamaño del rio
+unique(ds$V2)
+
+#velocidad 
+unique(ds$V3)
+
+#4-11 concentraciones quimicas
+str(ds[,4:11])
+
+#12-19 distribuciones de diferentes algas
+str(ds[,12:18])
+```
+
+No hay discrepancia entre las clases de variables y su significado. 
+
+## Observaciones
+
+```{r}
+head(ds)
+```
+
+```{r}
+tail(ds)
+```
+
+```{r}
+ds[sample(1:dim(ds)[1],6),]
+```
+
+
+# Sumario Estadístico
+
+```{r}
+summary(ds)
+```
+
+
+# Limpieza de metadatos
+
+```{r, echo=FALSE}
+
+# Usaremos la función que hiciste de ejercicio
+#names(ds) <- normalizarNombres(names(ds))
+```
+
+Cambiando nombre a las columnas
+
+```{r, echo=FALSE}
+names(ds) <- c('temporada','tamaño_rio','velocidad','cq_1','cq_2','cq_3','cq_4','cq_5','cq_6','cq_7','cq_8','da_1','da_2','da_3','da_4','da_5','da_6','da_7')
+
+names(ds)
+```
+
+# Ajuste de formatos
+
+Las clases de las variables son
+
+```{r}
+sapply(ds, class)
+```
+
+
+
+En este set de datos no hay fechas.
+
+# Transformación de variables
+
+No se realizó ninguna transformación.
+
+En el set de datos de algas no hay una variable risk ni costo asociada a la variable target. 
+
+Se ocupó como id el rowname.
+
+```{r, echo=FALSE}
+vars <- names(ds) # Guardamos los nombres de variables
+
+target <- names(ds[12:18])  # Si el modelo es supervisado
+risk <- "" # Si se proveé, es la importancia de la observación respecto a la variable (es una variable de salida)
+costo <- "" # Costo de equivocarse en la predicción (Si se proveé) (es una variable de salida)
+id <- rownames(ds) # Armar una id con columnas, o seleccionar el id del dataset
+```
+
+
+
+# Recodificación
+
+No se requirió recodificar las variables categóricas ya que tienen a lo más 4 niveles y no hay variables de fechas.
+
+
+# Variables a ignorar
+
+Ignoraremos las últimas 7 columnas que son las variables que queremos inferir.
+```{r, echo = FALSE}
+vars_ignoradas <- names(ds[12:18])
+```
+
+### IDs y variables de salida
+
+```{r, echo=FALSE}
+if (exists("risk") || exists("costo")) {
+  vars.a.ignorar <- union(union(id, if (exists("risk")) risk), if (exists("costo")) costo)
+} else {
+  vars.a.ignorar <- id
+}
+```
+
+### Constantes y valores únicos por observación
+
+En el set de datos de algas no se encontraron muchos niveles, el de mayor nivel tiene 4 niveles diferentes (temporada), tampoco se encontraron variables que sean constantes.
+
+```{r, echo=FALSE}
+# Ignoramos las que tengan un único valor por cada observación, pueden ser IDs
+# IMPORTANTE: Esto puede eliminar fechas, ver sección anterior
+
+ids <- names(which(sapply(ds, function(x) length(unique(x)) == nrow(ds))))
+
+# Ignoramos los factores que tengan muchos niveles
+# IMPORTANTE: ver sección anterior
+
+factors <- which(sapply(ds[vars], is.factor))
+niveles <- sapply(factors, function(x) length(levels(ds[[x]])))
+(muchos.niveles <- names(which(niveles > 20)))
+
+vars.a.ignorar <- union(vars.a.ignorar, muchos.niveles)
+
+# Constantes
+constantes <- names(which(sapply(ds[vars], function(x) all(x == x[1L]))))
+
+var.a.ignorar <- union(union(vars.a.ignorar, ids), constantes)
+```
+
+
+### Faltantes
+
+```{r}
+# Las que sean puros NAs
+ids.nas.count <- sapply(ds[vars], function(x) sum(is.na(x)))
+ids.nas <- names(which(ids.nas.count == nrow(ds)))
+
+vars.a.ignorar <- union(ids.nas, vars.a.ignorar)
+
+# Las que tengan muchos NAs (un 70% o más)
+ids.many.nas <- names(which(ids.nas.count >= 0.7*nrow(ds)))
+
+vars.a.ignorar <- union(ids.many.nas, vars.a.ignorar)
+```
+
+### Variable de salida (`target`) 
+
+No hubo NA's en las columnas target.
+
+```{r, echo=FALSE}
+#buscar los renglones que tengan NA en target
+dim(ds)
+ds <- ds[!is.na(ds['da_1']),]
+ds <- ds[!is.na(ds['da_2']),]
+ds <- ds[!is.na(ds['da_3']),]
+ds <- ds[!is.na(ds['da_4']),]
+ds <- ds[!is.na(ds['da_5']),]
+ds <- ds[!is.na(ds['da_6']),]
+ds <- ds[!is.na(ds['da_7']),]
+dim(ds)
+
+#ds <- ds[!is.na(ds[target]),]
+#dim(ds)
+```
+
+
+Mostramos la distribución (esto nos indicará si el problema no está balanceado)
+
+```{r, echo=FALSE}
+#reacomodar los datos para graficarlos en ggplot
+tss <- data.frame(id=rownames(ds), da_1=ds$da_1, da_2=ds$da_2, da_3=ds$da_3, da_4=ds$da_4, da_5=ds$da_5, da_6=ds$da_6, da_7=ds$da_7)
+tss <- gather(tss,tipo_alga, value,-id)
+ggplot(data=tss, aes(x=value)) + geom_bar(width=0.3) + facet_wrap(~tipo_alga) 
+
+```
+
+También se muestran las variables target en boxplot
+
+```{r, echo=FALSE}
+ggplot(data=tss, aes(x=tipo_alga, y=value, fill=tipo_alga)) + geom_boxplot()
+```
+
+
+# Variables correlacionadas
+
+```{r, eval=FALSE}
+vars.cor <- cor(ds[which(sapply(ds, is.numeric))], use="complete.obs")
+vars.cor[upper.tri(vars.cor, diag=TRUE)] <- NA
+
+vars.cor <- vars.cor                                  %>%
+            abs()                                     %>%   
+            data.frame()                              %>%
+            mutate(var1=row.names(vars.cor))          %>%
+            gather(var2, cor, -var1)                  %>%
+            na.omit()
+            
+
+vars.cor <- vars.cor[order(-abs(vars.cor$cor)), ]
+
+(muy.cor <- filter(vars.cor, cor > 0.95)) # Mostramos las que tengan más del 95% de correlación
+
+# Habría que decidir si se remueven y cuales se remueven (var1 o var2)
+vars.a.ignorar <- union(vars.a.ignorar, muy.cor$var2)
+```
+
+No hubo columnas que tuvieran mas del 95% de correlacion entre ellas
+
+
+# Valores faltantes
+
+La estrategia a seguir será la de eleminar las observaciones cuyos valores tengan más del 25\% de NAs. Aquellas que tienen menos del 25\% los valores de NAs se modificarán a través de una regresión lineal, media/mediana/moda dependiendo de la distribución de cada variable.
+
+De la correlación entre faltantes: 
+Los faltantes en la cq\_6 y cq\_5 están correlacionados positivamente al 100\% al igual que los faltantes en cq\_6 y cq\_4, esto significa que cuando falta un valor en cq_6 tambien falta en cq\_4 y cq\_5. La correlación entre cq\_8 y cq\_3 también es muy alta positivamente más del 75\%. 
+
+```{r, echo=FALSE}
+x <- as.data.frame(abs(is.na(ds))) 
+
+head(df)
+head(x)
+
+# Extrae las variables que tienen variables con NAs
+y <- x[which(sapply(x, sd) > 0)] 
+
+# Da la correación, un valor alto positivo significa que desaparecen juntas.
+cor(y) 
+
+
+matrix_df <- as.data.frame(y)
+corrgram(matrix_df, order=TRUE, lower.panel=panel.shade,
+  upper.panel=panel.pie, text.panel=panel.txt,
+  main="Correlación de NAs")
+```
+
+Variables con más faltantes: en cq\_8 el 6\% de sus datos son faltantes, cq\_3 el 5\% de sus datos son faltantes. 
+
+```{r}
+apply(ds, 2, function(x) mean(is.na(x))*100)
+```
+
+Observaciones con más faltantes: 
+```{r}
+apply(ds, 1, function(x) sum(is.na(x)))
+ds[apply(ds, 1, function(x) sum(is.na(x))) > 2,]
+```
+
+Eliminando las observaciones que tengan más del 25\% con NAs.
+
+```{r, echo=FALSE}
+#Numero de observaciones que no están completas
+nrow(ds[!complete.cases(ds),])
+#guardando las observaciones con NAs
+ds.con.NAs <- ds[!complete.cases(ds),]
+
+indicesConNAs <- function(data, porcentaje=0.2) {
+  n <- if (porcentaje < 1) {
+    as.integer(porcentaje  * ncol(data))
+  } else {
+    stop("Debes de introducir el porcentaje de columnas con NAs.")
+  }
+  indices <- which( apply(data, 1, function(x) sum(is.na(x))) > n )
+  if (!length(indices)) {
+    warning("No hay observaciones con tantos NAs 
+            (la respuesta de la función es vacía),
+            no se recomienda indexar el data.frame con esto")
+  }
+  indices
+}
+
+dim(ds)
+observaciones.omitidas <- ds[indicesConNAs(ds, 0.25),]
+ds <- ds[-indicesConNAs(ds, 0.25),]
+dim(ds)
+```
+
+En el caso de algas no hay valores NAs en las variables categóricas.
+
+Verificando la distribución de datos para las numéricas para obtener la mejor estrategia para imputar los valores faltantes. 
+
+```{r, echo=FALSE}
+sapply(ds, function(x) class(x))
+tipos <- lapply(ds, function(x) class(x))
+factor_cols <- which(ifelse(tipos == 'factor', TRUE,FALSE))
+numeric_cols <- which(ifelse(tipos == 'numeric',TRUE,FALSE))
+numeric_cols <- setdiff(names(numeric_cols), target)
+
+#juntar los numéricos para mostrar sus distribuciones 
+ss <- gather(ds[,numeric_cols], variable, value)
+#eliminar los na
+dim(ss)
+nas <- which(is.na(ss$value))
+ss <- ss[-nas,]
+ggplot(ss, aes(x=value)) + geom_density() + facet_wrap(~variable, scales="free") 
+ 
+```
+
+También mostramos las numéricas en boxplots, en cq_5 se identifica que hay un outlier muy 'grande'
+
+```{r, echo=FALSE}
+ggplot(data=ss, aes(x=variable, y=value, fill=variable)) + geom_boxplot() + facet_wrap(~variable, scale="free")
+```
+
+
+De acuerdo a las distribuciones tomaremos la **media** como valor de reemplazo en los valores faltantes.
+
+Número de NAs antes de cambiarlos por la media. 
+
+```{r, echo=FALSE}
+lapply(ds[,numeric_cols], function(x) sum(is.na(x)))
+```
+
+```{r, echo=FALSE}
+
+for(i in 1:length(numeric_cols)){
+  nas <- which(is.na(ds[,numeric_cols[i]]))
+  new_value <- mean(ds[,numeric_cols[i]], na.rm=TRUE)
+  ds[nas, numeric_cols[i]] <- new_value
+}
+```
+
+
+Verificamos que ya no hay NAs.
+
+```{r, echo=FALSE}
+#revisando que ya no hay nas
+lapply(ds[,numeric_cols], function(x) sum(is.na(x)))
+```
+
+
+# Normalizar niveles
+
+Removemos espacios, puntuaciones, camelCase, etc. en los niveles de los factores supervivientes.
+
+De acuerdo al summary de las variables categóricas no hay acentos, puntuaciones o nombres en formato camelCase
+
+```{r}
+summary(ds[,1:3])
+```
+
+
+# Identificación de Variables
+
+```{r, echo=FALSE}
+(vars.input <- setdiff(vars, target))
+idxs.input <- sapply(vars.input, function(x) which(x == names(ds)), USE.NAMES=FALSE)
+
+idxs.numericas <- intersect(idxs.input, which(sapply(ds, is.numeric)))
+(vars.numericas <- names(ds)[idxs.numericas])
+
+idxs.categoricas <- intersect(idxs.input, which(sapply(ds, is.factor)))
+(vars.categoricas <- names(ds)[idxs.categoricas])
+
+# Por conveniencia guardamos el número de observaciones supervivientes
+num.observaciones <- nrow(ds)
+
+```
+
+
+```{r,echo=FALSE}
+
+# Este paso debería de tener la bandera de echo a FALSE
+
+# Guardamos todo en la carpeta 
+ds.date <- paste0("_", format(Sys.Date(), "%y%m%d"))
+ds.rdata <- paste0(ds.name, ds.date, ".RData") # Guardamos todo en un RData para poder automatizar el modelado
+
+if (!file.exists("clean")) dir.create("clean") # Creamos la carpeta clean, si no existe
+
+save(ds, ds.name, ds.path, ds.date, target, risk, costo, 
+     id, vars.a.ignorar, vars, num.observaciones, 
+     vars.input, idxs.input,
+     observaciones.omitidas,
+     vars.numericas, idxs.numericas,
+     vars.categoricas, idxs.categoricas,
+     file=paste0("clean/", ds.rdata)
+     )
+```
+Guardamos todo en 
+
+```{r, echo=FALSE}
+ds.rdata
+```
+
+
+### Apéndice: Ambiente
+
+```{r, echo=FALSE}
+sessionInfo()
+```
+
+

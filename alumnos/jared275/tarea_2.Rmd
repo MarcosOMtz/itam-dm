@@ -1,0 +1,113 @@
+---
+title: "Untitled"
+author: "Carlos Ayala, Jared Romero y Marcos Olguin"
+date: "27/11/2014"
+output: html_document
+---
+
+###Función para detectar variabilidad.
+
+Hacemos una función que nos permita saber cuanta variabilidad existen en los datos, para probarla, esta y las demás funciones que en este documento se presentaran, utilizaremos la base de datos de algas.
+
+El primer paso es cargar la base.
+
+```{r}
+source("/home/jared/Proyectos/itam-dm/alumnos/jared275/utils.r")
+algas<-cargar_algas()
+
+```
+Ahora creamos la función con la manipulación de los datos.
+
+```{r}
+str(algas)
+mediana<-median(algas$mxPH, na.rm=T)
+cuant<-quantile(algas$mxPH,probs=c(.25,.75),na.rm=T)
+iqr<-cuant[2]-cuant[1]
+res<-c(mediana,iqr)
+names(res)<-c("mediana","RIQ")
+res
+```
+
+Ahora que sabemos como hacerlo, lo generalizamos para hacer una función.
+
+```{r}
+low.variability<-function(base){
+  formula<-function(variable){
+    if (class(variable) %in% c("numeric","integer")){
+      mediana<-median(variable, na.rm=T)
+      cuant<-quantile(variable,probs=c(.25,.75),na.rm=T)
+      iqr<-cuant[2]-cuant[1]
+      res<-list(mediana,iqr,iqr/mediana,class(variable))
+      names(res)<-c("mediana","RIQ","med/iqr","clase.var")
+      res
+      }else{
+      res<-list(0,0,0,class(variable))
+      names(res)<-c("mediana","RIQ","med/iqr","clase.var")
+      res
+  }
+  }
+  a<-NULL
+  for (i in 1:ncol(base)){
+  a<-rbind(a,formula(base[,i]))
+}
+  row.names(a)<-names(base)
+  a
+}
+```
+
+La probamos para saber si funciona correctamente, esta tabla nos permite ver cuan variable son las características de nuestra base de datos.
+
+```{r}
+german<-cargar_german()
+low.variability(algas)
+low.variability(german)
+```
+
+Ahora construimos una base de datos que nos diga cuales variables están más correlacionadas para decidir que variables quitar.
+
+```{r}
+correlation.filtering<-function(base){
+  nums <- sapply(base, function(x) (is.numeric(x) | is.integer(x)))
+  prueba<-base[,nums]
+  prueba<-prueba[complete.cases(prueba),]
+  corre<-NULL
+  var1<-NULL
+  var2<-NULL
+  for(i in 1:(ncol(prueba)-1)){
+    for(e in (i+1):ncol(prueba)){
+      var1<-rbind(var1,names(prueba[i]))
+      var2<-rbind(var2,names(prueba[e]))
+      corre<-rbind(corre,cor(prueba[,i],prueba[,e]))
+      }
+    }
+  a<-data.frame(var1=var1,var2=var2,correlacion=corre)
+  a<-a[order(-abs(a$correlacion)),]
+  a
+}
+```
+
+Probamos las función.
+
+```{r}
+correlation.filtering(algas)
+correlation.filtering(german)
+```
+
+Ahora una tabla de correlaciones con la variable de salida.
+
+```{r}
+FCB.filtering<-function(base,variable){
+  tabla<-correlation.filtering(base)
+  tabla<-rbind(tabla[tabla$var1==variable,],tabla[tabla$var2==variable,])
+  tabla[order(-abs(tabla$correlacion)),]
+}
+```
+
+Probamos la función
+
+```{r}
+FCB.filtering(algas,"a7")
+FCB.filtering(german,"V21")
+```
+
+

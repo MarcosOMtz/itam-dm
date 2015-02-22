@@ -1,0 +1,150 @@
+---
+title: "Tarea"
+author: "Andrés Villaseñor"
+date: "7 de diciembre de 2014"
+output: html_document
+---
+
+__low variability__
+
+```{r}
+low <- function(datos){   # meter el parametro asi "(bbva.reduce['avg'])"
+  options("scipen"=100, "digits"=4) # quitamos la notación científica
+  quantiles  <- apply(datos, 2, FUN = quantile) # aplicamos la funcion "quantile" al dataframe
+  rangoIQ  <- apply(datos,2,FUN=IQR) # determinamos los rangos intercuartiles
+  var  <- (apply(datos,2,FUN=IQR) /(apply(datos,2,FUN=max)-apply(datos,2,FUN=min)))*100 #IQR/rango
+  frame  <- round(rbind(quantile,IQR,var),4)
+  frame 
+}
+
+```
+
+__Correlation Filtering__
+
+```{r}
+correlation <- function(datos){
+  library(corrgram)
+  corrrelacion  <-  cor(datos,use="complete.obs")
+  corrgram(datos, order=TRUE, lower.panel=panel.shade,
+           upper.panel=panel.pie, text.panel=panel.txt,
+           main="Feature Selection") 
+  correlacion 
+}
+```
+
+__Fast correlation-based filtering__
+
+```{r}
+FCB <- function(datos,regresada){
+  df  <- as.data.frame(cor(datos,use="complete.obs"))
+  df[order(-abs(df[regresada,])),] 
+}
+```
+
+__forward selection__
+
+```{r}
+forward <- function(datos, regresada){
+  saturado <- paste(colnames(datos), collapse="+")
+  modelo <- step(lm(datos$regresada ~ 1,data=datos),direction="forward",scope= paste("~",saturado))
+  summary(modelo)
+  modelo$anova
+} 
+
+
+```
+
+__forward selection 2 (opción larga)__
+
+```{r}
+# funciones forward select "opcion larga", para checar modelo por modelo
+forward.select1 <- function(dataframe, regresada){
+  df <- dataframe #renombrar el dataframe
+  reg <- dataframe$regresada
+  df$regresada <- NULL #Quitar la variable regresada de 'df'
+  varlist <- names(df) # Enlistar las variables restantes
+  models <- lapply(varlist, function(x) {  #aplicar la funcion 'lm' a la lista como variables
+    lm(substitute(reg ~ i, list(i = as.name(x))), data = dataframe)
+  })
+  score1 <- lapply(models, AIC) # aplica AIC a los modelos
+  model1 <- models[[which.min(score1)]] # escoge el que tenga menos AIC
+  var1 <- names(coef(model1)[2]) #dame el nombre de la variable 
+  var1
+  model1
+}
+
+#aplicas la segunda funcion cuando ya tienes la primera covariable
+forward.select2 <- function(dataframe, regresada, var1){
+  df <- dataframe #renombrar el dataframe
+  reg <- dataframe$regresada
+  cov1 <- dataframe$var1
+  df$regresada <- df$var1 <- NULL #Quitar las variables ya utilizadas de 'df'
+  varlist <- names(df) # Enlistar las variables restantes
+  models <- lapply(varlist, function(x) {  #aplicar la funcion 'lm' a la lista como variables
+    lm(substitute(reg ~ cov1 + i, list(i = as.name(x))), data = dataframe)
+  })
+  score2 <- lapply(models, AIC) # aplica AIC a los modelos
+  model2 <- models[[which.min(score2)]] # escoge el que tenga menos AIC
+  var2 <- names(coef(model2)[3]) #dame el nombre de la variable 
+  var2
+  model2
+}
+#aplicas la tercera función cuando ya tienes la segunda covariable
+forward.select3 <- function(dataframe, regresada, var1, var2){
+  df <- dataframe #renombrar el dataframe
+  reg <- dataframe$regresada
+  cov1 <- dataframe$var1
+  cov2 <- dataframe$var2
+  df$regresada <- df$var1 <- df$var2 <- NULL #Quitar las variables ya utilizadas de 'df'
+  varlist <- names(df) # Enlistar las variables restantes
+  models <- lapply(varlist, function(x) {  #aplicar la funcion 'lm' a la lista como variables
+    lm(substitute(reg ~ cov1 + cov2 + i, list(i = as.name(x))), data = dataframe)
+  })
+  score3 <- lapply(models, AIC) # aplica AIC a los modelos
+  model3 <- models[[which.min(score3)]] # escoge el que tenga menos AIC
+  var3 <- names(coef(model3)[4]) #dame el nombre de la variable 
+  var3
+  model3
+}
+#aplicas la cuarta función cuando ya tienes la tercera covariable
+forward.select4 <- function(dataframe, regresada, var1, var2, var3){
+  df <- dataframe #renombrar el dataframe
+  reg <- dataframe$regresada
+  cov1 <- dataframe$var1
+  cov2 <- dataframe$var2
+  cov3 <- dataframe$var3
+  df$regresada <- df$var1 <- df$var2 <- df$var3 <- NULL #Quitar las variables ya utilizadas de 'df'
+  varlist <- names(df) # Enlistar las variables restantes
+  models <- lapply(varlist, function(x) {  #aplicar la funcion 'lm' a la lista como variables
+    lm(substitute(reg ~ cov1 + cov2 + cov3 + i, list(i = as.name(x))), data = dataframe)
+  })
+  score4 <- lapply(models, AIC) # aplica AIC a los modelos
+  model4 <- models[[which.min(score4)]] # escoge el que tenga menos AIC
+  var4 <- names(coef(model4)[5]) #dame el nombre de la variable 
+  var4
+  model4
+}
+#aplicas la quinta función cuando ya tienes la cuarta covariable
+forward.select5 <- function(dataframe, regresada, var1, var2, var3, var4){
+  df <- dataframe #renombrar el dataframe
+  reg <- dataframe$regresada
+  cov1 <- dataframe$var1
+  cov2 <- dataframe$var2
+  cov3 <- dataframe$var3
+  cov4 <- dataframe$var4
+  df$regresada <- df$var1 <- df$var2 <- df$var3 <- df$var4 <- NULL #Quitar las variables ya utilizadas de 'df'
+  varlist <- names(df) # Enlistar las variables restantes
+  models <- lapply(varlist, function(x) {  #aplicar la funcion 'lm' a la lista como variables
+    lm(substitute(reg ~ cov1 + cov2 + cov3 + cov4 +i, list(i = as.name(x))), data = dataframe)
+  })
+  score5 <- lapply(models, AIC) # aplica AIC a los modelos
+  model5 <- models[[which.min(score5)]] # escoge el que tenga menos AIC
+  var5 <- names(coef(model5)[6]) #dame el nombre de la variable 
+  var5
+  model5
+}
+
+
+```
+
+

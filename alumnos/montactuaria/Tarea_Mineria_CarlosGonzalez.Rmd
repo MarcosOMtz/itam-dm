@@ -1,0 +1,751 @@
+---
+title: "Tarea"
+author: "Carlos González Munguía"
+date: "Diciembre 2014"
+output: html_document
+---
+
+##Carga de datos
+
+-Se cargan los datos
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+library(dplyr)
+library(plyr)
+library(ggplot2)
+library(tidyr)
+library(lattice)
+library(scales)
+library(Hmisc)
+library(lubridate)
+library(gridExtra)
+library(ggthemes)
+library(knitr)
+library(car)
+library(stringr)
+library(party)
+library(rpart)
+library(randomForest)
+
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+
+datos <- read.table("C:/Users/Mont/itam-dm/alumnos/montactuaria/cup98lrn.txt", header=TRUE, sep=",")
+
+saveRDS(datos,"ds.rds")
+
+ds  <- readRDS("ds.rds")
+
+ds.path <- "cup98lrn.txt" 
+
+ds.name <- "cup98lrn" 
+
+```
+
+
+
+
+```{r, warning=TRUE, message=FALSE, error=FALSE, eval=FALSE,echo=TRUE}
+ds.path <- "cup98lrn.txt" 
+
+ds.name <- "cup98lrn" 
+
+ds <- loadData(name=ds.name, full_path=ds.path, sep=",", head=TRUE)
+
+ds <- tbl_df(ds)
+
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+dim(ds)
+```
+
+## Exploración de datos
+
+Se tienen identificadas 3 variables target:\n
+
+- TARGET_B: Binaria, si es que se tuvo respuesta o no.\n
+
+- TARGET_D: Monto de donación asociada con la variable TARGET B.\n
+
+- HPHONE_D: Binario, indicador de un número telefónico publicado.\n
+
+
+
+## Variables demográficas
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+summary((ds[,1:8]))
+
+```
+
+## Variables demográficas
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+summary((ds[,9:16]))
+
+```
+
+##Número de veces que el donador respondió a otras campañas
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+summary((ds[,29:36]))
+
+```
+
+##Número de veces que el donador respondió a otras campañas
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+summary((ds[,37:44]))
+
+```
+
+
+##Descripción de las variables de salida
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+
+(porcentaje.respuesta.b <- round(100 * prop.table(table(ds$TARGET_B)), digits=1))
+
+etiquetas <- paste("TARGET_B=", names(porcentaje.respuesta.b), "\n", porcentaje.respuesta.b, "%", sep=" ")
+
+ds.positive <- ds[ds$TARGET_D >0, ]
+
+target.d.positive <- ds.positive$TARGET_D
+
+donaciones.positivas <- length(target.d.positive)
+
+
+target.d.positive <- round(target.d.positive)
+
+
+ds$TARGET_D2 <- cut(ds$TARGET_D, right=FALSE, breaks=c(0,0.1, 10,15,20,25,30,50, max(ds$TARGET_D)))
+
+ds.positive$TARGET_D2 <- cut(ds.positive$TARGET_D, right=FALSE, breaks=c(0,0.1, 10,15,20,25,30,50, max(ds.positive$TARGET_D)))
+
+
+
+
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE,fig.width=5, fig.height=4.5}
+
+pie(porcentaje.respuesta.b, labels = etiquetas)
+
+```
+
+##Descripción de las variables de salida
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE,fig.width=5, fig.height=4.5}
+
+barplot(table(target.d.positive), las=2, cex.axis=0.8, cex.names=0.8)
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+
+normalizarNombres <- function(nombres) {
+  
+  # Convertimos a minúsculas
+  nombres <- tolower(nombres)
+  
+  # Eliminamos '_' por '.'
+  nombres <- str_replace_all(string = nombres, pattern = '_', replacement = '.')
+  
+}
+
+
+```
+
+###normalizar nombre
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+
+names(ds) <- normalizarNombres(names(ds))
+
+names(ds)
+
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+##identificacion variables
+
+vars <- names(ds) # Guardamos los nombres de variables
+target <- c("target.b", "target.d", "target.d2")  # Si el modelo es supervisado
+risk <- NULL # Si se proveé, es la importancia de la observación respecto a la variable (es una variable de salida)
+costo <- NULL # Costo de equivocarse en la predicción (Si se proveé) (es una variable de salida)
+id <- "controln" # Armar una id con columnas, o seleccionar el id del dataset
+```
+
+
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+##identificacion variables
+
+vars.input <- setdiff(vars, target)
+idxs.input <- sapply(vars.input, function(x) which(x == names(ds)), USE.NAMES=FALSE)
+
+idxs.numericas <- intersect(idxs.input, which(sapply(ds, is.numeric)))
+vars.numericas <- names(ds)[idxs.numericas]
+
+idxs.categoricas <- intersect(idxs.input, which(sapply(ds, is.factor)))
+vars.categoricas <- names(ds)[idxs.categoricas]
+
+#variables a ignorar
+
+vars.a.ignorar <- union(union(id, if (exists("risk")) risk), if(exists("cost")) cost)
+
+```
+
+
+##Recodificacion
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+vars.numericas 
+
+vars.categoricas 
+
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+# Ignoramos las que tengan un único valor por cada observación, pueden ser IDs
+# IMPORTANTE: Esto puede eliminar fechas, ver sección anterior
+
+ids <- names(which(sapply(ds, function(x) length(unique(x)) == nrow(ds))))
+
+# Ignoramos los factores que tengan muchos niveles
+# IMPORTANTE: ver sección anterior
+
+
+factors <- which(sapply(ds[vars], is.factor))
+
+niveles <- sapply(factors, function(x) length(levels(ds[[x]])))
+
+muchos.niveles <- names(which(niveles > 32))
+
+vars.a.ignorar <- union(vars.a.ignorar, muchos.niveles)
+
+# Constantes
+constantes <- names(which(sapply(ds[vars], function(x) all(x == x[1L]))))
+
+vars.a.ignorar <- union(vars.a.ignorar, c(ids, constantes))
+
+
+####faltantes
+
+# Las que sean puros NAs
+ids.nas.count <- sapply(ds[vars], function(x) sum(is.na(x)))
+ids.nas <- names(which(ids.nas.count == nrow(ds)))
+
+vars.a.ignorar <- union(ids.nas, vars.a.ignorar)
+
+
+# Las que tengan muchos NAs (un 70% o más)
+ids.many.nas <- names(which(ids.nas.count >= 0.7*nrow(ds)))
+
+vars.a.ignorar <- union(ids.many.nas, vars.a.ignorar)
+
+length(vars.a.ignorar)
+
+```
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+vars.a.ignorar
+
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+sapply(ds[,target], class)
+
+ds[target[1]] <- as.factor(ds[[target[1]]])
+table(ds[target[1]])
+sapply(ds[,target], class)
+
+
+```
+
+
+##Balance de ds
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE,fig.width=5, fig.height=4.5}
+
+ggplot(data=ds, aes_string(x=target[1])) + geom_bar(width=0.3)
+
+```
+
+
+###variables correlacionadas
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+vars.cor <- cor(ds[which(sapply(ds, is.numeric))], use="pairwise.complete.obs")
+
+vars.cor[upper.tri(vars.cor, diag=TRUE)] <- NA
+
+
+vars.cor <- vars.cor                                  %>%
+  abs()                                     %>%   
+  data.frame()                              %>%
+  mutate(var1=row.names(vars.cor))          %>%
+  gather(var2, cor, -var1)                  %>%
+  na.omit()
+
+vars.cor <- vars.cor[order(-abs(vars.cor$cor)), ]
+
+muy.cor <- filter(vars.cor, cor > 0.95)
+
+vars.a.ignorar <- union(vars.a.ignorar, muy.cor$var2)
+
+
+
+```
+
+###Normalizar niveles
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+factors <- which(sapply(ds[vars], is.factor))
+
+for (f in factors) levels(ds[[f]]) <- normalizarNombres(levels(ds[[f]]))
+
+# Removemos las variables
+vars <- setdiff(vars, vars.a.ignorar)
+
+
+
+##Variables independientes
+
+vars.input <- setdiff(vars, target)
+
+idxs.input <- sapply(vars.input, function(x) which(x == names(ds)), USE.NAMES=FALSE)
+
+###var numericas
+
+idxs.numericas <- intersect(idxs.input, which(sapply(ds, is.numeric)))
+
+vars.numericas <- names(ds)[idxs.numericas]
+
+
+##categoricas
+
+idxs.categoricas <- intersect(idxs.input, which(sapply(ds, is.factor)))
+
+vars.categoricas <- names(ds)[idxs.categoricas]
+
+# Por conveniencia guardamos el número de observaciones supervivientes
+num.observaciones <- nrow(ds)
+
+
+```
+
+#Modelado
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+ds.name
+ds.path
+dim(ds)
+id
+target
+risk
+vars.a.ignorar
+vars.input
+
+```
+
+Semilla
+
+Generamos una secuencia aleatoria y seleccionamos una al azar como la semilla. Así podremos repetir el análisis si lo deseamos.
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+(seed <- sample(1:1000000, 1))
+```
+
+
+Variable de salida
+Para este estudio, predeciremos la variable target.d.
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+ds <- as.data.frame(ds)
+(outcome <- target[2])
+cost <- 0.68
+
+```
+
+El costo de cada contacto es $0.68 USD.
+
+cost <- 0.68
+
+###Prueba y entrenamiento
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+
+train.size <- round(num.observaciones*0.7)
+
+test.size <- num.observaciones - train.size
+
+```
+
+
+Guardamos las columnas de salida
+
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+ds.targets <- ds[, target]
+
+dim(ds.targets)
+
+```
+
+Eliminamos las variables a ignorar
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+ds <- ds[,c(vars.input, outcome)]
+
+dim(ds)
+
+```
+
+
+
+
+
+##Feature Engineering
+
+###Modelos
+
+####Árbol de decisión
+
+Usaremos, para fines de ilustración, la función rpart() del paquete party. Este árbol tiene los siguientes parámetros:
+  
+-Minsplit: Mínimo número de instancias en un nodo para considerar su división.
+
+-MinBucket Mínimo número de instancias en el nodo terminal.
+
+-MaxSurrogate: Número de splits a evaluar.
+
+-MaxDepth: Controla la máxima profundidad del árbol.
+
+Fórmula
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+(form <- formula(paste(outcome, "~ ", paste(vars.input[1:50], collapse = ' + '), sep='')))
+
+```
+
+##Entrenamiento
+
+El entrenamiento consistirá en un hold-out repetido r num.iteraciones veces.
+
+Inicio de entrenamiento: 
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+date()
+
+```
+
+Tamaño de los datos de entrenamiento: 
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+format(train.size, scientific=FALSE, big.mark=",")
+
+```
+
+
+Tamaño de los datos de prueba:
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+format(test.size, scientific=FALSE, big.mark=",")
+
+```
+
+
+
+Parámetros del árbol:
+  
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+MinSplit <- 1000
+MinBucket <- 400
+MaxSurrogate <- 4
+MaxDepth <- 10
+parametros <- paste(MinSplit, MinBucket, MaxSurrogate, MaxDepth, sep="-")
+
+```
+
+  
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+num.iteraciones <- 5
+
+model <- 'rpart'
+
+
+run.donaciones <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+run.promedios <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+run.percentiles <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+
+
+for (iteracion in 1:num.iteraciones) {
+  cat( "Iteracion: ", iteracion, " iniciada el ", date(), "\n")
+  
+  ## Dividimos en entrenamiento y prueba
+  train.idx <- sample(1:num.observaciones, train.size)
+  train <- ds[train.idx,]
+  test <- ds[-train.idx,]
+  
+  train.targets <- ds.targets[train.idx,]
+  test.targets <- ds.targets[-train.idx,]
+  
+  ## Parámetros
+  controls <- rpart.control(minsplit = MinSplit, minbucket = MinBucket, maxsurrogate=MaxSurrogate, maxdepth = MaxDepth)
+  
+  ## Entrenamos un árbol
+  cat("Tiempo para entrenar: ", system.time(arbol <- rpart(form, data=train, control=controls)), "\n\n")
+  
+  ## Tamaño del árbol
+  cat("Tamaño del modelo en memoria: ", format(object.size(arbol), units="MB"), "\n\n")
+  
+  ## Guardamos el árbol
+  if (!file.exists("modelos")) dir.create("modelos") # Creamos la carpeta modelos, si no existe
+  
+  save(arbol, file=paste("modelos", "/", model, "-", parametros, "-iteracion-", iteracion, ".rdata", sep=""))
+  
+  fig.title <- paste("Árbol ", iteracion)
+  
+  tryCatch(plot(arbol, main=fig.title, type="simple",
+                gp = gpar(fontsize = 4),
+                ip_args=list(pval=FALSE),
+                ep_args=list(digits=0, abbreviate=TRUE)
+  ),
+  error = function(e) cat("El árbol ", iteracion, " no creció más allá del nodo raíz\n\n\n")
+  )
+  
+  
+  ## Test
+  pred <- predict(arbol, newdata=test)
+  
+  #cat(sum(test[outcome][pred > cost] - cost), "\n")
+  
+  s1 <- sort(pred, decreasing=TRUE, method="quick", index.return=TRUE)
+  
+  donacion.total <- cumsum(test[,outcome][s1$ix])
+  
+  donacion.promedio <- donacion.total / (1:test.size)
+  
+  donacion.percentil <- 100 * donacion.total / sum(test[,outcome])
+  
+  run.donaciones[, iteracion] <- donacion.total
+  
+  run.promedios[, iteracion] <- donacion.promedio
+  
+  run.percentiles[, iteracion] <- donacion.percentil
+  
+  cat( "Iteracion: ", iteracion, " terminada el ", date(), "\n\n\n\n")
+}
+
+
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+
+cat(date(), ": Terminada las iteraciones\n\n\n")
+
+donacion.final <- rowMeans(run.donaciones)
+
+promedio.final <- rowMeans(run.promedios)
+
+percentil.final <- rowMeans(run.percentiles)
+
+resultados <- data.frame(cbind(run.donaciones, donacion.final))
+
+names(resultados) <- c(paste("run", 1:num.iteraciones), "Promedio")
+
+```
+
+#Tarea
+
+Antes de empezar, se observa que existen muchas "categorias", así que lo que se puede hacer es correr todo
+de nuevo pero con outcome <- target[3], en lugar de 2 o volver a crear target.d2 para sólo obtener 7 categorias
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+table(ds$target.d)
+
+ds$target.d2 <- cut(ds$target.d, right=FALSE, breaks=c(0,0.1, 10,15,20,25,30,50, max(ds$target.d)))
+
+ds<-ds[,-370]
+
+summary(ds$target.d2)
+
+ds <- ds[!is.na(ds[target[3]]),]
+
+```
+
+
+Se eliminan las no donaciones
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+ds.target  <- ds[ds$target.d2 !="[0,0.1)", ]
+
+(dim(ds.target))
+
+```
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+ds$target.d2<- as.character(ds$target.d2)
+ds$target.d2<- as.factor(ds$target.d2)
+
+train$target.d2 <- cut(train$target.d, right=FALSE, breaks=c(0,0.1, 10,15,20,25,30,50, max(train$target.d)))
+
+entrenamiento<-train[,-370]
+
+test$target.d2 <- cut(test$target.d, right=FALSE, breaks=c(0,0.1, 10,15,20,25,30,50, max(test$target.d)))
+
+prueba<-test[,-370]
+
+entrenamiento.target  <- entrenamiento[entrenamiento$target.d2 !="[0,0.1)", ]
+
+entrenamiento.target$target.d2<- as.character(entrenamiento.target$target.d2)
+entrenamiento.target$target.d2<- as.factor(entrenamiento.target$target.d2)
+
+prueba.target  <- prueba[prueba$target.d2 !="[0,0.1)", ]
+
+
+prueba.target$target.d2<- as.character(prueba.target$target.d2)
+prueba.target$target.d2<- as.factor(prueba.target$target.d2)
+
+
+
+```
+
+
+###Selección de variables
+
+####Fast correlation-based filtering
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=FALSE}
+
+
+FCB.filtering <- function(datos, variable, p)
+{
+  df <- as.data.frame(train[which(sapply(train, is.numeric))]) ##eleminamos variables no numericas
+  y <- train[,370]
+  corr <- abs(apply(df, 2, cor, y, use = "p"))##se obtiene vector de correlacion
+  corr <- sort(corr[names(corr) != 370],decreasing=TRUE)
+  vars.quitan <- character(length(corr))
+  nvars.quitan <- numeric(length(corr))
+  for (i in 1:length(corr)) 
+  {if (corr[i] > p) vars.quitan[i] <- names(corr)[i]}
+  return(vars.quitan)
+}
+
+
+
+
+```
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=FALSE}
+
+FCB.filtering(train,370,0.02)
+
+var.cor<-c("lastgift","maxramnt","avggift","hv2","ic5","ic4","hvp1","wealth2","hvp6",
+           "hvp2","hvp3","ec8","hv3","mhuc1","income","hvp5","ic21","ic22","ic12",
+           "hv4","rp2","numprm12","cluster2","hhas3","ic13","rp1","ec7","wealth1","rp3",
+           "ic15","hhd9","ic6","occ11","ic20","occ4","eic15","occ2","pobc2","hhas4",
+           "occ1","occ13","ic16","ec3","eic9","lastdate","dma","ec1","ec2")
+
+form3  <- formula(paste(outcome1,"~ ",paste(var.cor,collapse = ' + '), sep=''))
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+
+outcome1 <- target[3]
+
+var.cor<-c("lastgift","maxramnt","avggift","hv2","ic5","ic4","hvp1","wealth2","hvp6",
+           "hvp2","hvp3","ec8","hv3","mhuc1","income","hvp5","ic21","ic22","ic12",
+           "hv4","rp2","numprm12","cluster2","hhas3","ic13","rp1","ec7","wealth1","rp3",
+           "ic15","hhd9","ic6","occ11","ic20","occ4","eic15","occ2","pobc2","hhas4",
+           "occ1","occ13","ic16","ec3","eic9","lastdate","dma","ec1","ec2")
+
+form3  <- formula(paste(outcome1,"~ ",paste(var.cor,collapse = ' + '), sep=''))
+
+```
+
+### Random Forest
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+
+rf.target <- randomForest(target.d2 ~ ., entrenamiento.target, importance=TRUE,na.action=na.omit)
+
+imp.target <- importance(rf.target)
+
+imp.target  <- as.data.frame(imp.target)
+
+rf.vars <- rownames(imp.target[with(imp.target, order(-MeanDecreaseAccuracy)), ])
+
+impvars  <- rf.vars[1:15]
+
+outcome1 <- target[3]
+
+form2  <- formula(paste(outcome1,"~ ",paste(impvars,collapse = ' + '), sep=''))
+
+form2
+
+```
+
+##Modelos
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=TRUE, eval=TRUE}
+
+
+modelo.completo <-randomForest(target.d2 ~ ., prueba.target, importance=TRUE,na.action=na.omit)
+
+modelo.cor<-randomForest(form3, prueba.target, importance=TRUE,na.action=na.omit)
+
+modelo.rf<-randomForest(form2, prueba.target, importance=TRUE,na.action=na.omit)
+
+modelo.completo
+modelo.cor
+modelo.rf
+
+```
+

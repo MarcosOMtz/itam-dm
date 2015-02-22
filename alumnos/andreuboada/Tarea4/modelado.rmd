@@ -1,0 +1,357 @@
+---
+title: "Modelado"
+author: "Adolfo De Unánue T."
+date: "03/12/2014"
+output: html_document
+---
+
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, eval=TRUE}
+library(Hmisc)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+library(stringr)
+library(rpart)
+```
+
+```{r, eval=TRUE, echo=FALSE, include=TRUE,warning=FALSE, message=FALSE,}
+source("utils.r")
+```
+
+
+# Data set
+
+```{r, echo=TRUE}
+(load("clean/pruebacup98lrn_141216.RData"))
+```
+
+```{r, echo=TRUE}
+ds.name
+ds.path
+dim(ds)
+id
+target
+risk
+vars.a.ignorar
+vars.input
+```
+
+# Semilla
+
+Generamos una secuencia aleatoria y seleccionamos una al azar como la semilla. Así podremos repetir el análisis si lo deseamos.
+
+```{r, echo=TRUE}
+(seed <- sample(1:1000000, 1))
+```
+
+Alternativamente, podemos establecer una semilla por _default_.
+
+```{r, echo=TRUE, eval=FALSE}
+# Este código no hace nada, no se está ejecutando
+seed <- 12345
+```
+
+# Variable de salida
+
+Para este estudio, predeciremos la variable `target.d`.
+
+```{r}
+ds <- as.data.frame(ds)
+(outcome <- target[2])
+```
+
+El costo de cada contacto es `$0.68` USD.
+
+```{r}
+cost <- 0.68
+```
+
+# Prueba y entrenamiento
+
+```{r}
+train.size <- round(num.observaciones*0.7)
+test.size <- num.observaciones - train.size
+```
+
+Guardamos las columnas de salida
+
+```{r}
+ds.targets <- ds[, target]
+dim(ds.targets)
+```
+
+Eliminamos las variables a ignorar
+
+```{r}
+ds <- ds[,c(vars.input, outcome)]
+dim(ds)
+```
+
+# Feature Engineering
+
+# Modelos
+
+## Árbol de decisión
+
+Usaremos, para fines de ilustración, la función `rpart()` del paquete `rpart`. Este árbol tiene los siguientes parámetros:
+
+- `Minsplit`: Mínimo número de instancias en un nodo para considerar su división.
+- `MinBucket` Mínimo número de instancias en el nodo terminal.
+- `MaxSurrogate`: Número de _splits_ a evaluar.
+- `MaxDepth`: Controla la máxima profundidad del árbol.
+
+## Fórmula
+
+```{r}
+(form <- formula(paste(outcome, "~ ", paste(vars.input, collapse = ' + '), sep='')))
+```
+
+
+### Entrenamiento
+
+```{r echo=FALSE}
+num.iteraciones <- 9
+```
+
+
+El entrenamiento consistirá en un `hold-out` repetido `r num.iteraciones` veces. 
+
+Inicio de entrenamiento: `r date()`
+
+Tamaño de los datos de entrenamiento: `r format(train.size, scientific=FALSE, big.mark=",")`
+
+Tamaño de los datos de prueba: `r format(test.size, scientific=FALSE, big.mark=",")`
+
+Parámetros del árbol:
+
+```{r}
+model <- 'rpart'
+MinSplit <- 20
+MinBucket <- 4
+MaxSurrogate <- 5
+MaxDepth <- 30
+```
+
+```{r echo=FALSE}
+parametros <- paste(MinSplit, MinBucket, MaxSurrogate, MaxDepth, sep="-")
+
+run.donaciones <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+run.promedios <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+run.percentiles <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+```
+
+
+```{r eval=TRUE, fig.height=6, fig.align='center', fig.width=8,echo=FALSE}
+for (iteracion in 1:num.iteraciones) {
+  cat( "Iteracion: ", iteracion, " iniciada el ", date(), "\n")
+  
+  ## Dividimos en entrenamiento y prueba
+  train.idx <- sample(1:num.observaciones, train.size)
+  train <- ds[train.idx,]
+  test <- ds[-train.idx,]
+  
+  train.targets <- ds.targets[train.idx,]
+  test.targets <- ds.targets[-train.idx,]
+  
+  ## Parámetros
+  controls <- rpart.control(minsplit = MinSplit, minbucket = MinBucket, maxsurrogate=MaxSurrogate, maxdepth = MaxDepth)
+  
+  ## Entrenamos un árbol
+  cat("Tiempo para entrenar: ", system.time(arbol <- rpart(form, data=train, control=controls)), "\n")
+  
+  ## Tamaño del árbol
+  cat("Tamaño del modelo en memoria: ", format(object.size(arbol), units="MB"), "\n")
+  
+  ## Guardamos el árbol
+  if (!file.exists("modelos")) dir.create("modelos") # Creamos la carpeta modelos, si no existe
+  
+  save(arbol, file=paste("modelos", "/", model, "-", parametros, "-iteracion-", iteracion, ".rdata", sep=""))
+  
+  #fig.title <- paste("Árbol ", iteracion)
+  print(arbol)
+  plot(arbol, compress = TRUE)
+  text(arbol, use.n = TRUE)
+  
+  #plot(arbol, main=fig.title, type="simple",
+       #gp = gpar(fontsize = 4),
+       #ip_args=list(pval=FALSE),
+       #ep_args=list(digits=0, abbreviate=TRUE))
+  
+  ## Test
+  pred <- predict(arbol, newdata=test)
+  
+  #cat(sum(test[outcome][pred > cost] - cost), "\n")
+  
+  s1 <- sort(pred, decreasing=TRUE, method="quick", index.return=TRUE)
+  
+  donacion.total <- cumsum(test[,outcome][s1$ix])
+  
+  donacion.promedio <- donacion.total / (1:test.size)
+  
+  donacion.percentil <- 100 * donacion.total / sum(test[,outcome])
+  
+  run.donaciones[, iteracion] <- donacion.total
+  
+  run.promedios[, iteracion] <- donacion.promedio
+  
+  run.percentiles[, iteracion] <- donacion.percentil
+  
+  cat( "Iteracion: ", iteracion, " terminada el ", date(), "\n\n\n\n")
+}
+
+cat(date(), ": Terminada las iteraciones\n\n\n")
+```
+
+
+## Cross-validation Modificado
+
+```{r eval=TRUE, fig.height=6, fig.align='center', fig.width=8,echo=FALSE}
+## Dividimos en k fold
+set.seed(123456)
+library(crossval)
+ds <- ds[1:89880,]
+num.sample <- nrow(ds)/10
+test.size <- num.sample
+
+train.idx <- matrix(0, nrow=num.sample, ncol=10)
+idx <- 1:89880
+for(i in 1:10){
+  train.idx[,i] <- sample(idx,num.sample)
+  idx <- idx[!(idx %in% train.idx[,i])]
+}
+
+num.iteraciones <- 10
+run.donaciones <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+run.promedios <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+run.percentiles <- matrix(0, nrow=test.size, ncol=num.iteraciones)
+
+for (iteracion in 1:num.iteraciones) {
+  cat( "Iteracion: ", iteracion, " iniciada el ", date(), "\n")
+  
+  train <- ds[-train.idx[,iteracion],]
+  test <- ds[train.idx[,iteracion],]
+  
+  train.targets <- ds.targets[-train.idx[,iteracion],]
+  test.targets <- ds.targets[train.idx[,iteracion],]
+  
+  ## Parámetros
+  controls <- rpart.control(minsplit = MinSplit, minbucket = MinBucket, maxsurrogate=MaxSurrogate, maxdepth = MaxDepth)
+  
+  ## Entrenamos un árbol
+  cat("Tiempo para entrenar: ", system.time(arbol <- rpart(form, data=train, control=controls)), "\n")
+  
+  ## Tamaño del árbol
+  cat("Tamaño del modelo en memoria: ", format(object.size(arbol), units="MB"), "\n")
+  
+  ## Guardamos el árbol
+  if (!file.exists("modelos")) dir.create("modelos") # Creamos la carpeta modelos, si no existe
+  
+  save(arbol, file=paste("modelos", "/", model, "-", parametros, "-iteracion-", iteracion, ".rdata", sep=""))
+  
+  #fig.title <- paste("Árbol ", iteracion)
+  #print(arbol)
+  #plot(arbol, compress = TRUE)
+  #text(arbol, use.n = TRUE)
+  
+  #plot(arbol, main=fig.title, type="simple",
+       #gp = gpar(fontsize = 4),
+       #ip_args=list(pval=FALSE),
+       #ep_args=list(digits=0, abbreviate=TRUE))
+  
+  ## Test
+  pred <- predict(arbol, newdata=test)
+  
+  #cat(sum(test[outcome][pred > cost] - cost), "\n")
+  
+  s1 <- sort(pred, decreasing=TRUE, method="quick", index.return=TRUE)
+  
+  donacion.total <- cumsum(test[,outcome][s1$ix])
+  
+  donacion.promedio <- donacion.total / (1:test.size)
+  
+  donacion.percentil <- 100 * donacion.total / sum(test[,outcome])
+  
+  run.donaciones[, iteracion] <- donacion.total
+  
+  run.promedios[, iteracion] <- donacion.promedio
+  
+  run.percentiles[, iteracion] <- donacion.percentil
+  
+  cat( "Iteracion: ", iteracion, " terminada el ", date(), "\n\n\n\n")
+}
+
+cat(date(), ": Terminada las iteraciones\n\n\n")
+```
+
+
+
+
+```{r echo=FALSE}
+donacion.final <- rowMeans(run.donaciones)
+promedio.final <- rowMeans(run.promedios)
+percentil.final <- rowMeans(run.percentiles)
+
+resultados <- data.frame(cbind(run.donaciones, donacion.final))
+names(resultados) <- c(paste("run", 1:num.iteraciones), "Promedio")
+
+if (!file.exists("resultados")) dir.create("resultados") # Creamos la carpeta resultados, si no existe
+write.csv(resultados, paste("resultados", "/", "evaluacion-donacion-total-", parametros, ".csv", sep=""))
+```
+
+```{r}
+library(randomForest)
+# Random Forest sin seleccion de variables
+(Sin.variables.Importantes.RandomForest<-randomForest(target.d~.,data = ds,na.action="na.delete",importance=FALSE))
+
+# > Sin.variables.Importantes.RandomForest
+# 
+# Call:
+#  randomForest(formula = target.d ~ ., data = ds, importance = FALSE,      na.action = "na.delete") 
+#                Type of random forest: regression
+#                      Number of trees: 500
+# No. of variables tried at each split: 134
+# 
+#           Mean of squared residuals: 28.3089
+#                     % Var explained: -19.92
+
+# Random Forest con seleccion de variables
+(variables.Importantes.RandomForest<-randomForest(target.d~.,data=ds[,!(colnames(ds)%in%variables.a.ignorar)],na.action="na.delete",importance=TRUE))
+# > variables.Importantes.RandomForest
+# 
+# Call:
+#  randomForest(formula = target.d ~ ., data = ds[, !(colnames(ds) %in%      variables.a.ignorar)], importance = TRUE, na.action = "na.delete") 
+#                Type of random forest: regression
+#                      Number of trees: 500
+# No. of variables tried at each split: 128
+# 
+#           Mean of squared residuals: 28.32396
+#                     % Var explained: -19.98
+
+# Rpart sin seleccion de variables
+arbol.Rpart.Sin.Seleccion.Variables <- rpart(form, data = ds, control=controls)
+pred <- predict(arbol.Rpart.Sin.Seleccion.Variables, newdata = test)
+(msr.sin <- mean((test$target.d - pred)^2))
+# > (msr.sin <- mean((test$target.d - pred)^2))
+# [1] 19.73378
+
+# Rpart con seleccion de variables
+vars.input <- setdiff(vars.input,variables.a.ignorar)
+form <- formula(paste(outcome, "~ ", paste(vars.input, collapse = ' + '), sep=''))
+arbol.Rpart.Con.Seleccion.Variables <- rpart(form, data=ds[,!(colnames(ds)%in%variables.a.ignorar)], control=controls)
+pred <- predict(arbol.Rpart.Con.Seleccion.Variables, newdata = test)
+(msr.con <- mean((test$target.d - pred)^2))
+
+# > (msr.con <- mean((test$target.d - pred)^2))
+# [1] 19.97157
+
+```
+
+
+
+# Apéndice: Ambiente
+
+```{r, echo=FALSE}
+sessionInfo()
+```
